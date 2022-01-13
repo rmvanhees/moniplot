@@ -56,28 +56,30 @@ class MONplot:
     -------
     close()
        Close PNG or (multipage) PDF document.
+    caption
+       Return figure caption
     set_cmap(cmap)
-       Define alternative color-map to overrule the default.
+       Define alternative color-map which overrules the default.
     unset_cmap()
        Unset user supplied color-map, and use default color-map.
-    get_cmap(zscale='linear')
-       Returns matplotlib colormap.
-    set_zunit(units)
-       Provide units of data to be displayed.
-    unset_zunit()
-       Unset user supplied unit definition of data.
-    zunit
-       Returns value of zunit (property).
-    draw_signal(data, vperc=None, vrange=None, zscale='linear', fig_info=None,
-                side_panels='nanmedian', title=None, sub_title=None)
-       Display 2D array data as image and averaged column/row signal plots.
+    cmap
+       Return matplotlib colormap.
+    set_institute(institute)
+       Define abbreviation of the name of your institute.
+    institute
+       Return name of your institute.
+    draw_signal(data, zscale='linear', fig_info=None, side_panels='nanmedian',
+                title=None)
+       Display 2D array data as an image and averaged column/row signal plots.
+    draw_quality(data, ref_data=None, fig_info=None, side_panels='quality',
+                 title=None)
+       Display pixel-quality 2D data as an image and column/row statistics.
+    draw_trend(xds=None, hk_xds=None, vrange_last_orbits=-1, fig_info=None,
+               title=None)
+       Display trends of measurement data and/or housekeeping data
 
     Notes
     -----
-    ...
-
-    Examples
-    --------
     ...
     """
     def __init__(self, figname, caption=None, institute=None, pdf_title=None):
@@ -106,7 +108,7 @@ class MONplot:
             return
 
         self.__pdf = PdfPages(figname)
-        # add annotation
+        # add PDF annotations
         doc = self.__pdf.infodict()
         if pdf_title is None:
             doc['Title'] = 'Monitor report on Tropomi SWIR instrument'
@@ -117,10 +119,10 @@ class MONplot:
         elif self.__institute:
             doc['Author'] = f'(c) {self.__institute}'
 
-    def __repr__(self):
+    def __repr__(self) -> None:
         pass
 
-    def __close_this_page(self, fig):
+    def __close_this_page(self, fig) -> None:
         """
         Close current matplotlib figure or page in a PDF document
         """
@@ -131,7 +133,7 @@ class MONplot:
         else:
             self.__pdf.savefig()
 
-    def close(self):
+    def close(self) -> None:
         """
         Close PNG or (multipage) PDF document
         """
@@ -143,14 +145,14 @@ class MONplot:
 
     # --------------------------------------------------
     @property
-    def caption(self):
+    def caption(self) -> str:
         """
         Return figure caption
         """
         return self.__caption
 
     # --------------------------------------------------
-    def set_cmap(self, cmap):
+    def set_cmap(self, cmap) -> None:
         """
         Define alternative color-map to overrule the default
 
@@ -160,7 +162,7 @@ class MONplot:
         """
         self.__cmap = cmap
 
-    def unset_cmap(self):
+    def unset_cmap(self) -> None:
         """
         Unset user supplied color-map, and use default color-map
         """
@@ -169,12 +171,12 @@ class MONplot:
     @property
     def cmap(self):
         """
-        Returns matplotlib colormap
+        Return matplotlib colormap
         """
         return self.__cmap
 
     # --------------------------------------------------
-    def set_institute(self, institute: str):
+    def set_institute(self, institute: str) -> None:
         """
         Define name of your institute
 
@@ -185,14 +187,14 @@ class MONplot:
         self.__institute = institute
 
     @property
-    def institute(self):
+    def institute(self) -> str:
         """
-        Returns name of your institute
+        Return name of your institute
         """
         return self.__institute
 
     # --------------------------------------------------
-    def __add_copyright(self, axx):
+    def __add_copyright(self, axx) -> None:
         """
         Display copyright in current figure (main panel)
         """
@@ -229,11 +231,10 @@ class MONplot:
                      horizontalalignment='right',
                      multialignment='left',
                      bbox={'facecolor': 'white', 'pad': 5})
-            return
 
     # --------------------------------------------------
     def draw_signal(self, data, zscale=None, *, fig_info=None,
-                    side_panels='nanmedian', title=None):
+                    side_panels='nanmedian', title=None) -> None:
         """
         Display 2D array data as image and averaged column/row signal plots
 
@@ -257,6 +258,36 @@ class MONplot:
         The information provided in the parameter 'fig_info' will be displayed
         in a text box. In addition, we display the creation date and the data
         (biweight) median & spread.
+
+        Examples
+        --------
+        Create a PDF document 'test.pdf' and add figure of dataset 'img'
+        (np.ndarray or xr.DataArray) with side-panels and title
+
+        >>> plot = MONplot('test.pdf', caption='my caption', institute='SRON')
+        >>> plot.draw_signal(img, title='my title')
+
+        Add the same figure without side-panels
+
+        >>> plot.draw_signal(img, side_panels='none', title='my title')
+
+        Add a figure using a fixed data-range that the colormap covers
+
+        >>> img1 = fig_data_to_xarr(img, vrange=[zmin, zmax])
+        >>> plot.draw_signal(img1, title='my title')
+
+        Add a figure where img2 = img - img_ref
+
+        >>> plot.draw_signal(img2, zscale='diff', title='my title')
+
+        Add a figure where img2 = img / img_ref
+
+        >>> plot.draw_signal(img2, zscale='ratio', title='my title')
+
+        Finalize the PDF file
+
+        >>> plot.close()
+
         """
         # initialize keyword parameters
         if zscale is None:
@@ -320,7 +351,7 @@ class MONplot:
 
     # --------------------------------------------------
     def draw_quality(self, data, ref_data=None, *, fig_info=None,
-                     side_panels='quality', title=None):
+                     side_panels='quality', title=None) -> None:
         """
         Display pixel-quality 2D array data as image and column/row statistics
 
@@ -357,6 +388,27 @@ class MONplot:
         The information provided in the parameter 'fig_info' will be displayed
         in a small box. Where creation date and statistics on the number of
         bad and worst pixels are displayed.
+
+        Examples
+        --------
+        Create a PDF document 'test.pdf' and add figure of dataset 'img'
+        (np.ndarray or xr.DataArray) with side-panels and title
+
+        >>> plot = MONplot('test.pdf', caption='my caption', institute='SRON')
+        >>> plot.draw_quality(img, title='my title')
+
+        Add the same figure without side-panels
+
+        >>> plot.draw_quality(img, side_panels='none', title='my title')
+
+        Add a figure where img_ref is a quality map from early in the mission
+
+        >>> plot.draw_quality(img, img_ref, title='my title')
+
+        Finalize the PDF file
+
+        >>> plot.close()
+
         """
         if fig_info is None:
             fig_info = FIGinfo()
@@ -431,9 +483,9 @@ class MONplot:
 
     # --------------------------------------------------
     def draw_trend(self, xds=None, hk_xds=None, vrange_last_orbits=-1, *,
-                   fig_info=None, title=None):
+                   fig_info=None, title=None) -> None:
         """
-        Display trends of measurement and house-keeping data
+        Display trends of measurement data and/or housekeeping data
 
         Parameters
         ----------
@@ -447,6 +499,27 @@ class MONplot:
            OrderedDict holding meta-data to be displayed in the figure
         title :  str, optional
            Title of this figure (matplotlib: sub_title)
+
+        Examples
+        --------
+        Create a PDF document 'test.pdf' and add figure of dataset 'xds'
+        (np.ndarray or xr.DataArray) with a title. The dataset 'xds' may
+        contain multiple DataArrays with a common X-coordinate. Each DataArray
+        will be displayed in a seperate sub-panel.
+
+        >>> plot = MONplot('test.pdf', caption='my caption', institute='SRON')
+        >>> plot.draw_trend(xds, hk_xds=None, title='my title')
+
+        Add a figure with the same Dataset 'xds' and a few trends of
+        housekeeping data (again each parameter in a seperate DataArray with
+        with a common X-coordinate).
+
+        >>> plot.draw_trend(xds, hk_xds, title='my title')
+
+        Finalize the PDF file
+
+        >>> plot.close()
+
         """
         if xds is None and hk_xds is None:
             raise ValueError('both xds and hk_xds are None')
