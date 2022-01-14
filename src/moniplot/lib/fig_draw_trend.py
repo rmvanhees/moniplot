@@ -15,21 +15,14 @@ License:  GNU GPL v3.0
 """
 import numpy as np
 
-import matplotlib as mpl
 from matplotlib.ticker import MultipleLocator
 
 from ..tol_colors import tol_cset
 
+from .fig_legend import blank_legend_key
+
 
 # - local functions --------------------------------
-def blank_legend_key():
-    """
-    Show only text in matplotlib legenda, no key
-    """
-    return mpl.patches.Rectangle((0, 0), 0, 0, fill=False,
-                                 edgecolor='none', visible=False)
-
-
 def set_labels_colors(xarr) -> tuple:
     """
     Determine name and units of housekeeping data and line and fill color

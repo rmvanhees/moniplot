@@ -36,6 +36,7 @@ from .lib.fig_draw_image import (adjust_img_ticks,
                                  fig_qdata_to_xarr,
                                  fig_draw_panels)
 from .lib.fig_draw_trend import add_subplot, add_hk_subplot
+from .lib.fig_draw_qhist import fig_draw_qhist
 
 
 # - local functions --------------------------------
@@ -85,7 +86,9 @@ class MONplot:
        Display pixel-quality 2D data as an image and column/row statistics.
     draw_trend(xds=None, hk_xds=None, vrange_last_orbits=-1, fig_info=None,
                title=None)
-       Display trends of measurement data and/or housekeeping data
+       Display trends of measurement data and/or housekeeping data.
+    draw_qhist(xds, density=True, fig_info=None, title=None)
+       Display pixel-quality data as histograms.
 
     Notes
     -----
@@ -578,6 +581,76 @@ class MONplot:
 
         # finally add a label for the X-coordinate
         axarr[-1].set_xlabel(xlabel)
+
+        # add annotation and save the figure
+        self.__add_copyright(axarr[-1])
+        self.__add_fig_box(fig, fig_info)
+        self.__close_this_page(fig)
+
+            # --------------------------------------------------
+    def draw_qhist(self, xds, *,
+                   density=True, fig_info=None, title=None) -> None:
+        """
+        Display pixel-quality data as histograms.
+
+        Parameters
+        ----------
+        xds :  xarray.Dataset, optional
+           Object holding measurement data and attributes
+        density : bool, optional
+           If True, draw and return a probability density: each bin will
+           display the bin's raw count divided by the total number of counts
+           and the bin width (see matplotlib.pyplot.hist). Default is True
+        fig_info :  FIGinfo, optional
+           OrderedDict holding meta-data to be displayed in the figure
+        title :  str, optional
+           Title of this figure (matplotlib: sub_title)
+
+        Examples
+        --------
+        Create a PDF document 'test.pdf' and add figure of dataset 'xds'
+        (np.ndarray or xr.DataArray) with a title. The dataset 'xds' may
+        contain multiple DataArrays with a common X-coordinate. Each DataArray
+        will be displayed in a seperate sub-panel.
+
+        >>> plot = MONplot('test.pdf', caption='my caption', institute='SRON')
+        >>> plot.draw_trend(xds, title='my title')
+        >>> plot.close()
+
+        """
+        if not isinstance(xds, xr.Dataset):
+            raise ValueError('xds should be and xarray Dataset object')
+
+        if fig_info is None:
+            fig_info = FIGinfo()
+
+        # determine npanels from xarray Dataset
+        npanels = len(xds.data_vars)
+
+        # initialize matplotlib using 'subplots'
+        figsize = (10., 1 + (npanels + 1) * 1.65)
+        fig, axarr = plt.subplots(npanels, sharex=True, figsize=figsize)
+        if npanels == 1:
+            axarr = [axarr]
+        margin = min(1. / (1.8 * (npanels + 1)), .25)
+        fig.subplots_adjust(bottom=margin, top=1-margin, hspace=0.02)
+
+        # draw title of the Figure
+        if self.caption:
+            fig.suptitle(self.caption + '\n', fontsize='x-large',
+                         horizontalalignment='center')
+
+        # add title to image panel
+        if title is not None:
+            title = 'Histograms of pixel-quality'
+        axarr[0].set_title(title, fontsize='large')
+
+        # add figures with histograms
+        for ii, (key, xda) in enumerate(xds.data_vars.items()):
+            fig_draw_qhist(axarr[ii], xda, key, density)
+
+        # finally add a label for the X-coordinate
+        axarr[-1].set_xlabel('pixel quality')
 
         # add annotation and save the figure
         self.__add_copyright(axarr[-1])

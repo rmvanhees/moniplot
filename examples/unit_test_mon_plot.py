@@ -253,7 +253,7 @@ def main():
     check_draw_signal = True
     check_draw_cmp_images = False
     check_draw_quality = True
-    check_draw_qhist = False
+    check_draw_qhist = True
     check_draw_trend1d = False
     check_draw_lines = False
 
