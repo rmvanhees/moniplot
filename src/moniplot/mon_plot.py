@@ -3,7 +3,16 @@ This file is part of moniplot
 
 https://github.com/rmvanhees/moniplot.git
 
-The class MONplot contains generic plot functions
+The class MONplot contains generic plot functions.
+
+Notes
+-----
+The methods of the class MONplot will accept numpy arrays as input and display
+your data without knowledge on the data units and coordinates. In most cases,
+this will be enough for a quick inspection of your data.
+However, when you use xarray labeled arrays and datasets then the software
+will use the name of the xarray arrays, coordinate names and data attributes,
+such as 'long_name' and 'units'.
 
 Copyright (c) 2022 SRON - Netherlands Institute for Space Research
    All Rights Reserved
