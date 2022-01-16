@@ -12,10 +12,10 @@ Copyright (c) 2020-2022 SRON - Netherlands Institute for Space Research
 License:  GNU GPL v3.0
 """
 from datetime import datetime, timedelta
+
 import numpy as np
 import xarray as xr
 
-from moniplot.lib.fig_info import FIGinfo
 from moniplot.image_to_xarray import data_to_xr
 from moniplot.mon_plot import MONplot
 
@@ -260,47 +260,48 @@ def main():
     # ---------- UNIT TEST: draw_signal ----------
     if check_draw_signal:
         plot = MONplot('mon_plot_draw_signal.pdf',
-                       caption='Unit test of MONplot [draw_signal]',
-                       institute='SRON')
+                       caption='Unit test of MONplot [draw_signal]')
+        plot.set_institute('SRON')
         run_draw_signal(plot)
         plot.close()
 
     # ---------- UNIT TEST: draw_cmp_images ----------
     if check_draw_cmp_images:
         plot = MONplot('mon_plot_draw_cmp_images.pdf',
-                       caption='Unit test of MONplot [draw_cmp_images]',
-                       institute='SRON')
+                       caption='Unit test of MONplot [draw_cmp_images]')
+        plot.set_institute('SRON')
         run_draw_cmp_swir(plot)
+        plot.close()
 
     # ---------- UNIT TEST: draw_quality ----------
     if check_draw_quality:
         plot = MONplot('mon_plot_draw_quality.pdf',
-                       caption='Unit test of MONplot [draw_quality]',
-                       institute='SRON')
+                       caption='Unit test of MONplot [draw_quality]')
+        plot.set_institute('SRON')
         run_draw_quality(plot)
         plot.close()
 
     # ---------- UNIT TEST: draw_qhist ----------
     if check_draw_qhist:
         plot = MONplot('mon_plot_draw_qhist.pdf',
-                       caption='Unit test of MONplot [draw_qhist]',
-                       institute='SRON')
+                       caption='Unit test of MONplot [draw_qhist]')
+        plot.set_institute('SRON')
         run_draw_qhist(plot)
         plot.close()
 
     # ---------- UNIT TEST: draw_trend1d ----------
     if check_draw_trend1d:
         plot = MONplot('mon_plot_draw_signal.pdf',
-                       caption='Unit test of MONplot [draw_trend1d]',
-                       institute='SRON')
+                       caption='Unit test of MONplot [draw_trend1d]')
+        plot.set_institute('SRON')
         run_draw_trend1d(plot)
         plot.close()
 
     # ---------- UNIT TEST: draw_lines ----------
     if check_draw_lines:
         plot = MONplot('mon_plot_draw_signal.pdf',
-                       caption='Unit test of MONplot [draw_lines]',
-                       institute='SRON')
+                       caption='Unit test of MONplot [draw_lines]')
+        plot.set_institute('SRON')
         run_draw_lines(plot)
         plot.close()
 

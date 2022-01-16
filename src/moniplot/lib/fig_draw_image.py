@@ -19,6 +19,8 @@ Copyright (c) 2017-2022 SRON - Netherlands Institute for Space Research
 
 License:  GNU GPL v3.0
 """
+from math import log10
+
 import numpy as np
 import xarray as xr
 
@@ -59,35 +61,12 @@ def adjust_zunit(zunit: str, vmin: float, vmax: float):
         zunit = zunit.replace('.s-1', ' s$^{-1}$')
 
     if zunit[0] in ('e', 'V', 'A'):
+        key_to_zunit = {-4: 'p', -3: 'n', -2: r'\xb5', -1: 'm',
+                        0: '', 1: 'k', 2: 'M', 3: 'G', 4: 'T'}
         max_value = max(abs(vmin), abs(vmax))
-        if max_value > 1000000000000:
-            dscale = 1e12
-            zunit = 'T' + zunit
-        elif max_value > 1000000000:
-            dscale = 1e9
-            zunit = 'G' + zunit
-        elif max_value > 1000000:
-            dscale = 1e6
-            zunit = 'M' + zunit
-        elif max_value > 1000:
-            dscale = 1e3
-            zunit = 'k' + zunit
-        elif max_value < 1e-12:
-            dscale = 1e-12
-            zunit = 'p' + zunit
-        elif max_value < 1e-9:
-            dscale = 1e-9
-            zunit = 'n' + zunit
-        elif max_value < 1e-6:
-            dscale = 1e-6
-            zunit = '\xb5' + zunit
-        elif max_value < 1e-3:
-            dscale = 1e-3
-            zunit = 'm' + zunit
-        else:
-            dscale = 1.
+        key = min(4, max(-4, log10(max_value) // 3))
 
-        return dscale, zunit
+        return 1000 ** key, key_to_zunit[key] + zunit
 
     return 1, zunit
 
@@ -229,7 +208,7 @@ def fig_draw_panels(fig, xarr, side_panels: str):
 
 
 # - main functions ---------------------------------
-def fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None, cmap=None):
+def fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None):
     """
     Prepare image data for plotting.
 
@@ -244,8 +223,6 @@ def fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None, cmap=None):
         array data.
     vrange :  list, default=None
         Range to normalize luminance data between vmin and vmax.
-    cmap :  matplotlib colormap, default=None
-        If None then a default colormap will be chosen based on 'zscale'
 
     Notes
     -----
@@ -301,13 +278,10 @@ def fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None, cmap=None):
         xarr.attrs['_zlabel'] = f'value [{xarr.attrs["_zunits"]}]'
 
     # set matplotlib colormap
-    if cmap is not None:
-        xarr.attrs['_cmap'] = cmap
-    elif '_cmap' not in xarr.attrs:
-        xarr.attrs['_cmap'] = {'linear': tol_cmap('rainbow_PuRd'),
-                               'log': tol_cmap('rainbow_WhBr'),
-                               'diff': tol_cmap('sunset'),
-                               'ratio': tol_cmap('sunset')}.get(zscale)
+    xarr.attrs['_cmap'] = {'linear': tol_cmap('rainbow_PuRd'),
+                           'log': tol_cmap('rainbow_WhBr'),
+                           'diff': tol_cmap('sunset'),
+                           'ratio': tol_cmap('sunset')}.get(zscale)
 
     # set matplotlib data normalization
     xarr.attrs['_znorm'] = set_norm(zscale, vmin, vmax)
@@ -408,6 +382,7 @@ def fig_qdata_to_xarr(data, ref_data=None,
         ctuple = (cset.grey, cset.red, cset.yellow, cset.green, '#FFFFFF')
         xarr.attrs['valid_range'] = np.array([0, 16], dtype='i1')
         xarr.attrs['flag_values'] = np.array([0, 1, 2, 4, 8, 16], dtype='i1')
+
     xarr.attrs['_cmap'] = mcolors.ListedColormap(ctuple)
     xarr.attrs['_znorm'] = mcolors.BoundaryNorm(xarr.attrs['flag_values'],
                                                 xarr.attrs['_cmap'].N)

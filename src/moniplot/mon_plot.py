@@ -94,7 +94,7 @@ class MONplot:
     -----
     ...
     """
-    def __init__(self, figname, caption=None, institute=None, pdf_title=None):
+    def __init__(self, figname, caption=None, pdf_title=None):
         """
         Initialize multi-page PDF document or a single-page PNG
 
@@ -104,16 +104,13 @@ class MONplot:
            Name of PDF or PNG file (extension required)
         caption :  str
            Caption repeated on each page of the PDF
-        institute :  str, default=None
-           Provide abbreviation of the name of your institute to be used in
-           the copyright statement in the main panel of the figures.
         pdf_title :  string
            Title of the PDF document (attribute of the PDF document)
            Default: 'Monitor report on Tropomi SWIR instrument'
         """
         self.__cmap = None
         self.__caption = '' if caption is None else caption
-        self.__institute = '' if institute is None else institute
+        self.__institute = ''
         self.__pdf = None
         self.filename = figname
         if PurePath(figname).suffix.lower() != '.pdf':
@@ -156,6 +153,18 @@ class MONplot:
         plt.close('all')
 
     # --------------------------------------------------
+    def set_caption(self, caption: str) -> None:
+        """
+        Set caption of each page of the PDF
+
+        Parameter
+        ---------
+        institute :  str
+           Provide abbreviation of the name of your institute to be used in
+           the copyright statement in the main panel of the figures.
+        """
+        self.__caption = caption
+
     @property
     def caption(self) -> str:
         """
@@ -166,7 +175,7 @@ class MONplot:
     # --------------------------------------------------
     def set_cmap(self, cmap) -> None:
         """
-        Define alternative color-map to overrule the default
+        Use alternative color-map for MONplot::draw_image
 
         Parameter
         ---------
@@ -190,11 +199,13 @@ class MONplot:
     # --------------------------------------------------
     def set_institute(self, institute: str) -> None:
         """
-        Define name of your institute
+        Use the name of your institute as a signature
 
         Parameter
         ---------
         institute :  str
+           Provide abbreviation of the name of your institute to be used in
+           the copyright statement in the main panel of the figures.
         """
         self.__institute = institute
 
@@ -208,7 +219,8 @@ class MONplot:
     # --------------------------------------------------
     def __add_copyright(self, axx) -> None:
         """
-        Display copyright in current figure (main panel)
+        Show value of institute as copyright in the lower right corner
+        of the current figure.
         """
         if not self.institute:
             return
@@ -222,7 +234,7 @@ class MONplot:
     @staticmethod
     def __add_fig_box(fig, fig_info) -> None:
         """
-        Add meta-information in the current figure
+        Add a box with meta information in the current figure
 
         Parameters
         ----------
@@ -245,8 +257,8 @@ class MONplot:
                      bbox={'facecolor': 'white', 'pad': 5})
 
     # --------------------------------------------------
-    def draw_signal(self, data, zscale=None, *, fig_info=None,
-                    side_panels='nanmedian', title=None) -> None:
+    def draw_signal(self, data, *, fig_info=None, side_panels='nanmedian',
+                    title=None, **kwargs) -> None:
         """
         Display 2D array data as image and averaged column/row signal plots
 
@@ -254,9 +266,6 @@ class MONplot:
         ----------
         data :  numpy.ndarray or xarray.DataArray
            Object holding measurement data and attributes
-        zscale : str, default='linear'
-           Scaling of the data values. Valid values are: 'linear', 'log',
-           'diff' or 'ratio'.
         fig_info :  FIGinfo, default=None
            OrderedDict holding meta-data to be displayed in the figure
         side_panels :  str, default='nanmedian'
@@ -266,6 +275,9 @@ class MONplot:
            'quality', 'std' and 'nanstd'.
         title :  str, default=None
            Title of this figure (matplotlib: sub_title)
+        **kwargs :   other keywords
+           Pass keyword arguments: zscale, vperc or vrange
+           to moniplot.lib.fig_draw_image.fig_data_to_xarr()
 
         The information provided in the parameter 'fig_info' will be displayed
         in a text box. In addition, we display the creation date and the data
@@ -276,7 +288,8 @@ class MONplot:
         Create a PDF document 'test.pdf' and add figure of dataset 'img'
         (np.ndarray or xr.DataArray) with side-panels and title
 
-        >>> plot = MONplot('test.pdf', caption='my caption', institute='SRON')
+        >>> plot = MONplot('test.pdf', caption='my caption')
+        >>> plot.set_institute('SRON')
         >>> plot.draw_signal(img, title='my title')
 
         Add the same figure without side-panels
@@ -285,16 +298,15 @@ class MONplot:
 
         Add a figure using a fixed data-range that the colormap covers
 
-        >>> img1 = fig_data_to_xarr(img, vrange=[zmin, zmax])
-        >>> plot.draw_signal(img1, title='my title')
+        >>> plot.draw_signal(img1, title='my title', vrange=[zmin, zmax])
 
         Add a figure where img2 = img - img_ref
 
-        >>> plot.draw_signal(img2, zscale='diff', title='my title')
+        >>> plot.draw_signal(img2, title='my title', zscale='diff')
 
         Add a figure where img2 = img / img_ref
 
-        >>> plot.draw_signal(img2, zscale='ratio', title='my title')
+        >>> plot.draw_signal(img2, title='my title', zscale='ratio')
 
         Finalize the PDF file
 
@@ -302,8 +314,6 @@ class MONplot:
 
         """
         # initialize keyword parameters
-        if zscale is None:
-            zscale = 'linear'
         if fig_info is None:
             fig_info = FIGinfo()
 
@@ -311,7 +321,7 @@ class MONplot:
         if isinstance(data, xr.DataArray) and '_zscale' in data.attrs:
             xarr = data.copy()
         else:
-            xarr = fig_data_to_xarr(data, zscale, self.cmap)
+            xarr = fig_data_to_xarr(data, **kwargs)
 
         # aspect of image data
         aspect = min(4, max(1, int(round(xarr.shape[1] / xarr.shape[0]))))
@@ -338,8 +348,8 @@ class MONplot:
             axx.set_title(xarr.attrs['long_name'])
 
         # draw image and add colorbar
-        img = axx.imshow(xarr.values,
-                         cmap=xarr.attrs['_cmap'], norm=xarr.attrs['_znorm'],
+        img = axx.imshow(xarr.values, norm=xarr.attrs['_znorm'],
+                         cmap=self.cmap if self.cmap else xarr.attrs['_cmap'],
                          aspect='equal', interpolation='none', origin='lower')
         adjust_img_ticks(axx, xarr)
 
@@ -363,7 +373,7 @@ class MONplot:
 
     # --------------------------------------------------
     def draw_quality(self, data, ref_data=None, *, fig_info=None,
-                     side_panels='quality', title=None) -> None:
+                     side_panels='quality', title=None, **kwargs) -> None:
         """
         Display pixel-quality 2D array data as image and column/row statistics
 
@@ -382,6 +392,9 @@ class MONplot:
            Use 'none' when you do not want the side panels.
         title :  str, default=None
            Title of this figure (matplotlib: sub_title)
+        **kwargs :   other keywords
+           Pass keyword arguments: 'thres_worst', 'thres_bad' or 'qlabels'
+           to moniplot.lib.fig_draw_image.fig_qdata_to_xarr()
 
         The quality ranking labels are ['unusable', 'worst', 'bad', 'good'],
         in case nor reference dataset is provided. Where:
@@ -429,7 +442,7 @@ class MONplot:
         if isinstance(data, xr.DataArray) and '_zscale' in data.attrs:
             xarr = data
         else:
-            xarr = fig_qdata_to_xarr(data, ref_data)
+            xarr = fig_qdata_to_xarr(data, ref_data, **kwargs)
 
         # aspect of image data
         aspect = min(4, max(1, int(round(xarr.shape[1] / xarr.shape[0]))))
@@ -494,8 +507,8 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_trend(self, xds=None, hk_xds=None, vrange_last_orbits=-1, *,
-                   fig_info=None, title=None) -> None:
+    def draw_trend(self, xds=None, hk_xds=None, *,
+                   fig_info=None, title=None, **kwargs) -> None:
         """
         Display trends of measurement data and/or housekeeping data
 
@@ -505,12 +518,13 @@ class MONplot:
            Object holding measurement data and attributes
         hk_xds :  xarray.Dataset, optional
            Object holding housekeeping data and attributes
-        vrange_last_orbits :  int, default=-1
-           Use the last N orbits to determine vrange (orbit coordinate only)
         fig_info :  FIGinfo, optional
            OrderedDict holding meta-data to be displayed in the figure
         title :  str, optional
            Title of this figure (matplotlib: sub_title)
+        **kwargs :   other keywords
+           Pass keyword arguments: vperc or vrange_last_orbits
+           to moniplot.lib.fig_draw_trend.add_hk_subplot()
 
         Examples
         --------
@@ -576,7 +590,7 @@ class MONplot:
         if hk_xds is not None:
             xlabel = 'orbit' if 'orbit' in hk_xds.coords else 'time [hours]'
             for name in hk_xds.data_vars:
-                add_hk_subplot(axarr[ipanel], hk_xds[name], vrange_last_orbits)
+                add_hk_subplot(axarr[ipanel], hk_xds[name], **kwargs)
                 ipanel += 1
 
         # finally add a label for the X-coordinate
@@ -588,8 +602,8 @@ class MONplot:
         self.__close_this_page(fig)
 
             # --------------------------------------------------
-    def draw_qhist(self, xds, *,
-                   density=True, fig_info=None, title=None) -> None:
+    def draw_qhist(self, xds, *, density=True,
+                   fig_info=None, title=None) -> None:
         """
         Display pixel-quality data as histograms.
 

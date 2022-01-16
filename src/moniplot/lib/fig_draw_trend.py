@@ -59,7 +59,7 @@ def set_labels_colors(xarr) -> tuple:
     return hk_title, hk_label, lcolor, fcolor
 
 
-def adjust_ylim(avg, err1=None, err2=None, vrange_last_orbits=-1):
+def adjust_ylim(avg, err1, err2, vperc: list, vrange_last_orbits: int):
     """
     Return the limits of the Y-coordinate
     """
@@ -68,6 +68,9 @@ def adjust_ylim(avg, err1=None, err2=None, vrange_last_orbits=-1):
             ni = vrange_last_orbits
             ylim = [min(err1[0:ni].min(), err1[-ni:].min()),
                     max(err2[0:ni].max(), err2[-ni:].max())]
+        elif isinstance(vperc, list) and len(vperc) == 2:
+            ylim = [np.percentile(err1, vperc[0]),
+                    np.percentile(err2, vperc[1])]
         else:
             ylim = [err1.min(), err2.max()]
         factor = 10
@@ -76,6 +79,8 @@ def adjust_ylim(avg, err1=None, err2=None, vrange_last_orbits=-1):
             ni = vrange_last_orbits
             ylim = [min(avg[0:ni].min(), avg[-ni:].min()),
                     max(avg[0:ni].max(), avg[-ni:].max())]
+        elif isinstance(vperc, list) and len(vperc) == 2:
+            ylim = np.percentile(err1, vperc)
         else:
             ylim = [avg.min(), avg.max()]
         factor = 5
@@ -182,13 +187,13 @@ def add_subplot(axx, xarr) -> None:
     # adjust data X-coordinate
     axx.locator_params(axis='y', nbins=5)
     if 'orbit' in xarr.coords:
-        axx.set_ylim(adjust_ylim(avg, err1, err2))
+        axx.set_ylim(adjust_ylim(avg, err1, err2, None, -1))
 
     axx.set_ylabel(ylabel)
     axx.grid(True)
 
 
-def add_hk_subplot(axx, xarr, vrange_last_orbits=-1) -> None:
+def add_hk_subplot(axx, xarr, vperc=None, vrange_last_orbits=-1) -> None:
     """
     Add a subplot for housekeeping data
 
@@ -197,6 +202,9 @@ def add_hk_subplot(axx, xarr, vrange_last_orbits=-1) -> None:
     axx :  matplotlib.Axes
     xarr :  xarray.DataArray
        Object holding housekeeping data data and attributes
+    vperc :  list, optional
+       Reject outliers before determining vrange
+       (neglected when vrange_last_orbits is used)
     vrange_last_orbits :  int
         Use the last N orbits to determine vrange (orbit coordinate only)
     """
@@ -237,10 +245,10 @@ def add_hk_subplot(axx, xarr, vrange_last_orbits=-1) -> None:
         axx.xaxis.set_minor_locator(minor_locator)
     axx.set_xlim([xdata[0], xdata[-1]])
 
-    # adjust data X-coordinate
+    # adjust data Y-coordinate
     axx.locator_params(axis='y', nbins=4)
     if 'orbit' in xarr.coords:
-        axx.set_ylim(adjust_ylim(avg, err1, err2, vrange_last_orbits))
+        axx.set_ylim(adjust_ylim(avg, err1, err2, vperc, vrange_last_orbits))
     axx.set_ylabel(hk_label)
     axx.grid(True)
 
