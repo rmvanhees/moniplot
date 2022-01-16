@@ -66,26 +66,28 @@ class MONplot:
     -------
     close()
        Close PNG or (multipage) PDF document.
+    set_caption(caption)
+       Set caption of each page of the PDF.
     caption
-       Return figure caption
+       Return figure caption.
     set_cmap(cmap)
-       Define alternative color-map which overrules the default.
+       Use alternative color-map for MONplot::draw_image.
     unset_cmap()
        Unset user supplied color-map, and use default color-map.
     cmap
        Return matplotlib colormap.
     set_institute(institute)
-       Define abbreviation of the name of your institute.
+       Use the name of your institute as a signature.
     institute
        Return name of your institute.
     draw_signal(data, zscale='linear', fig_info=None, side_panels='nanmedian',
-                title=None)
+                title=None, **kwargs)
        Display 2D array data as an image and averaged column/row signal plots.
     draw_quality(data, ref_data=None, fig_info=None, side_panels='quality',
-                 title=None)
+                 title=None, **kwargs)
        Display pixel-quality 2D data as an image and column/row statistics.
     draw_trend(xds=None, hk_xds=None, vrange_last_orbits=-1, fig_info=None,
-               title=None)
+               title=None, **kwargs)
        Display trends of measurement data and/or housekeeping data.
     draw_qhist(xds, density=True, fig_info=None, title=None)
        Display pixel-quality data as histograms.
