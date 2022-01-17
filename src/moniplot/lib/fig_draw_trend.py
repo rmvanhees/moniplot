@@ -7,6 +7,10 @@ This module
 
 Functions
 ---------
+add_subplot(axx, xarr)
+   Add a subplot for measurement data.
+add_hk_subplot(axx, xarr, vperc=None, vrange_last_orbits=-1)
+   Add a subplot for housekeeping data.
 
 Copyright (c) 2017-2022 SRON - Netherlands Institute for Space Research
    All Rights Reserved

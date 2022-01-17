@@ -7,7 +7,7 @@ This module
 
 Functions
 ---------
-fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None, cmap=None):
+fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None, cmap=None)
    Prepare image data for plotting.
 
 fig_qdata_to_xarr(data, ref_data=None, thres_worst=0.1, thres_bad=0.8,

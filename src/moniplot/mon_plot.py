@@ -24,6 +24,12 @@ from pathlib import PurePath
 import numpy as np
 import xarray as xr
 
+try:
+    from cartopy import crs as ccrs
+except ModuleNotFoundError:
+    FOUND_CARTOPY = False
+else:
+    FOUND_CARTOPY = True
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -37,6 +43,7 @@ from .lib.fig_draw_image import (adjust_img_ticks,
                                  fig_draw_panels)
 from .lib.fig_draw_trend import add_subplot, add_hk_subplot
 from .lib.fig_draw_qhist import fig_draw_qhist
+from .lib.fig_draw_tracks import fig_draw_tracks
 
 
 # - local functions --------------------------------
@@ -91,6 +98,8 @@ class MONplot:
        Display trends of measurement data and/or housekeeping data.
     draw_qhist(xds, density=True, fig_info=None, title=None)
        Display pixel-quality data as histograms.
+    draw_tracks(lons, lats, icids, saa_region=None, fig_info=None, title=None)
+       Display tracks of satellite on a world map using a Robinson projection.
 
     Notes
     -----
@@ -276,7 +285,7 @@ class MONplot:
            Other valid values are: 'median', 'nanmedian', 'mean', 'nanmean',
            'quality', 'std' and 'nanstd'.
         title :  str, default=None
-           Title of this figure (matplotlib: sub_title)
+           Title of this figure (matplotlib: Axis.set_title)
         **kwargs :   other keywords
            Pass keyword arguments: zscale, vperc or vrange
            to moniplot.lib.fig_draw_image.fig_data_to_xarr()
@@ -393,7 +402,7 @@ class MONplot:
            Show image row and column statistics in two side panels.
            Use 'none' when you do not want the side panels.
         title :  str, default=None
-           Title of this figure (matplotlib: sub_title)
+           Title of this figure (matplotlib: Axis.set_title)
         **kwargs :   other keywords
            Pass keyword arguments: 'thres_worst', 'thres_bad' or 'qlabels'
            to moniplot.lib.fig_draw_image.fig_qdata_to_xarr()
@@ -523,7 +532,7 @@ class MONplot:
         fig_info :  FIGinfo, optional
            OrderedDict holding meta-data to be displayed in the figure
         title :  str, optional
-           Title of this figure (matplotlib: sub_title)
+           Title of this figure (matplotlib: Axis.set_title)
         **kwargs :   other keywords
            Pass keyword arguments: vperc or vrange_last_orbits
            to moniplot.lib.fig_draw_trend.add_hk_subplot()
@@ -571,7 +580,7 @@ class MONplot:
         margin = min(1. / (1.8 * (npanels + 1)), .25)
         fig.subplots_adjust(bottom=margin, top=1-margin, hspace=0.02)
 
-        # draw title of the Figure
+        # add a centered suptitle to the figure
         if self.caption:
             fig.suptitle(self.caption + '\n',
                          fontsize='x-large',
@@ -603,7 +612,7 @@ class MONplot:
         self.__add_fig_box(fig, fig_info)
         self.__close_this_page(fig)
 
-            # --------------------------------------------------
+    # --------------------------------------------------
     def draw_qhist(self, xds, *, density=True, exclude_region=None,
                    fig_info=None, title=None) -> None:
         """
@@ -623,7 +632,7 @@ class MONplot:
         fig_info :  FIGinfo, optional
            OrderedDict holding meta-data to be displayed in the figure
         title :  str, optional
-           Title of this figure (matplotlib: sub_title)
+           Title of this figure (matplotlib: Axis.set_title)
 
         Examples
         --------
@@ -654,7 +663,7 @@ class MONplot:
         margin = min(1. / (1.8 * (npanels + 1)), .25)
         fig.subplots_adjust(bottom=margin, top=1-margin, hspace=0.02)
 
-        # draw title of the Figure
+        # add a centered suptitle to the figure
         if self.caption:
             fig.suptitle(self.caption + '\n', fontsize='x-large',
                          horizontalalignment='center')
@@ -679,5 +688,56 @@ class MONplot:
 
         # add annotation and save the figure
         self.__add_copyright(axarr[-1])
+        self.__add_fig_box(fig, fig_info)
+        self.__close_this_page(fig)
+
+    # --------------------------------------------------
+    def draw_tracks(self, lons, lats, icids, *, saa_region=None,
+                    fig_info=None, title=None) -> None:
+        """
+        Display tracks of satellite on a world map using a Robinson projection
+
+        Parameters
+        ----------
+        lons :  (N, 2) array-like
+           Longitude coordinates at start and end of measurement
+        lats :  (N, 2) array-like
+           Latitude coordinates at start and end of measurement
+        icids :  (N) array-like
+           ICID of measurements per (lon, lat)
+        saa_region :  (N, 2) array-like, optional
+           The coordinates of the vertices. When defined, then show SAA region
+           as a matplotlib polygon patch.
+        fig_info :  FIGinfo, optional
+           OrderedDict holding meta-data to be displayed in the figure
+
+        The information provided in the parameter 'fig_info' will be displayed
+        in a small box.
+        """
+        if not FOUND_CARTOPY:
+            raise RuntimeError('You need Cartopy to run this function')
+
+        if fig_info is None:
+            fig_info = FIGinfo()
+
+        # define plot layout
+        # pylint: disable=abstract-class-instantiated
+        myproj = {'projection': ccrs.Robinson(central_longitude=11.5)}
+        fig, axx = plt.subplots(figsize=(12.85, 6), subplot_kw=myproj)
+
+        # add a centered suptitle of the Figure
+        if self.caption:
+            fig.suptitle(self.caption + '\n', fontsize='x-large',
+                         horizontalalignment='center')
+
+        # add title to image panel
+        if title is not None:
+            axx.set_title(title)
+
+        # draw tracks of satellite
+        fig_draw_tracks(axx, lons, lats, icids, saa_region)
+
+        # finalize figure
+        self.__add_copyright(axx)
         self.__add_fig_box(fig, fig_info)
         self.__close_this_page(fig)
