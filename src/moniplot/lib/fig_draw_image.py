@@ -26,8 +26,6 @@ import xarray as xr
 
 import matplotlib.colors as mcolors
 
-from pys5p import swir_region
-
 from ..image_to_xarray import data_to_xr
 from ..tol_colors import tol_cmap, tol_cset
 
@@ -288,7 +286,7 @@ def fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None):
     return xarr
 
 
-def fig_qdata_to_xarr(data, ref_data=None,
+def fig_qdata_to_xarr(data, ref_data=None, exclude_region=None,
                       thres_worst=0.1, thres_bad=0.8, qlabels=None):
     """
     Prepare pixel-quality data for plotting
@@ -301,6 +299,9 @@ def fig_qdata_to_xarr(data, ref_data=None,
         Numpy array holding reference data, for example pixel quality
         reference map taken from the CKD. Shown are the changes with
         respect to the reference data.
+    exclude_region : numpy.ndarray, optional
+        Provide a mask to define the area on the detector which should be
+        excluded, e.g. get pixel quality label 'unusable'.
     thres_worst :  float, default=0.1
         Threshold to reject only the worst of the bad pixels, intended
         for CKD derivation.
@@ -337,7 +338,8 @@ def fig_qdata_to_xarr(data, ref_data=None,
         res[buff >= thres_bad] = 4
         res[(buff > thres_worst) & (buff < thres_bad)] = 2
         res[buff <= thres_worst] = 1
-        res[~swir_region.mask()] = 0
+        if exclude_region is not None:
+            res[exclude_region] = 0
         return res
 
     qval = float_to_quality(data)
@@ -347,7 +349,8 @@ def fig_qdata_to_xarr(data, ref_data=None,
         qval[(qdiff == -2) | (qdiff == -3)] = 4
         qval[qdiff == 2] = 2
         qval[(qdiff == 1) | (qdiff == 3)] = 1
-        qval[~swir_region.mask()] = 0
+        if exclude_region is not None:
+            qval[exclude_region] = 0
 
     # make sure that we are working with a xarray DataArray
     xarr = data_to_xr(qval)

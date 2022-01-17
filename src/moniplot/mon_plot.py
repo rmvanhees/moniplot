@@ -604,7 +604,7 @@ class MONplot:
         self.__close_this_page(fig)
 
             # --------------------------------------------------
-    def draw_qhist(self, xds, *, density=True,
+    def draw_qhist(self, xds, *, density=True, exclude_region=None,
                    fig_info=None, title=None) -> None:
         """
         Display pixel-quality data as histograms.
@@ -617,6 +617,9 @@ class MONplot:
            If True, draw and return a probability density: each bin will
            display the bin's raw count divided by the total number of counts
            and the bin width (see matplotlib.pyplot.hist). Default is True
+        exclude_region : numpy.ndarray, optional
+           Provide a mask to define the area on the detector which should be
+           excluded.
         fig_info :  FIGinfo, optional
            OrderedDict holding meta-data to be displayed in the figure
         title :  str, optional
@@ -663,7 +666,13 @@ class MONplot:
 
         # add figures with histograms
         for ii, (key, xda) in enumerate(xds.data_vars.items()):
-            fig_draw_qhist(axarr[ii], xda, key, density)
+            if isinstance(exclude_region, np.ndarray):
+                # pylint: disable=invalid-unary-operand-type
+                qdata = xda.values[~exclude_region].reshape(-1)
+            else:
+                qdata = xda.values.reshape(-1)
+            label = xda.attrs['long_name'] if 'long_name' in xda.attrs else key
+            fig_draw_qhist(axarr[ii], qdata, label, density)
 
         # finally add a label for the X-coordinate
         axarr[-1].set_xlabel('pixel quality')

@@ -16,6 +16,8 @@ from datetime import datetime, timedelta
 import numpy as np
 import xarray as xr
 
+from pys5p import swir_region
+
 from moniplot.image_to_xarray import data_to_xr
 from moniplot.mon_plot import MONplot
 
@@ -108,9 +110,10 @@ def run_draw_quality(plot):
     data[75:125, 900:925] = 0.05
     data[75:125, 825:875] = 0.4
 
-    plot.draw_quality(data, title='no reference')
-
-    plot.draw_quality(data, ref_data=ref_data, title='with reference')
+    region = ~swir_region.mask()
+    plot.draw_quality(data, exclude_region=region, title='no reference')
+    plot.draw_quality(data, ref_data=ref_data, exclude_region=region,
+                      title='with reference')
 
 
 def run_draw_cmp_swir(plot):
@@ -242,7 +245,8 @@ def run_draw_qhist(plot):
                     data_to_xr(frame, name='dpqm_noise_var',
                                long_name='pixel-quality map (noise variance)')])
 
-    plot.draw_qhist(msm, title='my histogram')
+    region = ~swir_region.mask()
+    plot.draw_qhist(msm, exclude_region=region, title='my histogram')
 
 
 # --------------------------------------------------
