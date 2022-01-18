@@ -4,7 +4,7 @@ This file is part of moniplot
 https://github.com/rmvanhees/moniplot.git
 
 Performs unit-tests on MONplot methods: draw_signal, draw_quality,
-   ## draw_cmp_images, draw_trend1d and draw_lines (xarray version)
+   draw_trend and draw_lplot ## draw_cmp_images
 
 Copyright (c) 2020-2022 SRON - Netherlands Institute for Space Research
    All Rights Reserved
@@ -132,11 +132,11 @@ def run_draw_cmp_swir(plot):
                        title='test image')
 
 
-def run_draw_trend1d(plot):
+def run_draw_trend(plot):
     """
-    Run unit tests on MONplot::draw_trend1d
+    Run unit tests on MONplot::draw_trend
     """
-    print('Run unit tests on MONplot::draw_trend1d')
+    print('Run unit tests on MONplot::draw_trend')
     xx = np.arange(200) / 100
     hk_params = [
         ('detector_temp', 'SWIR detector temperature', 'K', np.float32),
@@ -172,48 +172,48 @@ def run_draw_trend1d(plot):
     msm1 = data_to_xr(np.sin(xx * np.pi), dims=['orbit'])
     msm2 = data_to_xr(np.cos(xx * np.pi), dims=['orbit'])
 
-    plot.draw_trend1d(msm1, title='one dataset, no house-keeping')
-    plot.draw_trend1d(msm1, msm2=msm2,
-                      title='two datasets, no house-keeping')
+    plot.draw_trend(msm1, title='one dataset, no house-keeping')
+    plot.draw_trend(msm1, msm2=msm2,
+                    title='two datasets, no house-keeping')
     hk_keys = [parm[0] for parm in hk_params]
-    plot.draw_trend1d(msm1, msm2=msm2,
-                      hk_data=hk_ds, hk_keys=hk_keys[0:2],
-                      title='two datasets and house-keeping')
-    plot.draw_trend1d(msm1, msm2=msm2,
-                      hk_data=hk_ds, hk_keys=hk_keys,
-                      title='two datasets and house-keeping')
+    plot.draw_trend(msm1, msm2=msm2,
+                    hk_data=hk_ds, hk_keys=hk_keys[0:2],
+                    title='two datasets and house-keeping')
+    plot.draw_trend(msm1, msm2=msm2,
+                    hk_data=hk_ds, hk_keys=hk_keys,
+                    title='two datasets and house-keeping')
 
 
-def run_draw_lines(plot):
+def run_draw_lplot(plot):
     """
-    Run unit tests on MONplot::draw_lines
+    Run unit tests on MONplot::draw_lplot
     """
-    print('Run unit tests on MONplot::draw_lines')
+    print('Run unit tests on MONplot::draw_lplot')
     xx = np.arange(200) / 100
-    plot.draw_lines(xx, np.sin(xx * np.pi), color=0,
+    plot.draw_lplot(xx, np.sin(xx * np.pi), color=0,
                     label='sinus', marker='o', linestyle='-')
-    plot.draw_lines(xx, np.cos(xx * np.pi), color=1,
+    plot.draw_lplot(xx, np.cos(xx * np.pi), color=1,
                     label='cosinus', marker='o', linestyle='-')
-    plot.draw_lines(None, None, ylim=[-1.05, 1.05],
+    plot.draw_lplot(None, None, ylim=[-1.05, 1.05],
                     xlabel='x-axis [Pi]', ylabel='y-axis',
-                    title='draw_lines [no time_axis]')
+                    title='draw_lplot [no time_axis]')
 
     xx = np.arange(500) / 100
-    plot.draw_lines(xx, np.sin(xx * np.pi), color=0,
+    plot.draw_lplot(xx, np.sin(xx * np.pi), color=0,
                     label='sinus', marker='o', linestyle='-')
-    plot.draw_lines(xx, np.cos(xx * np.pi), color=1,
+    plot.draw_lplot(xx, np.cos(xx * np.pi), color=1,
                     label='cosinus', marker='o', linestyle='-')
-    plot.draw_lines(None, None, ylim=[-1.05, 1.05],
+    plot.draw_lplot(None, None, ylim=[-1.05, 1.05],
                     xlabel='x-axis [Pi]', ylabel='y-axis',
-                    title='draw_lines [no time_axis]')
+                    title='draw_lplot [no time_axis]')
 
     customdate = datetime(2016, 1, 1, 13, 0, 0)
     yy = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
     xx = [customdate + timedelta(hours=i, minutes=4*i)
           for i in range(len(yy))]
-    plot.draw_lines(xx, yy, color=0, label='mydata',
+    plot.draw_lplot(xx, yy, color=0, label='mydata',
                     marker='o', linestyle='-')
-    plot.draw_lines(None, None, title='draw_lines [time_axis]',
+    plot.draw_lplot(None, None, title='draw_lplot [time_axis]',
                     xlabel='x-axis', ylabel='y-axis')
 
 
@@ -258,8 +258,8 @@ def main():
     check_draw_cmp_images = False
     check_draw_quality = True
     check_draw_qhist = True
-    check_draw_trend1d = False
-    check_draw_lines = False
+    check_draw_trend = False
+    check_draw_lplot = True
 
     # ---------- UNIT TEST: draw_signal ----------
     if check_draw_signal:
@@ -293,20 +293,20 @@ def main():
         run_draw_qhist(plot)
         plot.close()
 
-    # ---------- UNIT TEST: draw_trend1d ----------
-    if check_draw_trend1d:
-        plot = MONplot('mon_plot_draw_signal.pdf',
-                       caption='Unit test of MONplot [draw_trend1d]')
+    # ---------- UNIT TEST: draw_trend ----------
+    if check_draw_trend:
+        plot = MONplot('mon_plot_draw_trend.pdf',
+                       caption='Unit test of MONplot [draw_trend]')
         plot.set_institute('SRON')
-        run_draw_trend1d(plot)
+        run_draw_trend(plot)
         plot.close()
 
-    # ---------- UNIT TEST: draw_lines ----------
-    if check_draw_lines:
-        plot = MONplot('mon_plot_draw_signal.pdf',
-                       caption='Unit test of MONplot [draw_lines]')
+    # ---------- UNIT TEST: draw_lplot ----------
+    if check_draw_lplot:
+        plot = MONplot('mon_plot_draw_lplot.pdf',
+                       caption='Unit test of MONplot [draw_lplot]')
         plot.set_institute('SRON')
-        run_draw_lines(plot)
+        run_draw_lplot(plot)
         plot.close()
 
 

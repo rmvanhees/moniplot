@@ -19,6 +19,7 @@ Copyright (c) 2022 SRON - Netherlands Institute for Space Research
 
 License:  GNU GPL v3.0
 """
+from datetime import datetime
 from pathlib import PurePath
 
 import numpy as np
@@ -43,6 +44,7 @@ from .lib.fig_draw_image import (adjust_img_ticks,
                                  fig_draw_panels)
 from .lib.fig_draw_trend import add_subplot, add_hk_subplot
 from .lib.fig_draw_qhist import fig_draw_qhist
+from .lib.fig_draw_lplot import fig_draw_lplot, close_draw_lplot
 from .lib.fig_draw_tracks import fig_draw_tracks
 
 
@@ -122,6 +124,7 @@ class MONplot:
         self.__cmap = None
         self.__caption = '' if caption is None else caption
         self.__institute = ''
+        self.__mpl = None
         self.__pdf = None
         self.filename = figname
         if PurePath(figname).suffix.lower() != '.pdf':
@@ -690,6 +693,93 @@ class MONplot:
         self.__add_copyright(axarr[-1])
         self.__add_fig_box(fig, fig_info)
         self.__close_this_page(fig)
+
+    # --------------------------------------------------
+    def draw_lplot(self, xdata, ydata, color=0, *,
+                   fig_info=None, title=None, **kwargs) -> None:
+        """
+        Plot y versus x lines, maybe called multiple times to add lines.
+        Figure is closed when called with x is None.
+
+        Parameters
+        ----------
+        xdata :  ndarray
+           [add line] X data, [close figure] when xdata is None
+        ydata :  ndarray
+           [add line] Y data
+        color :  integer, default=0
+           [add line] Index to color in tol_colors.tol_cset('bright')
+        fig_info  :  FIGinfo, optional
+           [close figure] Meta-data to be displayed in the figure
+        title :  str, default=None
+           [close figure] Title of this figure (matplotlib: Axis.set_title)
+        **kwargs :   other keywords
+           [add line] Keywords are passed to mpl.pyplot.plot()
+           [close figure] Kewords are passed to appropriate mpl.Axes method
+
+        Examples
+        --------
+        General example:
+        >>> plot = S5Pplot(fig_name)
+        >>> for ii, xx, yy in enumerate(data_of_each_line):
+        >>>    plot.draw_lplot(xx, yy, color=ii, label=mylabel[ii],
+        >>>                    marker='o', linestyle='None')
+        >>> plot.draw_lplot(None, None, xlim=[0, 0.5], ylim=[-10, 10],
+        >>>                 xlabel=my_xlabel, ylabel=my_ylabel)
+        >>> plot.close()
+
+        Using a time-axis:
+        >>> from datetime import datetime, timedelta
+        >>> tt0 = (datetime(year=2020, month=10, day=1)
+        >>>        + timedelta(seconds=sec_in_day))
+        >>> tt = [tt0 + xx * t_step for xx in range(yy.size)]
+        >>> plot = S5Pplot(fig_name)
+        >>> plot.draw_lplot(tt, yy, color=1, label=mylabel,
+        >>>                 marker='o', linestyle='None')
+        >>> plot.draw_line(None, None, ylim=[-10, 10],
+        >>>                xlabel=my_xlabel, ylabel=my_ylabel)
+        >>> plot.close()
+        """
+        if xdata is None:
+            if self.__mpl is None:
+                raise ValueError('No plot defined and no data provided')
+
+            if fig_info is None:
+                fig_info = FIGinfo()
+
+            close_draw_lplot(self.__mpl['axx'], self.__mpl['time_axis'],
+                             title, **kwargs)
+
+            # add annotation and save the figure
+            self.__add_copyright(self.__mpl['axx'])
+            self.__add_fig_box(self.__mpl['fig'], fig_info)
+            self.__close_this_page(self.__mpl['fig'])
+            self.__mpl = None
+            return
+
+        # initialize figure
+        if self.__mpl is None:
+            if len(xdata) <= 256:
+                figsize = (8, 8)
+            elif 256 > len(xdata) <= 512:
+                figsize = (10, 8)
+            elif 512 > len(xdata) <= 768:
+                figsize = (12, 8)
+            else:
+                figsize = (14, 8)
+
+            self.__mpl = dict(zip(('fig', 'axx'),
+                                  plt.subplots(1, figsize=figsize)))
+            self.__mpl['time_axis'] = isinstance(xdata[0], datetime)
+
+            # add a centered suptitle to the figure
+            if self.caption:
+                self.__mpl['fig'].suptitle(self.caption + '\n',
+                                           fontsize='x-large',
+                                           horizontalalignment='center')
+
+        # draw line in figure
+        fig_draw_lplot(self.__mpl['axx'], xdata, ydata, color, **kwargs)
 
     # --------------------------------------------------
     def draw_tracks(self, lons, lats, icids, *, saa_region=None,
