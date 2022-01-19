@@ -154,15 +154,15 @@ def fig_draw_panels(fig, xarr, side_panels: str):
 
     cset = tol_cset('bright')
     if aspect == 1:
-        axx = fig.add_gridspec(left=0.25, bottom=0.25).subplots()
+        axx = fig.add_gridspec(left=0.25, top=0.9, bottom=0.25).subplots()
         ax_panelx = axx.inset_axes([0, -0.25, 1, 0.2], sharex=axx)
         ax_panely = axx.inset_axes([-0.25, 0, 0.2, 1], sharey=axx)
     elif aspect == 2:
-        axx = fig.add_gridspec(left=0.125, bottom=0.25).subplots()
+        axx = fig.add_gridspec(left=0.125, top=0.9, bottom=0.25).subplots()
         ax_panelx = axx.inset_axes([0, -0.25, 1, 0.2], sharex=axx)
         ax_panely = axx.inset_axes([-0.125, 0, 0.1, 1], sharey=axx)
     else:
-        axx = fig.add_gridspec(left=0.0625, bottom=0.25).subplots()
+        axx = fig.add_gridspec(left=0.0625, top=0.9, bottom=0.25).subplots()
         ax_panelx = axx.inset_axes([0, -0.25, 1, 0.2], sharex=axx)
         ax_panely = axx.inset_axes([-0.0625, 0, 0.05, 1], sharey=axx)
 

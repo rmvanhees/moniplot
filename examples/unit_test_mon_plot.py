@@ -115,6 +115,8 @@ def run_draw_quality(plot):
     plot.draw_quality(data, exclude_region=region, title='no reference')
     plot.draw_quality(data, ref_data=ref_data, exclude_region=region,
                       title='with reference')
+    plot.draw_quality(data, exclude_region=region,
+                      side_panels='none', title='no reference')
 
 
 def run_draw_cmp_swir(plot):
@@ -138,51 +140,48 @@ def run_draw_trend(plot):
     Run unit tests on MONplot::draw_trend
     """
     print('Run unit tests on MONplot::draw_trend')
-    xx = np.arange(200) / 100
-    hk_params = [
-        ('detector_temp', 'SWIR detector temperature', 'K', np.float32),
-        ('grating_temp', 'SWIR grating temperature', 'K', np.float32),
-        ('obm_temp', 'SWIR OBM temperature', 'K', np.float32)]
-    hk_dtype = np.dtype(
-        [(parm[0], parm[3]) for parm in hk_params])
-    hk_min = np.zeros(200, dtype=hk_dtype)
-    hk_avg = np.zeros(200, dtype=hk_dtype)
-    hk_max = np.zeros(200, dtype=hk_dtype)
-    data = 140. + (100 - np.arange(200)) / 1000
-    hk_min['detector_temp'][:] = data - .0125
-    hk_avg['detector_temp'][:] = data
-    hk_max['detector_temp'][:] = data + .0075
-    data = 202.1 + (100 - np.arange(200)) / 1000
-    hk_min['grating_temp'][:] = data - .15
-    hk_avg['grating_temp'][:] = data
-    hk_max['grating_temp'][:] = data + .175
-    data = 208.2 + (100 - np.arange(200)) / 1000
-    hk_min['obm_temp'][:] = data - .15
-    hk_avg['obm_temp'][:] = data
-    hk_max['obm_temp'][:] = data + .175
-    units = [parm[2] for parm in hk_params]
-    long_name = [parm[1] for parm in hk_params]
+    n_elmnt = 200
+    xx = np.arange(n_elmnt) / 100
 
-    msm_mean = data_to_xr(hk_avg, dims=['orbit'], name='hk_mean',
-                          long_name=long_name, units=units)
-    msm_range = data_to_xr(np.stack([hk_min, hk_max], axis=1),
-                           dims=['orbit', 'range'], name='hk_range',
-                           long_name=long_name, units=units)
-    hk_ds = xr.merge([msm_mean, msm_range])
+    res = []
+    hk_dtype = np.dtype([('mean', 'f8'), ('err1', 'f8'), ('err2', 'f8')])
+    buff = np.empty(len(xx), dtype=hk_dtype)
+    data = 140. + (100 - np.arange(n_elmnt)) / 1000
+    buff['mean'] = data
+    buff['err1'] = data - .0125
+    buff['err2'] = data + .0075
+    hk_attrs = {'long_name': 'SWIR detector temperature', 'units': 'K'}
+    res.append(xr.DataArray(buff, name='detector_temp', dims=['orbit'],
+                            coords=[np.arange(n_elmnt)], attrs=hk_attrs))
 
-    msm1 = data_to_xr(np.sin(xx * np.pi), dims=['orbit'])
-    msm2 = data_to_xr(np.cos(xx * np.pi), dims=['orbit'])
+    buff = np.empty(len(xx), dtype=hk_dtype)
+    data = 202.1 + (100 - np.arange(n_elmnt)) / 1000
+    buff['mean'] = data
+    buff['err1'] = data - .15
+    buff['err2'] = data + .175
+    hk_attrs = {'long_name': 'SWIR grating temperature', 'units': 'K'}
+    res.append(xr.DataArray(buff, name='grating_temp', dims=['orbit'],
+                            coords=[np.arange(n_elmnt)], attrs=hk_attrs))
 
-    plot.draw_trend(msm1, title='one dataset, no house-keeping')
-    plot.draw_trend(msm1, msm2=msm2,
-                    title='two datasets, no house-keeping')
-    hk_keys = [parm[0] for parm in hk_params]
-    plot.draw_trend(msm1, msm2=msm2,
-                    hk_data=hk_ds, hk_keys=hk_keys[0:2],
-                    title='two datasets and house-keeping')
-    plot.draw_trend(msm1, msm2=msm2,
-                    hk_data=hk_ds, hk_keys=hk_keys,
-                    title='two datasets and house-keeping')
+    buff = np.empty(len(xx), dtype=hk_dtype)
+    data = 208.2 + (100 - np.arange(n_elmnt)) / 1000
+    buff['mean'] = data
+    buff['err1'] = data - .15
+    buff['err2'] = data + .175
+    hk_attrs = {'long_name': 'SWIR OBM temperature', 'units': 'K'}
+    res.append(xr.DataArray(buff, name='obm_temp', dims=['orbit'],
+                            coords=[np.arange(n_elmnt)], attrs=hk_attrs))
+    hk_ds = xr.merge(res, combine_attrs="drop_conflicts")
+    
+
+    msm1 = data_to_xr(np.sin(xx * np.pi), name='msm1', dims=['orbit'])
+    msm2 = data_to_xr(np.cos(xx * np.pi), name='msm2', dims=['orbit'])
+    msm_ds = xr.merge((msm1, msm2), combine_attrs="drop_conflicts")
+
+    # plot.draw_trend(msm_ds, title='one dataset, no house-keeping')
+    plot.draw_trend(xds=msm_ds, title='two datasets, no house-keeping')
+    plot.draw_trend(hk_xds=hk_ds, title='no datasets, only house-keeping')
+    plot.draw_trend(msm_ds, hk_ds, title='two datasets and house-keeping')
 
 
 def run_draw_lplot(plot):
@@ -247,7 +246,7 @@ def run_draw_qhist(plot):
                                long_name='pixel-quality map (noise variance)')])
 
     # define a region which will be excluded
-    region = np.full(data.shape, True)     # this will exclude all
+    region = np.full(frame.shape, True)     # this will exclude all
     region[np.s_[11:228, 16:991]] = False  # define region of interest
     
     plot.draw_qhist(msm, exclude_region=region, title='my histogram')
@@ -260,10 +259,10 @@ def main():
     """
     check_draw_signal = True
     check_draw_cmp_images = False
-    check_draw_quality = True
-    check_draw_qhist = True
+    check_draw_quality = False
+    check_draw_qhist = False
     check_draw_trend = False
-    check_draw_lplot = True
+    check_draw_lplot = False
 
     # ---------- UNIT TEST: draw_signal ----------
     if check_draw_signal:

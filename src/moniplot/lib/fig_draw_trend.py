@@ -38,8 +38,12 @@ def set_labels_colors(xarr) -> tuple:
     """
     cset = tol_cset('bright')
 
-    hk_unit = xarr.attrs['units'].decode()
-    hk_title = xarr.attrs['long_name'].decode()
+    hk_unit = xarr.attrs['units']
+    if isinstance(hk_unit, bytes):
+        hk_unit = hk_unit.decode()
+    hk_title = xarr.attrs['long_name']
+    if isinstance(hk_title, bytes):
+        hk_title = hk_title.decode()
     if hk_unit == 'K':
         hk_title = hk_title.rsplit(' ', 1)[0]
         hk_label = f'temperature [{hk_unit}]'

@@ -22,6 +22,7 @@ License:  GNU GPL v3.0
 from datetime import datetime
 from pathlib import PurePath
 
+import os
 import numpy as np
 import xarray as xr
 
@@ -53,10 +54,14 @@ def fig_size(aspect: int, side_panels: str):
     """
     Calculate size of the figure (inches)
     """
-    sz_corr = {4: (2.5, 0.85 if side_panels == 'none' else 1.),
-               3: (2.25, 1. if side_panels == 'none' else 1.25),
-               2: (2.0, 1.2 if side_panels == 'none' else 1.45),
-               1: (1.75, 1.75)}.get(aspect)
+    sz_corr = {4: (2.7, 0.865 if side_panels == 'none' else 1.025),
+               3: (2.3, 0.9 if side_panels == 'none' else 1.05),
+               2: (2.0, 1.05 if side_panels == 'none' else 1.3),
+               1: (1.75, 1.5 if side_panels == 'none' else 1.75)}.get(aspect)
+    if 'FIG_SZ_X' in os.environ:
+        sz_corr = (float(os.environ.get('FIG_SZ_X')), sz_corr[1])
+    if 'FIG_SZ_Y' in os.environ:
+        sz_corr = (sz_corr[0], float(os.environ.get('FIG_SZ_Y')))
     return (6.4 * sz_corr[0], 4.8 * sz_corr[1])
 
 
@@ -167,6 +172,13 @@ class MONplot:
         plt.close('all')
 
     # --------------------------------------------------
+    @property
+    def caption(self) -> str:
+        """
+        Return figure caption
+        """
+        return self.__caption
+
     def set_caption(self, caption: str) -> None:
         """
         Set caption of each page of the PDF
@@ -179,14 +191,24 @@ class MONplot:
         """
         self.__caption = caption
 
-    @property
-    def caption(self) -> str:
+    def __add_caption(self, fig):
         """
-        Return figure caption
+        Add figure caption
         """
-        return self.__caption
+        if not self.caption:
+            return
+
+        fig.suptitle(self.caption, fontsize='x-large',
+                     position=(0.5, 1 - 0.3 / fig.get_figheight()))
 
     # --------------------------------------------------
+    @property
+    def cmap(self):
+        """
+        Return matplotlib colormap
+        """
+        return self.__cmap
+
     def set_cmap(self, cmap) -> None:
         """
         Use alternative color-map for MONplot::draw_image
@@ -203,14 +225,14 @@ class MONplot:
         """
         self.__cmap = None
 
-    @property
-    def cmap(self):
-        """
-        Return matplotlib colormap
-        """
-        return self.__cmap
-
     # --------------------------------------------------
+    @property
+    def institute(self) -> str:
+        """
+        Return name of your institute
+        """
+        return self.__institute
+
     def set_institute(self, institute: str) -> None:
         """
         Use the name of your institute as a signature
@@ -222,13 +244,6 @@ class MONplot:
            the copyright statement in the main panel of the figures.
         """
         self.__institute = institute
-
-    @property
-    def institute(self) -> str:
-        """
-        Return name of your institute
-        """
-        return self.__institute
 
     # --------------------------------------------------
     def __add_copyright(self, axx) -> None:
@@ -343,13 +358,10 @@ class MONplot:
         # draw figure
         fig = plt.figure(figsize=fig_size(aspect, side_panels),
                          constrained_layout=True)
-        if title is not None:
-            fig.suptitle(self.caption + '\n',
-                         fontsize='x-large',
-                         horizontalalignment='center')
+        self.__add_caption(fig)
 
         if side_panels == 'none':
-            axx = fig.add_gridspec(top=1).subplots()
+            axx = fig.add_gridspec(top=.9, right=0.9).subplots()
             axx.set_xlabel('column')
             axx.set_ylabel('row')
         else:
@@ -464,13 +476,10 @@ class MONplot:
         # draw figure
         fig = plt.figure(figsize=fig_size(aspect, side_panels),
                          constrained_layout=True)
-        if title is not None:
-            fig.suptitle(self.caption + '\n',
-                         fontsize='x-large',
-                         horizontalalignment='center')
+        self.__add_caption(fig)
 
         if side_panels == 'none':
-            axx = fig.add_gridspec(top=1).subplots()
+            axx = fig.add_gridspec(top=.9, right=0.9).subplots()
             axx.set_xlabel('column')
             axx.set_ylabel('row')
         else:
@@ -584,10 +593,7 @@ class MONplot:
         fig.subplots_adjust(bottom=margin, top=1-margin, hspace=0.02)
 
         # add a centered suptitle to the figure
-        if self.caption:
-            fig.suptitle(self.caption + '\n',
-                         fontsize='x-large',
-                         horizontalalignment='center')
+        self.__add_caption(fig)
 
         # add title to image panel
         if title is not None:
@@ -667,9 +673,7 @@ class MONplot:
         fig.subplots_adjust(bottom=margin, top=1-margin, hspace=0.02)
 
         # add a centered suptitle to the figure
-        if self.caption:
-            fig.suptitle(self.caption + '\n', fontsize='x-large',
-                         horizontalalignment='center')
+        self.__add_caption(fig)
 
         # add title to image panel
         if title is not None:
@@ -773,10 +777,7 @@ class MONplot:
             self.__mpl['time_axis'] = isinstance(xdata[0], datetime)
 
             # add a centered suptitle to the figure
-            if self.caption:
-                self.__mpl['fig'].suptitle(self.caption + '\n',
-                                           fontsize='x-large',
-                                           horizontalalignment='center')
+            self.__add_caption(self.__mpl['fig'])
 
         # draw line in figure
         fig_draw_lplot(self.__mpl['axx'], xdata, ydata, color, **kwargs)
@@ -816,9 +817,7 @@ class MONplot:
         fig, axx = plt.subplots(figsize=(12.85, 6), subplot_kw=myproj)
 
         # add a centered suptitle of the Figure
-        if self.caption:
-            fig.suptitle(self.caption + '\n', fontsize='x-large',
-                         horizontalalignment='center')
+        self.__add_caption(fig)
 
         # add title to image panel
         if title is not None:
