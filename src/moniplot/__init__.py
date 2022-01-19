@@ -7,8 +7,9 @@
 #
 # License:  GNU GPL v3.0
 
-""" The pys5p package contains software to read S5p Tropomi L1B products.
-    And contains plotting routines to display your data beautifully."""
+""" Moniplot is a Python data visualization library for (satellite)
+instrument monitoring.
+"""
 
 from pkg_resources import get_distribution, DistributionNotFound
 

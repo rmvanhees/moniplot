@@ -225,11 +225,10 @@ def fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None):
     Notes
     -----
     The input data should have two dimensions. If the input data is array-like,
-    it will be converted into a xarray DataArray using the function data_to_xr
-    or pys5p.s5p_xarray.
+    it will be converted into a xarray DataArray using the function data_to_xr.
 
     The returned xarray DataArray has addition attributes to facilitate the
-    plotting methods of S5Pplot with names '_cmap' or start with '_z'.
+    plotting methods of MONplot with names '_cmap' or start with '_z'.
 
     The default values of vperc are used when both vrange and vperc are None.
     When vrange and vperc are provided, then vrange is used.

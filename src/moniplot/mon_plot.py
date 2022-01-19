@@ -254,7 +254,7 @@ class MONplot:
         ----------
         fig :  Matplotlib figure instance
         fig_info :  FIGinfo
-           instance of pys5p.lib.plotlib.FIGinfo to be displayed
+           instance of moniplot.lib.fig_info to be displayed
         """
         if fig_info is None or fig_info.location == 'none':
             return
@@ -720,7 +720,7 @@ class MONplot:
         Examples
         --------
         General example:
-        >>> plot = S5Pplot(fig_name)
+        >>> plot = MONplot(fig_name)
         >>> for ii, xx, yy in enumerate(data_of_each_line):
         >>>    plot.draw_lplot(xx, yy, color=ii, label=mylabel[ii],
         >>>                    marker='o', linestyle='None')
@@ -733,7 +733,7 @@ class MONplot:
         >>> tt0 = (datetime(year=2020, month=10, day=1)
         >>>        + timedelta(seconds=sec_in_day))
         >>> tt = [tt0 + xx * t_step for xx in range(yy.size)]
-        >>> plot = S5Pplot(fig_name)
+        >>> plot = MONplot(fig_name)
         >>> plot.draw_lplot(tt, yy, color=1, label=mylabel,
         >>>                 marker='o', linestyle='None')
         >>> plot.draw_line(None, None, ylim=[-10, 10],
