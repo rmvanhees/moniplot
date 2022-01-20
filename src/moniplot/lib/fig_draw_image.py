@@ -97,48 +97,45 @@ def set_norm(zscale: str, vmin: float, vmax: float):
     return mcolors.Normalize(vmin=vmin, vmax=vmax)
 
 
-def adjust_img_ticks(axx, xarr):
+def adjust_img_ticks(axx, xarr, dims=None):
     """
     Adjust ticks of the image axis
     """
-    if (xarr.shape[1] % 10) == 0:
-        axx.set_xticks(np.linspace(0, xarr.shape[1], 6, dtype=int))
-        axx.set_xticks(np.linspace(0, xarr.shape[1], 21, dtype=int),
-                       minor=True)
-    elif (xarr.shape[1] % 8) == 0:
-        axx.set_xticks(np.linspace(0, xarr.shape[1], 5, dtype=int))
-        axx.set_xticks(np.linspace(0, xarr.shape[1], 17, dtype=int),
-                       minor=True)
+    if dims is None or dims == 'X':
+        if (xarr.shape[1] % 10) == 0:
+            axx.set_xticks(np.linspace(0, xarr.shape[1], 6, dtype=int))
+            axx.set_xticks(np.linspace(0, xarr.shape[1], 21, dtype=int),
+                           minor=True)
+        elif (xarr.shape[1] % 8) == 0:
+            axx.set_xticks(np.linspace(0, xarr.shape[1], 5, dtype=int))
+            axx.set_xticks(np.linspace(0, xarr.shape[1], 17, dtype=int),
+                           minor=True)
 
-    if (xarr.shape[0] % 10) == 0:
-        axx.set_yticks(np.linspace(0, xarr.shape[0], 6, dtype=int))
-        axx.set_yticks(np.linspace(0, xarr.shape[0], 21, dtype=int),
-                       minor=True)
-    elif (xarr.shape[0] % 8) == 0:
-        axx.set_yticks(np.linspace(0, xarr.shape[0], 5, dtype=int))
-        axx.set_yticks(np.linspace(0, xarr.shape[0], 17, dtype=int),
-                       minor=True)
+    if dims is None or dims == 'Y':
+        if (xarr.shape[0] % 10) == 0:
+            axx.set_yticks(np.linspace(0, xarr.shape[0], 6, dtype=int))
+            axx.set_yticks(np.linspace(0, xarr.shape[0], 21, dtype=int),
+                           minor=True)
+        elif (xarr.shape[0] % 8) == 0:
+            axx.set_yticks(np.linspace(0, xarr.shape[0], 5, dtype=int))
+            axx.set_yticks(np.linspace(0, xarr.shape[0], 17, dtype=int),
+                           minor=True)
 
 
-def fig_draw_panels(fig, xarr, side_panels: str):
+def fig_draw_panels(axx_p: dict, xarr, side_panels: str) -> None:
     """
     Draw two side-panels, one left and one under the main image panel
 
     Parameters
     ----------
-    fig :  matplotlib
+    axx_p :  dict
+       dictionary holding matplotlib Axes for panel 'X' and 'Y'
     xarr :  xarray.DataArray
        Object holding measurement data and attributes
     side_panels :  str
        Show row and column statistics in side plots.
-
-    Returns
-    -------
-    matplotlib.Axes
-       axes object of the image panel
     """
-    # aspect of image data
-    aspect = min(4, max(1, int(round(xarr.shape[1] / xarr.shape[0]))))
+    cset = tol_cset('bright')
 
     # get numpy function to apply on image rows and columns for side pannels
     func_panels = {
@@ -150,59 +147,40 @@ def fig_draw_panels(fig, xarr, side_panels: str):
         'std': np.std,
         'nanstd': np.nanstd}.get(side_panels, None)
     if func_panels is None:
-        raise KeyError('unknown function for side_panels')
-
-    cset = tol_cset('bright')
-    if aspect == 1:
-        axx = fig.add_gridspec(left=0.25, top=0.9, bottom=0.25).subplots()
-        ax_panelx = axx.inset_axes([0, -0.25, 1, 0.2], sharex=axx)
-        ax_panely = axx.inset_axes([-0.25, 0, 0.2, 1], sharey=axx)
-    elif aspect == 2:
-        axx = fig.add_gridspec(left=0.125, top=0.9, bottom=0.25).subplots()
-        ax_panelx = axx.inset_axes([0, -0.25, 1, 0.2], sharex=axx)
-        ax_panely = axx.inset_axes([-0.125, 0, 0.1, 1], sharey=axx)
-    else:
-        axx = fig.add_gridspec(left=0.0625, top=0.9, bottom=0.25).subplots()
-        ax_panelx = axx.inset_axes([0, -0.25, 1, 0.2], sharex=axx)
-        ax_panely = axx.inset_axes([-0.0625, 0, 0.05, 1], sharey=axx)
+        raise KeyError(f'unknown function for side_panels: {side_panels}')
 
     # draw panel below the image pannel
     xdata = np.arange(xarr.shape[1])
     if side_panels == 'quality':
         ydata = np.sum(((xarr.values == 1) | (xarr.values == 2)), axis=0)
-        ax_panelx.step(xdata, ydata, linewidth=0.75, color=cset.yellow)
+        axx_p['X'].step(xdata, ydata, linewidth=0.75, color=cset.yellow)
         ydata = np.sum((xarr.values == 1), axis=0)          # worst
-        ax_panelx.step(xdata, ydata, linewidth=0.75, color=cset.red)
+        axx_p['X'].step(xdata, ydata, linewidth=0.75, color=cset.red)
         if len(xarr.attrs['flag_values']) == 6:
             ydata = np.sum((xarr.values == 4), axis=0)      # to_good
-            ax_panelx.step(xdata, ydata, linewidth=0.75, color=cset.green)
+            axx_p['X'].step(xdata, ydata, linewidth=0.75, color=cset.green)
     else:
-        ax_panelx.plot(xdata, func_panels(xarr.values, axis=0),
-                       linewidth=0.75, color=cset.blue)
-    ax_panelx.grid()
-    for xtl in axx.get_xticklabels():
-        xtl.set_visible(False)
-    ax_panelx.set_xlabel('column')
+        axx_p['X'].plot(xdata, func_panels(xarr.values, axis=0),
+                        linewidth=0.75, color=cset.blue)
+    adjust_img_ticks(axx_p['X'], xarr, dims='X')
+    axx_p['X'].grid()
 
     # draw panel left of the image pannel
     ydata = np.arange(xarr.shape[0])
     if side_panels == 'quality':
         xdata = np.sum(((xarr.values == 1) | (xarr.values == 2)), axis=1)
-        ax_panely.step(xdata, ydata, linewidth=0.75, color=cset.yellow)
+        axx_p['Y'].step(xdata, ydata, linewidth=0.75, color=cset.yellow)
         xdata = np.sum(xarr.values == 1, axis=1)            # worst
-        ax_panely.step(xdata, ydata, linewidth=0.75, color=cset.red)
+        axx_p['Y'].step(xdata, ydata, linewidth=0.75, color=cset.red)
         if len(xarr.attrs['flag_values']) == 6:
             xdata = np.sum(xarr.values == 4, axis=1)        # to_good
-            ax_panely.step(xdata, ydata, linewidth=0.75, color=cset.green)
+            axx_p['Y'].step(xdata, ydata, linewidth=0.75, color=cset.green)
     else:
-        ax_panely.plot(func_panels(xarr.values, axis=1), ydata,
-                       linewidth=0.75, color=cset.blue)
-    ax_panely.grid()
-    for ytl in axx.get_yticklabels():
-        ytl.set_visible(False)
-    ax_panely.set_ylabel('row')
-
-    return axx
+        axx_p['Y'].plot(func_panels(xarr.values, axis=1), ydata,
+                        linewidth=0.75, color=cset.blue)
+    axx_p['Y'].xaxis.tick_top()
+    adjust_img_ticks(axx_p['Y'], xarr, dims='Y')
+    axx_p['Y'].grid()
 
 
 # - main functions ---------------------------------

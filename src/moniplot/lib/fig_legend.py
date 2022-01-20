@@ -19,5 +19,3 @@ def blank_legend_key():
     """
     return mpl.patches.Rectangle((0, 0), 0, 0, fill=False,
                                  edgecolor='none', visible=False)
-
-

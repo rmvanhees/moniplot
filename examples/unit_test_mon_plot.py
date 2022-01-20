@@ -111,7 +111,7 @@ def run_draw_quality(plot):
     # define a region which will be excluded
     region = np.full(data.shape, True)     # this will exclude all
     region[np.s_[11:228, 16:991]] = False  # define region of interest
-    
+
     plot.draw_quality(data, exclude_region=region, title='no reference')
     plot.draw_quality(data, ref_data=ref_data, exclude_region=region,
                       title='with reference')
@@ -172,7 +172,6 @@ def run_draw_trend(plot):
     res.append(xr.DataArray(buff, name='obm_temp', dims=['orbit'],
                             coords=[np.arange(n_elmnt)], attrs=hk_attrs))
     hk_ds = xr.merge(res, combine_attrs="drop_conflicts")
-    
 
     msm1 = data_to_xr(np.sin(xx * np.pi), name='msm1', dims=['orbit'])
     msm2 = data_to_xr(np.cos(xx * np.pi), name='msm2', dims=['orbit'])
@@ -248,7 +247,7 @@ def run_draw_qhist(plot):
     # define a region which will be excluded
     region = np.full(frame.shape, True)     # this will exclude all
     region[np.s_[11:228, 16:991]] = False  # define region of interest
-    
+
     plot.draw_qhist(msm, exclude_region=region, title='my histogram')
 
 
@@ -259,10 +258,10 @@ def main():
     """
     check_draw_signal = True
     check_draw_cmp_images = False
-    check_draw_quality = False
-    check_draw_qhist = False
-    check_draw_trend = False
-    check_draw_lplot = False
+    check_draw_quality = True
+    check_draw_qhist = True
+    check_draw_trend = True
+    check_draw_lplot = True
 
     # ---------- UNIT TEST: draw_signal ----------
     if check_draw_signal:
