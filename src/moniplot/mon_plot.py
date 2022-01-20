@@ -284,14 +284,14 @@ class MONplot:
                  bbox={'facecolor': 'white', 'pad': 5})
 
     @staticmethod
-    def __add_img_fig_box(axx_c, axx_t, aspect, fig_info) -> None:
+    def __add_img_fig_box(axx_c, aspect: int, fig_info) -> None:
         """
         Add a box with meta information for draw_signal and draw_quality
 
         Parameters
         ----------
-        gspec :  Matplotlib gridspec instance
         axx_c :  Matplotlib Axes instance of the colorbar
+        aspect :  int
         fig_info :  FIGinfo
            instance of moniplot.lib.fig_info to be displayed
         """
@@ -319,10 +319,11 @@ class MONplot:
                        multialignment='left',
                        bbox={'facecolor': 'white', 'pad': 5})
         else:                     # put text below the colorbar (xx-small)
-            axx_t.text(0.075 if aspect in (1, 2) else 0.15,
-                       .95 - (aspect-1) * 0.025,
+            axx_c.text(0.1 * aspect,
+                       -0.03 - (aspect-1) * 0.005,
                        fig_info.as_str(),
-                       fontsize='xx-small', style='normal',
+                       transform=axx_c.transAxes,
+                       fontsize='x-small', style='normal',
                        verticalalignment='top',
                        horizontalalignment='left',
                        multialignment='left',
@@ -413,11 +414,7 @@ class MONplot:
         # - gspec[0, 0] is reserved for the y-panel
         # - gspec[0, 2] is reserved for the colorbar
         # - gspec[0, 2] is used to pace the small fig_info box (max 4 lines)
-        # - gspec[1, 2:] is reserved for the bigger fig_info box (4-9 lines)
-        wratio = {1: (1, 4, 0.25, 0.75),
-                  2: (1, 8, 0.25, 0.75),
-                  3: (1, 12, 0.25, 0.75),
-                  4: (1, 16, 0.25, 0.75)}.get(aspect)
+        wratio = (1., 4. * aspect, 0.25, 0.75)
         gspec = fig.add_gridspec(2, 4, left=0.1, right=0.9,
                                  width_ratios=wratio, height_ratios=(4, 1),
                                  bottom=0.1 if aspect in (1, 2) else 0.125,
@@ -468,9 +465,7 @@ class MONplot:
             fig_info.add('spread', (spread, xarr.attrs['_zunits']), '{:.5g} {}')
 
         # add annotation and save figure
-        axx_t = fig.add_subplot(gspec[1, 2:])
-        axx_t.axis('off')
-        self.__add_img_fig_box(axx_c, axx_t, aspect, fig_info)
+        self.__add_img_fig_box(axx_c, aspect, fig_info)
         self.__close_this_page(fig)
 
     # --------------------------------------------------
@@ -564,11 +559,7 @@ class MONplot:
         # - gspec[0, 0] is reserved for the y-panel
         # - gspec[0, 2] is reserved for the colorbar
         # - gspec[0, 2] is used to pace the small fig_info box (max 4 lines)
-        # - gspec[1, 2:] is reserved for the bigger fig_info box (4-9 lines)
-        wratio = {1: (1, 4, 0.25, 0.75),
-                  2: (1, 8, 0.25, 0.75),
-                  3: (1, 12, 0.25, 0.75),
-                  4: (1, 16, 0.25, 0.75)}.get(aspect)
+        wratio = (1., 4. * aspect, 0.25, 0.75)
         gspec = fig.add_gridspec(2, 4, left=0.1, right=0.9,
                                  width_ratios=wratio, height_ratios=(4, 1),
                                  bottom=0.1 if aspect in (1, 2) else 0.125,
@@ -632,9 +623,7 @@ class MONplot:
                          np.sum(xarr.values == 1))
 
         # add annotation and save the figure
-        axx_t = fig.add_subplot(gspec[1, 2:])
-        axx_t.axis('off')
-        self.__add_img_fig_box(axx_c, axx_t, aspect, fig_info)
+        self.__add_img_fig_box(axx_c, aspect, fig_info)
         self.__close_this_page(fig)
 
     # --------------------------------------------------
