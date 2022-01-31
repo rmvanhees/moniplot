@@ -46,10 +46,13 @@ def fig_draw_qhist(axx, qdata, label: str, density: bool):
     cset = tol_cset('bright')
 
     qdata[np.isnan(qdata)] = 0.
-    axx.hist(qdata, bins=11, range=[-.1, 1.],
-             histtype='stepfilled', log=True,
-             density=density, color=cset.blue)
-    # axx.set_yscale('log', nonpositive='clip')
+    axx.hist(qdata, bins=10, range=[0, 1], density=density,
+             histtype='bar', align='mid', log=True, fill=False,
+             linewidth=1.5, edgecolor=cset.blue)
+    axx.hist(qdata, bins=10, range=[0, 1], density=density,
+             histtype='step', align='mid', log=True, fill=True,
+             linewidth=0.1, facecolor=cset.blue, alpha=.5)
+   
     axx.set_xlim([0, 1])
     axx.set_ylabel('density' if density else 'count')
     axx.set_ylim([1e-4, 10])

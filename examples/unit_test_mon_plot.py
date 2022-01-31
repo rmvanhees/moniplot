@@ -120,14 +120,11 @@ def run_draw_quality(plot):
     data[75:125, 900:925] = 0.05
     data[75:125, 825:875] = 0.4
 
-    # define a region which will be excluded
-    region = np.full(data.shape, True)     # this will exclude all
-    region[np.s_[11:228, 16:991]] = False  # define region of interest
-
-    plot.draw_quality(data, exclude_region=region, title='no reference')
-    plot.draw_quality(data, ref_data=ref_data, exclude_region=region,
+    plot.draw_quality(data, data_sel=np.s_[11:228, 16:991],
+                      title='no reference')
+    plot.draw_quality(data, ref_data=ref_data, data_sel=np.s_[11:228, 16:991],
                       title='with reference')
-    plot.draw_quality(data, exclude_region=region,
+    plot.draw_quality(data, data_sel=np.s_[11:228, 16:991],
                       side_panels='none', title='no reference')
 
 
@@ -256,11 +253,7 @@ def run_draw_qhist(plot):
                     data_to_xr(frame, name='dpqm_noise_var',
                                long_name='pixel-quality map (noise variance)')])
 
-    # define a region which will be excluded
-    region = np.full(frame.shape, True)     # this will exclude all
-    region[np.s_[11:228, 16:991]] = False  # define region of interest
-
-    plot.draw_qhist(msm, exclude_region=region, title='my histogram')
+    plot.draw_qhist(msm, data_sel=np.s_[11:228, 16:991], title='my histogram')
 
 
 # --------------------------------------------------
@@ -268,9 +261,9 @@ def main():
     """
     main function
     """
-    check_draw_signal = True
+    check_draw_signal = False   # True
     check_draw_cmp_images = False
-    check_draw_quality = True
+    check_draw_quality = False  # True
     check_draw_qhist = True
     check_draw_trend = True
     check_draw_lplot = True

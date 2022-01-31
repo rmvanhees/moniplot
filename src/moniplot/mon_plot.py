@@ -108,13 +108,16 @@ class MONplot:
     draw_signal(data, zscale='linear', fig_info=None, side_panels='nanmedian',
                 title=None, **kwargs)
        Display 2D array data as an image and averaged column/row signal plots.
-    draw_quality(data, ref_data=None, fig_info=None, side_panels='quality',
-                 title=None, **kwargs)
+    draw_quality(data, ref_data=None, data_sel=None, fig_info=None,
+                 side_panels='quality', title=None, **kwargs)
        Display pixel-quality 2D data as an image and column/row statistics.
     draw_trend(xds=None, hk_xds=None, vrange_last_orbits=-1, fig_info=None,
                title=None, **kwargs)
        Display trends of measurement data and/or housekeeping data.
-    draw_qhist(xds, density=True, fig_info=None, title=None)
+    draw_hist(data, data_sel=None, vrange=None, fig_info=None,
+              title=None, **kwargs)
+        Display data as histograms.
+    draw_qhist(xds, data_sel=None, density=True, fig_info=None, title=None)
        Display pixel-quality data as histograms.
     draw_tracks(lons, lats, icids, saa_region=None, fig_info=None, title=None)
        Display tracks of satellite on a world map using a Robinson projection.
@@ -481,8 +484,8 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_quality(self, data, ref_data=None, *, fig_info=None,
-                     side_panels='quality', title=None, **kwargs) -> None:
+    def draw_quality(self, data, ref_data=None, *, side_panels='quality',
+                     fig_info=None, title=None, **kwargs) -> None:
         """
         Display pixel-quality 2D array data as image and column/row statistics
 
@@ -502,8 +505,8 @@ class MONplot:
         title :  str, default=None
            Title of this figure (matplotlib: Axis.set_title)
         **kwargs :   other keywords
-           Pass keyword arguments: 'thres_worst', 'thres_bad' or 'qlabels'
-           to moniplot.lib.fig_draw_image.fig_qdata_to_xarr()
+           Pass keyword arguments: 'data_sel', 'thres_worst', 'thres_bad'
+           or 'qlabels' to moniplot.lib.fig_draw_image.fig_qdata_to_xarr()
 
         The quality ranking labels are ['unusable', 'worst', 'bad', 'good'],
         in case nor reference dataset is provided. Where:
@@ -542,7 +545,6 @@ class MONplot:
         Finalize the PDF file
 
         >>> plot.close()
-
         """
         if fig_info is None:
             fig_info = FIGinfo()
@@ -731,7 +733,105 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_qhist(self, xds, *, density=True, exclude_region=None,
+    def draw_hist(self, data, data_sel=None, vrange=None,
+                  fig_info=None, title=None, **kwargs) -> None:
+        """
+        Display data as histograms.
+
+        Parameters
+        ----------
+        data :  numpy.ndarray or xarray.DataArray
+           Object holding measurement data and attributes
+        data_sel :  mask or index tuples for arrays, optional
+           Select a region on the detector by fancy indexing (using a
+           boolean/interger arrays), or using index tuples for arrays
+           (generated with numpy.s_).
+        vrange :  list, default=[data.min(), data.max()]
+           The lower and upper range of the bins.
+           Note data will also be clipped according to this range.
+        fig_info :  FIGinfo, optional
+           OrderedDict holding meta-data to be displayed in the figure
+        title :  str, optional
+           Title of this figure (matplotlib: Axis.set_title)
+        **kwargs :   other keywords
+           Pass keyword arguments matplotlib.pyplot.hist: a.o. bins, density
+           Note the keywords histtype, color, linewidth and fill are predefined.
+
+        Examples
+        --------
+        Create a PDF document 'test.pdf' and add figure with a histogram
+        of array 'data' (np.ndarray or xr.DataArray). And a second page
+        with also a histogram where data is a xarray with attribute
+        'long_name' then the title is
+        f'Histograms of {xarr.attrs["long_name"]} values'
+
+        The array will be flattend the the histogram is created with
+        matplotlib.pyplot.hist.
+
+        >>> plot = MONplot('test.pdf', caption='my caption')
+        >>> plot.set_institute('SRON')
+        >>> plot.draw_hist(data, title='my title')
+        >>> plot.draw_hist(xarr)
+        >>> plot.close()
+        """
+        long_name = ''
+        zunits = '1'
+        if isinstance(data, xr.DataArray):
+            if data_sel is None:
+                values = data.values.reshape(-1)
+            else:
+                values = data.values[data_sel].reshape(-1)
+            if 'long_name' in data.attrs:
+                long_name = data.attrs['long_name']
+            if 'units' in data.attrs:
+                zunits = data.attrs['units']
+        else:
+            if data_sel is None:
+                values = data.reshape(-1)
+            else:
+                values = data[data_sel].reshape(-1)
+
+        # add data statistics to fig_info
+        if fig_info is None:
+            fig_info = FIGinfo()
+
+        median, spread = biweight(values, spread=True)
+        if zunits == '1':
+            fig_info.add('median', median, '{:.5g}')
+            fig_info.add('spread', spread, '{:.5g}')
+        else:
+            fig_info.add('median', (median, zunits), '{:.5g} {}')
+            fig_info.add('spread', (spread, zunits), '{:.5g} {}')
+
+        # create figure
+        fig, axx = plt.subplots(1, figsize=(8, 7))
+
+        # add a centered suptitle to the figure
+        self.__add_caption(fig)
+
+        # add title to image panel
+        if title is None:
+            title = f'Histograms of {long_name} values'
+        axx.set_title(title)
+
+        # add histogram
+        if vrange is not None:
+            values = np.clip(values, vrange[0], vrange[1])
+        axx.hist(values, range=vrange, fill=True, histtype='step',
+                 linewidth=.1, alpha=.33, facecolor='#4477AA', **kwargs)
+        axx.hist(values, range=vrange, fill=False, histtype='step',
+                 linewidth=1.5, color='#4477AA', **kwargs)
+        axx.grid(True)
+        axx.set_xlabel(long_name if long_name else 'value')
+        axx.set_ylabel('number of pixels')
+
+        # add annotation and save the figure
+        self.__add_copyright(axx)
+        self.__add_fig_box(fig, fig_info)
+        self.__close_this_page(fig)
+
+    # --------------------------------------------------
+    def draw_qhist(self, xds, data_sel=None, density=True,
                    fig_info=None, title=None) -> None:
         """
         Display pixel-quality data as histograms.
@@ -740,13 +840,14 @@ class MONplot:
         ----------
         xds :  xarray.Dataset, optional
            Object holding measurement data and attributes
+        data_sel :  mask or index tuples for arrays, optional
+           Select a region on the detector by fancy indexing (using a
+           boolean/interger arrays), or using index tuples for arrays
+           (generated with numpy.s_).
         density : bool, optional
            If True, draw and return a probability density: each bin will
            display the bin's raw count divided by the total number of counts
            and the bin width (see matplotlib.pyplot.hist). Default is True
-        exclude_region : numpy.ndarray, optional
-           Provide a mask to define the area on the detector which should be
-           excluded.
         fig_info :  FIGinfo, optional
            OrderedDict holding meta-data to be displayed in the figure
         title :  str, optional
@@ -760,7 +861,7 @@ class MONplot:
         will be displayed in a seperate sub-panel.
 
         >>> plot = MONplot('test.pdf', caption='my caption', institute='SRON')
-        >>> plot.draw_trend(xds, title='my title')
+        >>> plot.draw_qhist(xds, title='my title')
         >>> plot.close()
 
         """
@@ -785,17 +886,16 @@ class MONplot:
         self.__add_caption(fig)
 
         # add title to image panel
-        if title is not None:
+        if title is None:
             title = 'Histograms of pixel-quality'
-        axarr[0].set_title(title, fontsize='large')
+        axarr[0].set_title(title)
 
         # add figures with histograms
         for ii, (key, xda) in enumerate(xds.data_vars.items()):
-            if isinstance(exclude_region, np.ndarray):
-                # pylint: disable=invalid-unary-operand-type
-                qdata = xda.values[~exclude_region].reshape(-1)
-            else:
+            if data_sel is None:
                 qdata = xda.values.reshape(-1)
+            else:
+                qdata = xda.values[data_sel].reshape(-1)
             label = xda.attrs['long_name'] if 'long_name' in xda.attrs else key
             fig_draw_qhist(axarr[ii], qdata, label, density)
 
@@ -873,13 +973,13 @@ class MONplot:
         # initialize figure
         if self.__mpl is None:
             if len(xdata) <= 256:
-                figsize = (8, 8)
+                figsize = (8, 7)
             elif 256 > len(xdata) <= 512:
-                figsize = (10, 8)
+                figsize = (10, 7)
             elif 512 > len(xdata) <= 768:
-                figsize = (12, 8)
+                figsize = (12, 7)
             else:
-                figsize = (14, 8)
+                figsize = (14, 7)
 
             self.__mpl = dict(zip(('fig', 'axx'),
                                   plt.subplots(1, figsize=figsize)))

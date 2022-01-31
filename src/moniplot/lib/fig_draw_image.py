@@ -32,6 +32,7 @@ Copyright (c) 2022 SRON - Netherlands Institute for Space Research
 License:  GPLv3
 """
 from math import log10
+import warnings
 
 import numpy as np
 import xarray as xr
@@ -172,8 +173,11 @@ def fig_draw_panels(axx_p: dict, xarr, side_panels: str) -> None:
             ydata = np.sum((xarr.values == 4), axis=0)      # to_good
             axx_p['X'].step(xdata, ydata, linewidth=0.75, color=cset.green)
     else:
-        axx_p['X'].plot(xdata, func_panels(xarr.values, axis=0),
-                        linewidth=0.75, color=cset.blue)
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore',
+                                    r'All-NaN (slice|axis) encountered')
+            axx_p['X'].plot(xdata, func_panels(xarr.values, axis=0),
+                            linewidth=0.75, color=cset.blue)
     adjust_img_ticks(axx_p['X'], xarr, dims='X')
     axx_p['X'].grid()
 
@@ -188,8 +192,11 @@ def fig_draw_panels(axx_p: dict, xarr, side_panels: str) -> None:
             xdata = np.sum(xarr.values == 4, axis=1)        # to_good
             axx_p['Y'].step(xdata, ydata, linewidth=0.75, color=cset.green)
     else:
-        axx_p['Y'].plot(func_panels(xarr.values, axis=1), ydata,
-                        linewidth=0.75, color=cset.blue)
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore',
+                                    r'All-NaN (slice|axis) encountered')
+            axx_p['Y'].plot(func_panels(xarr.values, axis=1), ydata,
+                            linewidth=0.75, color=cset.blue)
     axx_p['Y'].xaxis.tick_top()
     adjust_img_ticks(axx_p['Y'], xarr, dims='Y')
     axx_p['Y'].grid()
@@ -275,7 +282,8 @@ def fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None):
     return xarr
 
 
-def fig_qdata_to_xarr(data, ref_data=None, exclude_region=None,
+# pylint: disable=too-many-arguments
+def fig_qdata_to_xarr(data, ref_data=None, data_sel=None,
                       thres_worst=0.1, thres_bad=0.8, qlabels=None):
     """
     Prepare pixel-quality data for plotting
@@ -288,9 +296,11 @@ def fig_qdata_to_xarr(data, ref_data=None, exclude_region=None,
         Numpy array holding reference data, for example pixel quality
         reference map taken from the CKD. Shown are the changes with
         respect to the reference data.
-    exclude_region : numpy.ndarray, optional
-        Provide a mask to define the area on the detector which should be
-        excluded, e.g. get pixel quality label 'unusable'.
+    data_sel :  mask or index tuples for arrays, optional
+        Select a region on the detector by fancy indexing (using a
+        boolean/interger arrays), or using index tuples for arrays
+        (generated with numpy.s_).
+        Outside this region the pixels will be labeled: 'unusable'.
     thres_worst :  float, default=0.1
         Threshold to reject only the worst of the bad pixels, intended
         for CKD derivation.
@@ -318,6 +328,15 @@ def fig_qdata_to_xarr(data, ref_data=None, exclude_region=None,
     -------
     xarray.DataArray
     """
+    if isinstance(data_sel, slice):
+        exclude_region = np.full(data.shape, True)
+        exclude_region[np.s_[11:228, 16:991]] = False
+    elif isinstance(data_sel, np.ndarray):
+        # pylint: disable=invalid-unary-operand-type
+        exclude_region = ~data_sel
+    else:
+        exclude_region = None
+
     def float_to_quality(arr):
         """
         Convert float value [0, 1] to quality classes
