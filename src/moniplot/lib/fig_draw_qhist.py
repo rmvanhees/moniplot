@@ -24,7 +24,6 @@ License:  GPLv3
 """
 import numpy as np
 
-from ..tol_colors import tol_cset
 from .fig_legend import blank_legend_key
 
 
@@ -42,23 +41,18 @@ def fig_draw_qhist(axx, qdata, label: str, density: bool):
     density :  bool
        See method MONplot::draw_qhist for a description
     """
-    # define colors
-    cset = tol_cset('bright')
-
     qdata[np.isnan(qdata)] = 0.
+    # draw histogram
     axx.hist(qdata, bins=10, range=[0, 1], density=density,
-             histtype='bar', align='mid', log=True, fill=False,
-             linewidth=1.5, edgecolor=cset.blue)
-    axx.hist(qdata, bins=10, range=[0, 1], density=density,
-             histtype='step', align='mid', log=True, fill=True,
-             linewidth=0.1, facecolor=cset.blue, alpha=.5)
-   
+             histtype='bar',align='mid', log=True, fill=True,
+             edgecolor='#4477AA', facecolor='#77AADD', linewidth=1.5)
+    # add label
+    legenda = axx.legend([blank_legend_key()],
+                         [label], loc='upper left')
+    legenda.draw_frame(False)
+    # add decoration
+    axx.grid(which='major', axis='y', color='#AAAAAA', ls='--')
     axx.set_xlim([0, 1])
     axx.set_ylabel('density' if density else 'count')
     axx.set_ylim([1e-4, 10])
     axx.set_yticks([1e-4, 1e-3, 1e-2, 1e-1, 1])
-    axx.grid(which='major', color='#BBBBBB',
-                   lw=0.75, ls=(0, (1, 5)))
-    legenda = axx.legend([blank_legend_key()],
-                         [label], loc='upper left')
-    legenda.draw_frame(False)

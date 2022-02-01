@@ -817,13 +817,18 @@ class MONplot:
         # add histogram
         if vrange is not None:
             values = np.clip(values, vrange[0], vrange[1])
-        axx.hist(values, range=vrange, fill=True, histtype='step',
-                 linewidth=.1, alpha=.33, facecolor='#4477AA', **kwargs)
-        axx.hist(values, range=vrange, fill=False, histtype='step',
-                 linewidth=1.5, color='#4477AA', **kwargs)
-        axx.grid(True)
+        # Edgecolor is tol_cset('bright').blue
+        if 'bins' in kwargs and kwargs['bins'] > 24:
+            axx.hist(values, range=vrange, histtype='steps',
+                     edgecolor='#4477AA', facecolor='#77AADD',
+                     fill=True, linewidth=1.5, **kwargs)
+        else:
+            axx.hist(values, range=vrange, histtype='bar',
+                     edgecolor='#4477AA', facecolor='#77AADD',
+                     linewidth=1.5, **kwargs)
+        axx.grid(which='major', axis='y', color='#AAAAAA', ls='--')
         axx.set_xlabel(long_name if long_name else 'value')
-        axx.set_ylabel('number of pixels')
+        axx.set_ylabel('density' if density else 'count')
 
         # add annotation and save the figure
         self.__add_copyright(axx)
