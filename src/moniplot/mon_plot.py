@@ -822,13 +822,17 @@ class MONplot:
             axx.hist(values, range=vrange, histtype='step',
                      edgecolor='#4477AA', facecolor='#77AADD',
                      fill=True, linewidth=1.5, **kwargs)
+            axx.grid(which='major', color='#AAAAAA', ls='--')
         else:
             axx.hist(values, range=vrange, histtype='bar',
                      edgecolor='#4477AA', facecolor='#77AADD',
                      linewidth=1.5, **kwargs)
-        axx.grid(which='major', axis='y', color='#AAAAAA', ls='--')
+            axx.grid(which='major', axis='y', color='#AAAAAA', ls='--')
         axx.set_xlabel(long_name if long_name else 'value')
-        axx.set_ylabel('density' if density else 'count')
+        if 'density' in kwargs and kwargs['density']:
+            axx.set_ylabel('density')
+        else:
+            axx.set_ylabel('count')
 
         # add annotation and save the figure
         self.__add_copyright(axx)
