@@ -819,7 +819,7 @@ class MONplot:
             values = np.clip(values, vrange[0], vrange[1])
         # Edgecolor is tol_cset('bright').blue
         if 'bins' in kwargs and kwargs['bins'] > 24:
-            axx.hist(values, range=vrange, histtype='steps',
+            axx.hist(values, range=vrange, histtype='step',
                      edgecolor='#4477AA', facecolor='#77AADD',
                      fill=True, linewidth=1.5, **kwargs)
         else:
