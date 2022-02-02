@@ -72,7 +72,7 @@ def adjust_zunit(zunit: str, vmin: float, vmax: float):
         zunit = zunit.replace('.s-1', ' s$^{-1}$')
 
     if zunit[0] in ('e', 'V', 'A'):
-        key_to_zunit = {-4: 'p', -3: 'n', -2: r'\xb5', -1: 'm',
+        key_to_zunit = {-4: 'p', -3: 'n', -2: '\xb5', -1: 'm',
                         0: '', 1: 'k', 2: 'M', 3: 'G', 4: 'T'}
         max_value = max(abs(vmin), abs(vmax))
         key = min(4, max(-4, log10(max_value) // 3))
@@ -257,7 +257,7 @@ def fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None):
 
     # set data units and scaling
     dscale, zunits = adjust_zunit(xarr.attrs['units'], vmin, vmax)
-    xarr.values[np.isfinite(xarr.values)] *= dscale
+    xarr.values[np.isfinite(xarr.values)] /= dscale
     xarr.attrs['_zunits'] = zunits
     xarr.attrs['_zrange'] = (vmin / dscale, vmax / dscale)
 
@@ -278,7 +278,7 @@ def fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None):
                            'ratio': tol_cmap('sunset')}.get(zscale)
 
     # set matplotlib data normalization
-    xarr.attrs['_znorm'] = set_norm(zscale, vmin, vmax)
+    xarr.attrs['_znorm'] = set_norm(zscale, vmin / dscale, vmax / dscale)
     return xarr
 
 
