@@ -83,26 +83,32 @@ def adjust_ylim(avg, err1, err2, vperc: list, vrange_last_orbits: int):
     """
     Return the limits of the Y-coordinate
     """
-    if err1 is not None:
-        if vrange_last_orbits > 0:
+    if err1 is not None and err2 is not None:
+        indx = np.isfinite(err1) & np.isfinite(err2)
+        if np.all(~indx):
+            ylim = [0., 0.]
+        elif np.sum(indx) > vrange_last_orbits > 0:
             ni = vrange_last_orbits
-            ylim = [min(err1[0:ni].min(), err1[-ni:].min()),
-                    max(err2[0:ni].max(), err2[-ni:].max())]
+            ylim = [min(err1[indx][0:ni].min(), err1[indx][-ni:].min()),
+                    max(err2[indx][0:ni].max(), err2[indx][-ni:].max())]
         elif isinstance(vperc, list) and len(vperc) == 2:
-            ylim = [np.percentile(err1, vperc[0]),
-                    np.percentile(err2, vperc[1])]
+            ylim = [np.percentile(err1[indx], vperc[0]),
+                    np.percentile(err2[indx], vperc[1])]
         else:
-            ylim = [err1.min(), err2.max()]
+            ylim = [err1[indx].min(), err2[indx].max()]
         factor = 10
     else:
-        if vrange_last_orbits > 0:
+        indx = np.isfinite(avg)
+        if np.all(~indx):
+            ylim = [0., 0.]
+        elif np.sum(indx) > vrange_last_orbits > 0:
             ni = vrange_last_orbits
-            ylim = [min(avg[0:ni].min(), avg[-ni:].min()),
-                    max(avg[0:ni].max(), avg[-ni:].max())]
+            ylim = [min(avg[indx][0:ni].min(), avg[indx][-ni:].min()),
+                    max(avg[indx][0:ni].max(), avg[indx][-ni:].max())]
         elif isinstance(vperc, list) and len(vperc) == 2:
-            ylim = np.percentile(err1, vperc)
+            ylim = np.percentile(avg[indx], vperc)
         else:
-            ylim = [avg.min(), avg.max()]
+            ylim = [avg[indx].min(), avg[indx].max()]
         factor = 5
 
     if ylim[0] == ylim[1]:
