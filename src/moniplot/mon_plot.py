@@ -105,11 +105,11 @@ class MONplot:
        Use the name of your institute as a signature.
     institute
        Return name of your institute.
-    draw_signal(data, zscale='linear', fig_info=None, side_panels='nanmedian',
+    draw_signal(data, zscale='linear', side_panels='nanmedian', fig_info=None,
                 title=None, **kwargs)
        Display 2D array data as an image and averaged column/row signal plots.
-    draw_quality(data, ref_data=None, data_sel=None, fig_info=None,
-                 side_panels='quality', title=None, **kwargs)
+    draw_quality(data, ref_data=None, side_panels='quality', fig_info=None,
+                 title=None, **kwargs)
        Display pixel-quality 2D data as an image and column/row statistics.
     draw_trend(xds=None, hk_xds=None, vrange_last_orbits=-1, fig_info=None,
                title=None, **kwargs)
@@ -847,16 +847,16 @@ class MONplot:
 
         Parameters
         ----------
-        xds :  xarray.Dataset, optional
+        xds :  xarray.Dataset
            Object holding measurement data and attributes
         data_sel :  mask or index tuples for arrays, optional
            Select a region on the detector by fancy indexing (using a
            boolean/interger arrays), or using index tuples for arrays
            (generated with numpy.s_).
-        density : bool, optional
+        density : bool, default=True
            If True, draw and return a probability density: each bin will
            display the bin's raw count divided by the total number of counts
-           and the bin width (see matplotlib.pyplot.hist). Default is True
+           and the bin width (see matplotlib.pyplot.hist).
         fig_info :  FIGinfo, optional
            OrderedDict holding meta-data to be displayed in the figure
         title :  str, optional

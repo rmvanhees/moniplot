@@ -328,12 +328,13 @@ def fig_qdata_to_xarr(data, ref_data=None, data_sel=None,
     -------
     xarray.DataArray
     """
-    if isinstance(data_sel, slice):
-        exclude_region = np.full(data.shape, True)
-        exclude_region[np.s_[11:228, 16:991]] = False
-    elif isinstance(data_sel, np.ndarray):
-        # pylint: disable=invalid-unary-operand-type
-        exclude_region = ~data_sel
+    if data_sel is not None:
+        if isinstance(data_sel, np.ndarray):
+            # pylint: disable=invalid-unary-operand-type
+            exclude_region = ~data_sel
+        else:
+            exclude_region = np.full(data.shape, True)
+            exclude_region[data_sel] = False
     else:
         exclude_region = None
 
