@@ -87,25 +87,27 @@ def set_norm(zscale: str, vmin: float, vmax: float):
     Set data-range normalization
     """
     if zscale == 'log':
-        return mcolors.LogNorm(vmin=max(vmin, 1e-6), vmax=vmax)  # clip=True
+        return mcolors.LogNorm(vmin=max(vmin, 1e-6), vmax=vmax)
 
     if zscale == 'diff':
-        mid_val = (vmin + vmax) / 2
         if vmin < 0 < vmax:
+            vcntr = 0.
             tmp1, tmp2 = (vmin, vmax)
             vmin = -max(-tmp1, tmp2)
             vmax = max(-tmp1, tmp2)
-            mid_val = 0.
-        return mcolors.TwoSlopeNorm(vmin=vmin, vcenter=mid_val, vmax=vmax)
+        else:
+            vcntr = (vmin + vmax) / 2
+        return mcolors.TwoSlopeNorm(vcntr, vmin=vmin, vmax=vmax)
 
     if zscale == 'ratio':
-        mid_val = (vmin + vmax) / 2
         if vmin < 1 < vmax:
+            vcntr = 1.
             tmp1, tmp2 = (vmin, vmax)
             vmin = min(tmp1, 1 / tmp2)
             vmax = max(1 / tmp1, tmp2)
-            mid_val = 1.
-        return mcolors.TwoSlopeNorm(vmin=vmin, vcenter=mid_val, vmax=vmax)
+        else:
+            vcntr = (vmin + vmax) / 2
+        return mcolors.TwoSlopeNorm(vcntr, vmin=vmin, vmax=vmax)
 
     return mcolors.Normalize(vmin=vmin, vmax=vmax)
 
@@ -259,7 +261,6 @@ def fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None):
     dscale, zunits = adjust_zunit(xarr.attrs['units'], vmin, vmax)
     xarr.values[np.isfinite(xarr.values)] /= dscale
     xarr.attrs['_zunits'] = zunits
-    xarr.attrs['_zrange'] = (vmin / dscale, vmax / dscale)
 
     # set data label
     if zscale == 'ratio' or xarr.attrs['_zunits'] == '1':
@@ -279,6 +280,7 @@ def fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None):
 
     # set matplotlib data normalization
     xarr.attrs['_znorm'] = set_norm(zscale, vmin / dscale, vmax / dscale)
+
     return xarr
 
 
