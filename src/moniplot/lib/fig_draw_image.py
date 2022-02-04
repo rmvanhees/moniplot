@@ -200,8 +200,10 @@ def fig_draw_panels(axx_p: dict, xarr, side_panels: str) -> None:
             axx_p['Y'].plot(func_panels(xarr.values, axis=1), ydata,
                             linewidth=0.75, color=cset.blue)
     #axx_p['Y'].xaxis.tick_top()
-    axx_p['Y'].xaxis.tick_params(axis='Y', top=True, labeltop=True,
-                                 labelrotation=-45, labelsize=0.75)
+    axx_p['X'].tick_params(axis='y', labelrotation=45, labelsize='small')
+    axx_p['Y'].tick_params(axis='x', bottom=False, top=True,
+                           labelbottom=False, labeltop=True,
+                           labelrotation=-45, labelsize='small')
     adjust_img_ticks(axx_p['Y'], xarr, dims='Y')
     axx_p['Y'].grid()
 
