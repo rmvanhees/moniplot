@@ -10,7 +10,7 @@ The latest release of moniplot is available from:
 Where you can download the source as a tar-file or zipped archive.
 Or you can use git do download the repository:
 
-    git clone https://gitlab.sron.nl/Richardh/moniplot.git
+    git clone https://github.com/rmvanhees/moniplot.git
 	
 Before you can install moniplot, you need:
 
@@ -20,7 +20,7 @@ Before you can install moniplot, you need:
 And the following Python modules have to be available:
  * setuptools v60+
  * setuptools-scm v6+
- * numpy v1.22+
+ * numpy v1.21+
  * h5py v3.5+
  * xarray v0.20+
  * matplotlib v3.5+
