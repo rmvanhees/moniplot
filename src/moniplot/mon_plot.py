@@ -46,6 +46,7 @@ else:
     FOUND_CARTOPY = True
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib.gridspec import GridSpec
 
 from .biweight import biweight
 
@@ -371,6 +372,18 @@ class MONplot:
         in a text box. In addition, we display the creation date and the data
         (biweight) median & spread.
 
+        xarray attributes
+        -----------------
+        Attributes starting with an underscore are added by fig_data_to_xarr
+
+        long_name :  used as the title of the main panel when parameter 'title'
+            is not defined.
+        _cmap :  contains the matplotlib colormap
+        _zlabel :  contains the label of the color bar
+        _znorm :  matplotlib class to normalize the data between zero and one.
+        _zscale :  scaling of the data values: linear, log, diff, ratio, ...
+        _zunits :  adjusted units of the data
+
         Examples
         --------
         Create a PDF document 'test.pdf' and add figure of dataset 'img'
@@ -508,6 +521,21 @@ class MONplot:
            Pass keyword arguments: 'data_sel', 'thres_worst', 'thres_bad'
            or 'qlabels' to moniplot.lib.fig_draw_image.fig_qdata_to_xarr()
 
+        xarray attributes
+        -----------------
+        Attributes starting with an underscore are added by fig_qdata_to_xarr
+
+        long_name :  used as the title of the main panel when parameter 'title'
+            is not defined.
+        flag_values :  values of the flags used to qualify the pixel quality
+        flag_meanings :  description of the flag values
+        thres_bad :  threshold between good and bad
+        thres_worst :  threshold between bad and worst
+        _cmap :  contains the matplotlib colormap
+        _znorm :  matplotlib class to normalize the data between zero and one.
+
+        Notes
+        -----
         The quality ranking labels are ['unusable', 'worst', 'bad', 'good'],
         in case nor reference dataset is provided. Where:
         - 'unusable'  : pixels outside the illuminated region
@@ -660,6 +688,12 @@ class MONplot:
            Pass keyword arguments: vperc or vrange_last_orbits
            to moniplot.lib.fig_draw_trend.add_hk_subplot()
 
+        xarray attributes
+        -----------------
+        long_name :  used as the title of the main panel when parameter 'title'
+            is not defined.
+        units :  units of the data
+
         Examples
         --------
         Create a PDF document 'test.pdf' and add figure of dataset 'xds'
@@ -756,6 +790,12 @@ class MONplot:
         **kwargs :   other keywords
            Pass keyword arguments matplotlib.pyplot.hist: a.o. bins, density
            Note the keywords histtype, color, linewidth and fill are predefined.
+
+        xarray attributes
+        -----------------
+        long_name :  used as the title of the main panel when parameter 'title'
+            is not defined.
+        units :  units of the data
 
         Examples
         --------
@@ -861,6 +901,12 @@ class MONplot:
            OrderedDict holding meta-data to be displayed in the figure
         title :  str, optional
            Title of this figure (matplotlib: Axis.set_title)
+
+        xarray attributes
+        -----------------
+        long_name :  used as the title of the main panel when parameter 'title'
+            is not defined.
+        units :  units of the data
 
         Examples
         --------
@@ -1000,6 +1046,64 @@ class MONplot:
         # draw line in figure
         fig_draw_lplot(self.__mpl['axx'], xdata, ydata, color, **kwargs)
 
+    # --------------------------------------------------
+    def draw_multiplot(self, xds, gridspec=None, *,
+                       fig_info=None, title=None, **kwargs) -> None:
+        """
+        Display multiple subplots on one page using
+        matplotlib.gridspec.GridSpec
+        
+        Parameters
+        ----------
+
+        xarray attributes
+        -----------------
+        long_name :  used as the title of the main panel when parameter 'title'
+            is not defined.
+        units :  units of the data
+        _xlim :  range of the x-axis
+        _ylim :  range of the y-axis
+
+        Notes
+        -----
+
+        Examples
+        --------
+
+        """
+        if fig_info is None:
+            fig_info = FIGinfo()
+
+        # define grid layout to place subplots within a figure
+        if gridspec is None:
+            npanels = len(xds.data_vars)
+            geometry = {1: (1, 1),
+                        2: (2, 1),
+                        3: (3, 1),
+                        4: (2, 2)}.get(npanels)
+            gridspec = GridSpec(*geometry)
+        else:
+            npanels = gridspec.nrows + gridspec.ncols
+            geometry = gridspec.get_geometry()
+
+        # generate figure using contrained layout
+        fig = plt.figure(figsize=(10, 10), constrained_layout=True)
+
+        # add a centered suptitle to the figure
+        self.__add_caption(fig)
+
+        # add subplots, cycle the DataArrays of the Dataset
+        ii = 0
+        for yy in range(gridspec.nrows):
+            for xx in range(gridspec.nrows):
+                axx = plt.subplot(gspec[yy, xx])
+
+
+        # add annotation and save the figure
+        self.__add_copyright(axx)
+        self.__add_fig_box(fig, fig_info)
+        self.__close_this_page(fig)
+        
     # --------------------------------------------------
     def draw_tracks(self, lons, lats, icids, *, saa_region=None,
                     fig_info=None, title=None) -> None:
