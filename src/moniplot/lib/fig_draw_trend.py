@@ -173,7 +173,6 @@ def add_subplot(axx, xarr) -> None:
     xstep = np.gcd.reduce(np.diff(xdata))
     gap_list = (np.diff(xdata) > xstep).nonzero()[0].tolist()
     gap_list.append(len(xdata)-1)
-    # use_steps = xdata.size <= 256
 
     # define avg, err1, err2
     # check if xarr.values is a structured array:
@@ -188,14 +187,17 @@ def add_subplot(axx, xarr) -> None:
         err1 = xarr.values['err1'][isel]
         err2 = xarr.values['err2'][isel]
 
-    # ToDo: implement use_steps
     ii = 0
     for jj in gap_list:
         isel = np.s_[ii:jj+1]
         if err1 is not None:
             axx.fill_between(xdata[isel], err1[isel], err2[isel],
                              step='post', linewidth=0, facecolor=fcolor)
-        axx.plot(xdata[isel], avg[isel], linewidth=1.5, color=lcolor)
+            axx.step(np.append(xdata[isel], xdata[jj]),
+                     np.append(avg[isel], avg[jj]), where='post',
+                     linewidth=1.5, color=lcolor)
+        else:
+            axx.plot(xdata[isel], avg[isel], linewidth=1.5, color=lcolor)
         if 'legend' in xarr.attrs:
             legenda = axx.legend([blank_legend_key()],
                                  [xarr.attrs['legend']], loc='upper left')
