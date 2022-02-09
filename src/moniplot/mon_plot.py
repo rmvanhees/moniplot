@@ -1061,6 +1061,7 @@ class MONplot:
         long_name :  used as the title of the main panel when parameter 'title'
             is not defined.
         units :  units of the data
+        _yscale :  y-axis scale type, default 'linear'
         _xlim :  range of the x-axis
         _ylim :  range of the y-axis
 
@@ -1074,6 +1075,9 @@ class MONplot:
         if fig_info is None:
             fig_info = FIGinfo()
 
+        # generate figure using contrained layout
+        fig = plt.figure(figsize=(10, 10))
+
         # define grid layout to place subplots within a figure
         if gridspec is None:
             npanels = len(xds.data_vars)
@@ -1081,23 +1085,39 @@ class MONplot:
                         2: (2, 1),
                         3: (3, 1),
                         4: (2, 2)}.get(npanels)
-            gridspec = GridSpec(*geometry)
+            gridspec = GridSpec(*geometry, figure=fig)
         else:
             npanels = gridspec.nrows + gridspec.ncols
             geometry = gridspec.get_geometry()
-
-        # generate figure using contrained layout
-        fig = plt.figure(figsize=(10, 10), constrained_layout=True)
 
         # add a centered suptitle to the figure
         self.__add_caption(fig)
 
         # add subplots, cycle the DataArrays of the Dataset
         ii = 0
+        xar = [xa for _, xa in xds.data_vars.items()]
         for yy in range(gridspec.nrows):
-            for xx in range(gridspec.nrows):
-                axx = plt.subplot(gspec[yy, xx])
-
+            for xx in range(gridspec.ncols):
+                axx = fig.add_subplot(gridspec[yy, xx])
+                xdim = xar[ii].dims[0]
+                label = xar[ii].attrs['long_name'] \
+                    if 'long_name' in xar[ii].attrs else None
+                print('label: ', label)
+                axx.plot(xar[ii].coords[xdim], xar[ii].values, label=label,
+                         **kwargs)
+                if '_yscale' in xar[ii].attrs:
+                    axx.set_yscale(xar[ii].attrs['_yscale'])
+                if '_xlim' in xar[ii].attrs:
+                    axx.set_xlim(xar[ii].attrs['_xlim'])
+                if '_ylim' in xar[ii].attrs:
+                    axx.set_ylim(xar[ii].attrs['_ylim'])
+                axx.grid(True)
+                legenda = axx.legend(fontsize='small', loc='upper left')
+                if ii == 0 and title is not None:
+                    axx.set_title(title)
+                axx.set_xlabel(xdim)
+                axx.set_ylabel('value')
+                ii += 1
 
         # add annotation and save the figure
         self.__add_copyright(axx)
