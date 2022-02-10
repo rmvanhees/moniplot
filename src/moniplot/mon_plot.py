@@ -963,7 +963,7 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_lplot(self, xdata, ydata, color=0, *,
+    def draw_lplot(self, xdata, ydata, color=0, *, square=False,
                    fig_info=None, title=None, **kwargs) -> None:
         """
         Plot y versus x lines, maybe called multiple times to add lines.
@@ -975,6 +975,9 @@ class MONplot:
            [add line] X data, [close figure] when xdata is None
         ydata :  ndarray
            [add line] Y data
+        square :  bool
+           [first call, only] create a square figure, independent of
+           number of data-points.
         color :  integer, default=0
            [add line] Index to color in tol_colors.tol_cset('bright')
         fig_info  :  FIGinfo, optional
@@ -984,6 +987,8 @@ class MONplot:
         **kwargs :   other keywords
            [add line] Keywords are passed to mpl.pyplot.plot()
            [close figure] Kewords are passed to appropriate mpl.Axes method
+           [close figure] keyword 'text' can be used to add addition text in
+               the upper left corner.
 
         Examples
         --------
@@ -1011,30 +1016,36 @@ class MONplot:
         if xdata is None:
             if self.__mpl is None:
                 raise ValueError('No plot defined and no data provided')
+            fig = self.__mpl['fig']
+            axx = self.__mpl['axx']
 
             if fig_info is None:
                 fig_info = FIGinfo()
 
-            close_draw_lplot(self.__mpl['axx'], self.__mpl['time_axis'],
-                             title, **kwargs)
+            if 'text' in kwargs:
+                axx.text(0.05, 0.985, kwargs['text'],
+                         transform=axx.transAxes,
+                         fontsize='small', verticalalignment='top',
+                         bbox=dict(boxstyle='round', facecolor='#FFFFFF',
+                                   edgecolor='#BBBBBB', alpha=0.5))
+
+            close_draw_lplot(axx, self.__mpl['time_axis'], title, **kwargs)
 
             # add annotation and save the figure
-            self.__add_copyright(self.__mpl['axx'])
-            self.__add_fig_box(self.__mpl['fig'], fig_info)
-            self.__close_this_page(self.__mpl['fig'])
+            self.__add_copyright(axx)
+            self.__add_fig_box(fig, fig_info)
+            self.__close_this_page(fig)
             self.__mpl = None
             return
 
         # initialize figure
         if self.__mpl is None:
-            if len(xdata) <= 256:
-                figsize = (8, 7)
-            elif 256 > len(xdata) <= 512:
-                figsize = (10, 7)
-            elif 512 > len(xdata) <= 768:
-                figsize = (12, 7)
+            if square:
+                figsize = (9, 9)
             else:
-                figsize = (14, 7)
+                figsize = {0: (8, 7),
+                           1: (10, 7),
+                           2: (12, 7)}.get(len(xdata) // 256, (14, 7))
 
             self.__mpl = dict(zip(('fig', 'axx'),
                                   plt.subplots(1, figsize=figsize)))
@@ -1052,9 +1063,18 @@ class MONplot:
         """
         Display multiple subplots on one page using
         matplotlib.gridspec.GridSpec
-        
+
         Parameters
         ----------
+        xds :  Xarray.Dataset
+        gridspec :  matplotlib.gridspec.GridSpec, optional
+           Instance of matplotlib.gridspec.GridSpec
+        fig_info  :  FIGinfo, optional
+           Meta-data to be displayed in the figure
+        title :  str, default=None
+           Title of this figure (matplotlib: Axis.set_title)
+        **kwargs :   other keywords
+           Keywords are passed to mpl.pyplot.plot()
 
         xarray attributes
         -----------------
@@ -1080,15 +1100,11 @@ class MONplot:
 
         # define grid layout to place subplots within a figure
         if gridspec is None:
-            npanels = len(xds.data_vars)
             geometry = {1: (1, 1),
                         2: (2, 1),
                         3: (3, 1),
-                        4: (2, 2)}.get(npanels)
+                        4: (2, 2)}.get(len(xds.data_vars))
             gridspec = GridSpec(*geometry, figure=fig)
-        else:
-            npanels = gridspec.nrows + gridspec.ncols
-            geometry = gridspec.get_geometry()
 
         # add a centered suptitle to the figure
         self.__add_caption(fig)
@@ -1102,7 +1118,6 @@ class MONplot:
                 xdim = xar[ii].dims[0]
                 label = xar[ii].attrs['long_name'] \
                     if 'long_name' in xar[ii].attrs else None
-                print('label: ', label)
                 axx.plot(xar[ii].coords[xdim], xar[ii].values, label=label,
                          **kwargs)
                 if '_yscale' in xar[ii].attrs:
@@ -1112,7 +1127,7 @@ class MONplot:
                 if '_ylim' in xar[ii].attrs:
                     axx.set_ylim(xar[ii].attrs['_ylim'])
                 axx.grid(True)
-                legenda = axx.legend(fontsize='small', loc='upper left')
+                _ = axx.legend(fontsize='small', loc='upper left')
                 if ii == 0 and title is not None:
                     axx.set_title(title)
                 axx.set_xlabel(xdim)
@@ -1123,7 +1138,7 @@ class MONplot:
         self.__add_copyright(axx)
         self.__add_fig_box(fig, fig_info)
         self.__close_this_page(fig)
-        
+
     # --------------------------------------------------
     def draw_tracks(self, lons, lats, icids, *, saa_region=None,
                     fig_info=None, title=None) -> None:
