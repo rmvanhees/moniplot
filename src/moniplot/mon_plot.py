@@ -1058,7 +1058,7 @@ class MONplot:
         fig_draw_lplot(self.__mpl['axx'], xdata, ydata, color, **kwargs)
 
     # --------------------------------------------------
-    def draw_multiplot(self, xds, gridspec=None, *,
+    def draw_multiplot(self, data_tuple: tuple, gridspec=None, *,
                        fig_info=None, title=None, **kwargs) -> None:
         """
         Display multiple subplots on one page using
@@ -1066,21 +1066,26 @@ class MONplot:
 
         Parameters
         ----------
-        xds :  Xarray.Dataset
+        data_tuple :  tuple with nparray, xarray.DataArray or xarray.Dataset
+           One dataset per subplot
         gridspec :  matplotlib.gridspec.GridSpec, optional
            Instance of matplotlib.gridspec.GridSpec
         fig_info  :  FIGinfo, optional
            Meta-data to be displayed in the figure
         title :  str, default=None
            Title of this figure (matplotlib: Axis.set_title)
+           Ignored when data is a xarray data structure
         **kwargs :   other keywords
-           Keywords are passed to mpl.pyplot.plot()
+           Keywords are passed to mpl.pyplot.plot().
+           Ignored when data is a xarray data structure
 
         xarray attributes
         -----------------
         long_name :  used as the title of the main panel when parameter 'title'
             is not defined.
         units :  units of the data
+        _plot :  dictionalry with parameters for matplotlib.pyplot.plot
+        _text :  text shown in textbox placed in the upper left corner.
         _yscale :  y-axis scale type, default 'linear'
         _xlim :  range of the x-axis
         _ylim :  range of the y-axis
@@ -1092,8 +1097,38 @@ class MONplot:
         --------
 
         """
-        if fig_info is None:
-            fig_info = FIGinfo()
+        def draw_subplot(axx, xarr):
+            label = xarr.attrs['long_name'] \
+                if 'long_name' in xarr.attrs else None
+            xlabel = xarr.dims[0]
+            ylabel = 'value'
+            if 'units' in xarr.attrs:
+                ylabel += f' [{xarr.attrs["units"]}]'
+            if '_plot' in xarr.attrs:
+                kwargs = xarr.attrs['_plots']
+            else:
+                kwargs = {'color': '#4477AA'}
+            axx.plot(xarr.coords[xlabel], xarr.values, label=label, **kwargs)
+            if '_title' in xarr.attrs:
+                axx.set_title(xarr.attrs['_title'])
+            if '_yscale' in xarr.attrs:
+                axx.set_yscale(xarr.attrs['_yscale'])
+            if '_xlim' in xarr.attrs:
+                axx.set_xlim(xarr.attrs['_xlim'])
+            if '_ylim' in xarr.attrs:
+                axx.set_ylim(xarr.attrs['_ylim'])
+            if '_text' in xarr.attrs:
+                axx.text(0.05, 0.985, kwargs['text'],
+                         transform=axx.transAxes,
+                         fontsize='small', verticalalignment='top',
+                         bbox=dict(boxstyle='round',
+                                   facecolor='#FFFFFF',
+                                   edgecolor='#BBBBBB',
+                                   alpha=0.5))
+            if label is not None:
+                _ = axx.legend(fontsize='small', loc='upper right')
+            axx.set_xlabel(xlabel)
+            axx.set_ylabel(ylabel)
 
         # generate figure using contrained layout
         fig = plt.figure(figsize=(10, 10))
@@ -1103,39 +1138,37 @@ class MONplot:
             geometry = {1: (1, 1),
                         2: (2, 1),
                         3: (3, 1),
-                        4: (2, 2)}.get(len(xds.data_vars))
+                        4: (2, 2)}.get(len(data_tuple))
             gridspec = GridSpec(*geometry, figure=fig)
+        else:
+            if len(data_tuple) > gridspec.nrows * gridspec.ncols:
+                raise RuntimeError('grid too small for number of datasets')
 
         # add a centered suptitle to the figure
         self.__add_caption(fig)
 
         # add subplots, cycle the DataArrays of the Dataset
-        ii = 0
-        xar = [xa for _, xa in xds.data_vars.items()]
+        data_iter = iter(data_tuple)
         for yy in range(gridspec.nrows):
             for xx in range(gridspec.ncols):
                 axx = fig.add_subplot(gridspec[yy, xx])
-                xdim = xar[ii].dims[0]
-                label = xar[ii].attrs['long_name'] \
-                    if 'long_name' in xar[ii].attrs else None
-                axx.plot(xar[ii].coords[xdim], xar[ii].values, label=label,
-                         **kwargs)
-                if '_yscale' in xar[ii].attrs:
-                    axx.set_yscale(xar[ii].attrs['_yscale'])
-                if '_xlim' in xar[ii].attrs:
-                    axx.set_xlim(xar[ii].attrs['_xlim'])
-                if '_ylim' in xar[ii].attrs:
-                    axx.set_ylim(xar[ii].attrs['_ylim'])
                 axx.grid(True)
-                _ = axx.legend(fontsize='small', loc='upper left')
-                if ii == 0 and title is not None:
-                    axx.set_title(title)
-                axx.set_xlabel(xdim)
-                axx.set_ylabel('value')
-                ii += 1
+
+                data = next(data_iter)
+                if isinstance(data, np.ndarray):
+                    if xx == yy == 0 and title is not None:
+                        axx.set_title(title)
+                    axx.plot(np.arange(data.size), data, **kwargs)
+                elif isinstance(data, xr.DataArray):
+                    draw_subplot(axx, data)
+                else:
+                    for name in data.data_vars:
+                        draw_subplot(axx, data[name])
 
         # add annotation and save the figure
         self.__add_copyright(axx)
+        if fig_info is None:
+            fig_info = FIGinfo()
         self.__add_fig_box(fig, fig_info)
         self.__close_this_page(fig)
 
