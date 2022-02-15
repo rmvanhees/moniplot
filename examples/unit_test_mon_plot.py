@@ -128,22 +128,6 @@ def run_draw_quality(plot):
                       side_panels='none', title='no reference')
 
 
-def run_draw_cmp_swir(plot):
-    """
-    Run unit tests on MONplot::draw_cmp_swir
-    """
-    print('Run unit tests on MONplot::draw_cmp_swir')
-
-    msm = get_test_data(data_sel=np.s_[500-128:500+128, :], error=.1)
-    msm_ref = get_test_data(data_sel=np.s_[500-128:500+128, :], error=.025)
-
-    plot.draw_cmp_swir(msm, msm_ref.values, title='test image')
-    plot.draw_cmp_swir(msm, msm_ref.values, add_residual=False,
-                       title='test image')
-    plot.draw_cmp_swir(msm, msm_ref.values, add_model=False,
-                       title='test image')
-
-
 def run_draw_trend(plot):
     """
     Run unit tests on MONplot::draw_trend
@@ -261,9 +245,8 @@ def main():
     """
     main function
     """
-    check_draw_signal = False   # True
-    check_draw_cmp_images = False
-    check_draw_quality = False  # True
+    check_draw_signal = True
+    check_draw_quality = True
     check_draw_qhist = True
     check_draw_trend = True
     check_draw_lplot = True
@@ -274,14 +257,6 @@ def main():
                        caption='Unit test of MONplot [draw_signal]')
         plot.set_institute('SRON')
         run_draw_signal(plot)
-        plot.close()
-
-    # ---------- UNIT TEST: draw_cmp_images ----------
-    if check_draw_cmp_images:
-        plot = MONplot('mon_plot_draw_cmp_images.pdf',
-                       caption='Unit test of MONplot [draw_cmp_images]')
-        plot.set_institute('SRON')
-        run_draw_cmp_swir(plot)
         plot.close()
 
     # ---------- UNIT TEST: draw_quality ----------

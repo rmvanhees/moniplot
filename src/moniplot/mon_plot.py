@@ -62,20 +62,6 @@ from .lib.fig_draw_tracks import fig_draw_tracks
 
 
 # - local functions --------------------------------
-def fig_size(aspect: int, side_panels: str):
-    """
-    Calculate size of the figure (inches)
-    """
-    sz_corr = {4: (2.7, 0.865 if side_panels == 'none' else 1.025),
-               3: (2.3, 0.9 if side_panels == 'none' else 1.05),
-               2: (2.0, 1.05 if side_panels == 'none' else 1.3),
-               1: (1.75, 1.5 if side_panels == 'none' else 1.75)}.get(aspect)
-    if 'FIG_SZ_X' in os.environ:
-        sz_corr = (float(os.environ.get('FIG_SZ_X')), sz_corr[1])
-    if 'FIG_SZ_Y' in os.environ:
-        sz_corr = (sz_corr[0], float(os.environ.get('FIG_SZ_Y')))
-    return (6.4 * sz_corr[0], 4.8 * sz_corr[1])
-
 
 # - main function ----------------------------------
 class MONplot:
@@ -428,10 +414,10 @@ class MONplot:
         aspect = min(4, max(1, int(round(xarr.shape[1] / xarr.shape[0]))))
 
         # create a new figure
-        fig_sz = {1: (9.5, 8.5),
-                  2: (12, 6),
-                  3: (12, 5),
-                  4: (15.5, 5)}.get(aspect)
+        fig_sz = {1: (10, 8),
+                  2: (12, 6.15),
+                  3: (13, 5),
+                  4: (15, 4.65)}.get(aspect)
         fig = plt.figure(figsize=fig_sz)
         if self.caption:
             fig.suptitle(self.caption)
@@ -441,13 +427,19 @@ class MONplot:
         # - gspec[1, 1] is reserved for the x-panel
         # - gspec[0, 0] is reserved for the y-panel
         # - gspec[0, 2] is reserved for the colorbar
-        # - gspec[0, 2] is used to pace the small fig_info box (max 4 lines)
-        wratio = (1., 4. * aspect, 0.25, 0.75)
-        gspec = fig.add_gridspec(2, 4, left=0.1, right=0.9,
-                                 width_ratios=wratio, height_ratios=(4, 1),
-                                 bottom=0.1 if aspect in (1, 2) else 0.125,
-                                 top=0.9 if aspect in (1, 2) else 0.825,
-                                 wspace=0.05 / aspect, hspace=0.025)
+        # - gspec[1, 2] is used to pace the small fig_info box (max 4 lines)
+        # - gspec(:, 3] extra space for FigInfo and colorbar labels
+        if aspect == 1:
+            gspec = fig.add_gridspec(2, 4, wspace=0.05, hspace=0.025,
+                                     width_ratios=(.5, 4., .2, .8),
+                                     height_ratios=(4, .5),
+                                     bottom=.1, top=.875)
+        else:
+            gspec = fig.add_gridspec(2, 4, wspace=0.05 / aspect, hspace=0.025,
+                                     width_ratios=(1., 4. * aspect, .3, .7),
+                                     height_ratios=(4, 1),
+                                     bottom=.1 if aspect == 2 else .125,
+                                     top=.85 if aspect == 2 else 0.825)
 
         # add image panel and draw image
         axx = fig.add_subplot(gspec[0, 1])
@@ -587,10 +579,10 @@ class MONplot:
         aspect = min(4, max(1, int(round(xarr.shape[1] / xarr.shape[0]))))
 
         # create a new figure
-        fig_sz = {1: (9.5, 8.5),
-                  2: (12, 6),
-                  3: (12, 5),
-                  4: (15.5, 5)}.get(aspect)
+        fig_sz = {1: (10, 8),
+                  2: (12, 6.15),
+                  3: (13, 5),
+                  4: (15, 4.65)}.get(aspect)
         fig = plt.figure(figsize=fig_sz)
         if self.caption:
             fig.suptitle(self.caption)
@@ -600,13 +592,17 @@ class MONplot:
         # - gspec[1, 1] is reserved for the x-panel
         # - gspec[0, 0] is reserved for the y-panel
         # - gspec[0, 2] is reserved for the colorbar
-        # - gspec[0, 2] is used to pace the small fig_info box (max 4 lines)
-        wratio = (1., 4. * aspect, 0.25, 0.75)
-        gspec = fig.add_gridspec(2, 4, left=0.1, right=0.9,
-                                 width_ratios=wratio, height_ratios=(4, 1),
-                                 bottom=0.1 if aspect in (1, 2) else 0.125,
-                                 top=0.9 if aspect in (1, 2) else 0.825,
-                                 wspace=0.05 / aspect, hspace=0.05)
+        # - gspec[1, 2] is used to pace the small fig_info box (max 4 lines)
+        if aspect == 1:
+            gspec = fig.add_gridspec(2, 4, wspace=0.05, hspace=0.025,
+                                     width_ratios=(.5, 4., .2, .8),
+                                     height_ratios=(4, .5), bottom=.1, top=.875)
+        else:
+            gspec = fig.add_gridspec(2, 4, wspace=0.05 / aspect, hspace=0.025,
+                                     width_ratios=(1., 4. * aspect, .3, .7),
+                                     height_ratios=(4, 1),
+                                     bottom=.1 if aspect == 2 else .125,
+                                     top=.85 if aspect == 2 else 0.825)
 
         # add image panel and draw image
         axx = fig.add_subplot(gspec[0, 1])

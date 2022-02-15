@@ -30,21 +30,26 @@ import matplotlib.pyplot as plt
 def draw_figure(aspect: int, side_panels='one'):
     """
     """
-    figsize = {1: (9.5, 8.5),
-               2: (12, 6),
-               3: (12, 5),
-               4: (15.5, 5)}.get(aspect)
+    figsize = {1: (10, 8),
+               2: (12, 6.15),
+               3: (13, 5),
+               4: (15, 4.65)}.get(aspect)
 
     fig = plt.figure(figsize=figsize)
-    fig.suptitle('test of matplotlib gridspec')
+    fig.suptitle('test of matplotlib gridspec', fontsize='x-large',
+                 position=(0.5, 1 - 0.3 / fig.get_figheight()))
 
     # Add a gridspec
-    wratio = (1., 4. * aspect, 0.25, 0.75)
-    gspec = fig.add_gridspec(2, 4, left=0.1, right=0.9,
-                             width_ratios=wratio, height_ratios=(4, 1),
-                             bottom=0.1 if aspect in (1, 2) else 0.125,
-                             top=0.9 if aspect in (1, 2) else 0.825,
-                             wspace=0.05 / aspect, hspace=0.025)
+    if aspect == 1:
+        gspec = fig.add_gridspec(2, 4, wspace=0.05, hspace=0.025,
+                                 width_ratios=(.5, 4., .2, .8),
+                                 height_ratios=(4, .5), bottom=.1, top=.875)
+    else:
+        gspec = fig.add_gridspec(2, 4, wspace=0.05 / aspect, hspace=0.025,
+                                 width_ratios=(1., 4. * aspect, .3, .7),
+                                 height_ratios=(4, 1),
+                                 bottom=.1 if aspect == 2 else .125,
+                                 top=.85 if aspect == 2 else 0.825)
 
     axx = fig.add_subplot(gspec[0, 1])
     pcm = axx.pcolormesh(np.random.randn(30, aspect * 30),
@@ -73,37 +78,6 @@ def draw_figure(aspect: int, side_panels='one'):
     axx_c = fig.add_subplot(gspec[0, 2])
     _ = plt.colorbar(pcm, cax=axx_c, label='value')
 
-    # text panel
-    axx_c.text(1 if aspect == 1 else 0,
-               1.025 if aspect in (1, 2) else 1.05,
-               "(1) This is the info location\n"
-               "(2) This the next line with info\n"
-               "(3) This the next line with info\n"
-               "(4) This the next line with info",
-               transform=axx_c.transAxes,
-               fontsize='x-small', style='normal',
-               verticalalignment='bottom',
-               horizontalalignment='center',
-               multialignment='left',
-               bbox={'facecolor': 'white', 'pad': 5})
-    axx_c.text(0.1 * aspect,
-               -0.03 - (aspect-1) * 0.005,
-               "(0) This is the info location\n"
-               "(1) This the next line with info\n"
-               "(2) This the next line with info\n"
-               "(3) This the next line with info\n"
-               "(4) This the next line with info\n"
-               "(5) This the next line with info\n"
-               "(6) This the next line with info\n"
-               "(7) This the next line with info\n"
-               "(8) This the next line with info\n"
-               "(9) This the next line with info",
-               transform=axx_c.transAxes,
-               fontsize='x-small', style='normal',
-               verticalalignment='top',
-               horizontalalignment='left',
-               multialignment='left',
-               bbox={'facecolor': 'white', 'pad': 5})
     plt.show()
 
 
@@ -111,9 +85,9 @@ def main():
     """
     """
     draw_figure(1)
-    draw_figure(2)
-    draw_figure(3)
-    draw_figure(4)
+    #draw_figure(2)
+    #draw_figure(3)
+    #draw_figure(4)
 
 # --------------------------------------------------
 if __name__ == '__main__':
