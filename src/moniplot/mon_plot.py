@@ -1080,7 +1080,7 @@ class MONplot:
         long_name :  used as the title of the main panel when parameter 'title'
             is not defined.
         units :  units of the data
-        _plot :  dictionalry with parameters for matplotlib.pyplot.plot
+        _plot :  dictionary with parameters for matplotlib.pyplot.plot
         _text :  text shown in textbox placed in the upper left corner.
         _yscale :  y-axis scale type, default 'linear'
         _xlim :  range of the x-axis
@@ -1101,7 +1101,7 @@ class MONplot:
             if 'units' in xarr.attrs:
                 ylabel += f' [{xarr.attrs["units"]}]'
             if '_plot' in xarr.attrs:
-                kwargs = xarr.attrs['_plots']
+                kwargs = xarr.attrs['_plot']
             else:
                 kwargs = {'color': '#4477AA'}
             axx.plot(xarr.coords[xlabel], xarr.values, label=label, **kwargs)
