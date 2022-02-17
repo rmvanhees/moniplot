@@ -30,13 +30,13 @@ from datetime import datetime
 # - main function -------------------------
 class FIGinfo:
     """
-    The figure information constists of key, value combinations which are
-    to be displayed 'above' or 'right' from the main image.
+    The figure information constists of [key, value] combinations which are
+    to be displayed upper-right corner of the figure.
 
     Attributes
     ----------
     location : string
-       Location to draw the fig_info box: 'above' (default), 'right', 'none'
+       Location to draw the fig_info box: 'above' (default), 'none'
     fig_info : OrderedDict
        Dictionary holding the information for the fig_info box
 
@@ -57,9 +57,6 @@ class FIGinfo:
       'above' :  The figure information is displayed in a small box. This box
                  grows with the number of lines and will overlap with the main
                  image or its colorbar at about 7+ entries.
-      'right' :  Depending on the aspect ratio of the main image, the number of
-                 lines are limited to 70 (aspect-ratio=1), 50 (aspect-ratio=2),
-                 or 40 (aspect-ratio > 2).
     """
     def __init__(self, loc='above', info_dict=None) -> None:
         self.fig_info = OrderedDict() if info_dict is None else info_dict
@@ -86,8 +83,8 @@ class FIGinfo:
         loc : str
           Location of the fig_info box
         """
-        if loc not in ('above', 'right', 'none'):
-            raise KeyError('location should be: above, right or none')
+        if loc not in ('above', 'none'):
+            raise KeyError("location should be: 'above' or 'none'")
 
         self.location = loc
 

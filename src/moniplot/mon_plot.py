@@ -300,36 +300,33 @@ class MONplot:
         if fig_info is None or fig_info.location != 'above':
             return
 
-        if len(fig_info) < 5:     # put text above colorbar (x-small)
-            axx_c.text(1 if aspect == 1 else 0,
-                       1.025 if aspect in (1, 2) else 1.05,
-                       fig_info.as_str(),
+        if len(fig_info) <= 5:    # put text above colorbar
+            if aspect in (3, 4):
+                halign = 'right'
+                fontsize = 'xx-small' if len(fig_info) == 5 else 'x-small'
+            else:
+                halign = 'center'
+                fontsize = 'x-small'
+                    
+            axx_c.text(0 if aspect == 2 else 1,
+                       1.025 + aspect * 0.005,
+                       fig_info.as_str(), fontsize=fontsize,
                        transform=axx_c.transAxes,
-                       fontsize='x-small', style='normal',
+                       multialignment='left',                       
                        verticalalignment='bottom',
-                       horizontalalignment='center',
-                       multialignment='left',
-                       bbox={'facecolor': 'white', 'pad': 5})
-        elif len(fig_info) < 7:   # put text above colorbar (xx-small)
-            axx_c.text(1 if aspect == 1 else 0,
-                       1.025 if aspect in (1, 2) else 1.05,
-                       fig_info.as_str(),
-                       transform=axx_c.transAxes,
-                       fontsize='xx-small', style='normal',
-                       verticalalignment='bottom',
-                       horizontalalignment='center',
-                       multialignment='left',
-                       bbox={'facecolor': 'white', 'pad': 5})
-        else:                     # put text below the colorbar (xx-small)
-            axx_c.text(0.1 * aspect,
+                       horizontalalignment=halign,
+                       bbox={'facecolor': 'white', 'pad': 4})
+        else:                     # put text below colorbar
+            fontsize = 'xx-small' if aspect in (3, 4) else 'x-small'
+            axx_c.text(0.125 + (aspect-1) * 0.2,
                        -0.03 - (aspect-1) * 0.005,
-                       fig_info.as_str(),
+                       fig_info.as_str(), fontsize=fontsize,
                        transform=axx_c.transAxes,
-                       fontsize='x-small', style='normal',
+                       multialignment='left',
                        verticalalignment='top',
                        horizontalalignment='left',
-                       multialignment='left',
-                       bbox={'facecolor': 'white', 'pad': 5})
+                       bbox={'facecolor': 'white', 'pad': 4})
+
 
     # --------------------------------------------------
     def draw_signal(self, data, *, fig_info=None, side_panels='nanmedian',
@@ -1081,7 +1078,8 @@ class MONplot:
             is not defined.
         units :  units of the data
         _plot :  dictionary with parameters for matplotlib.pyplot.plot
-        _text :  text shown in textbox placed in the upper left corner.
+        _title :  title of the subplot (matplotlib: Axis.set_title)
+        _text :  text shown in textbox placed in the upper left corner
         _yscale :  y-axis scale type, default 'linear'
         _xlim :  range of the x-axis
         _ylim :  range of the y-axis
@@ -1091,20 +1089,31 @@ class MONplot:
 
         Examples
         --------
-
+        Show two numpy arrays:
+        >>> data_tuple = (ndarray1, ndarray2)
+        >>> plot = MONplot(fig_name)
+        >>> plot.draw_multiplot(data_tuple: tuple, title='my title',
+        >>>                     marker='o', linestyle='', color='r')
+        >>> plot.close()
         """
         def draw_subplot(axx, xarr):
+            if '_plot' in xarr.attrs:
+                kwargs = xarr.attrs['_plot']
+            else:
+                kwargs = {'color': '#4477AA'}
+
             label = xarr.attrs['long_name'] \
                 if 'long_name' in xarr.attrs else None
             xlabel = xarr.dims[0]
             ylabel = 'value'
             if 'units' in xarr.attrs:
                 ylabel += f' [{xarr.attrs["units"]}]'
-            if '_plot' in xarr.attrs:
-                kwargs = xarr.attrs['_plot']
-            else:
-                kwargs = {'color': '#4477AA'}
             axx.plot(xarr.coords[xlabel], xarr.values, label=label, **kwargs)
+            if label is not None:
+                _ = axx.legend(fontsize='small', loc='upper right')
+            axx.set_xlabel(xlabel)
+            axx.set_ylabel(ylabel)
+
             if '_title' in xarr.attrs:
                 axx.set_title(xarr.attrs['_title'])
             if '_yscale' in xarr.attrs:
@@ -1121,10 +1130,6 @@ class MONplot:
                                    facecolor='#FFFFFF',
                                    edgecolor='#BBBBBB',
                                    alpha=0.5))
-            if label is not None:
-                _ = axx.legend(fontsize='small', loc='upper right')
-            axx.set_xlabel(xlabel)
-            axx.set_ylabel(ylabel)
 
         # generate figure using contrained layout
         fig = plt.figure(figsize=(10, 10))
