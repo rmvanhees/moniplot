@@ -1106,7 +1106,7 @@ class MONplot:
                 if 'long_name' in xarr.attrs else None
             xlabel = xarr.dims[0]
             ylabel = 'value'
-            if 'units' in xarr.attrs:
+            if 'units' in xarr.attrs and xarr.attrs['units'] != '1':
                 ylabel += f' [{xarr.attrs["units"]}]'
             axx.plot(xarr.coords[xlabel], xarr.values, label=label, **kwargs)
             if label is not None:
