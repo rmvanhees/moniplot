@@ -160,7 +160,7 @@ def add_subplot(axx, xarr) -> None:
     ylabel = xarr.attrs['long_name']
     if 'units' in xarr.attrs and xarr.attrs['units'] != '1':
         ylabel += f' [{adjust_units(xarr.attrs["units"])}]'
-    lcolor = cset.blue
+    lcolor = xarr.attrs['_color'] if '_color' in xarr.attrs else cset.blue
     fcolor = '#BBCCEE'
 
     # define xdata and determine gap_list (always one element!)
