@@ -34,7 +34,6 @@ License:  GPLv3
 from datetime import datetime
 from pathlib import PurePath
 
-import os
 import numpy as np
 import xarray as xr
 
@@ -58,6 +57,7 @@ from .lib.fig_draw_image import (adjust_img_ticks,
 from .lib.fig_draw_trend import add_subplot, add_hk_subplot
 from .lib.fig_draw_qhist import fig_draw_qhist
 from .lib.fig_draw_lplot import fig_draw_lplot, close_draw_lplot
+from .lib.fig_draw_multiplot import get_xylabels, draw_subplot
 from .lib.fig_draw_tracks import fig_draw_tracks
 
 
@@ -300,19 +300,20 @@ class MONplot:
         if fig_info is None or fig_info.location != 'above':
             return
 
-        if len(fig_info) <= 5:    # put text above colorbar
+        # put text above colorbar
+        if len(fig_info) <= 7 if aspect == 1 else 5 :
             if aspect in (3, 4):
                 halign = 'right'
                 fontsize = 'xx-small' if len(fig_info) == 5 else 'x-small'
             else:
                 halign = 'center'
                 fontsize = 'x-small'
-                    
+
             axx_c.text(0 if aspect == 2 else 1,
-                       1.025 + aspect * 0.005,
+                       1.025 + (aspect-1) * 0.0075,
                        fig_info.as_str(), fontsize=fontsize,
                        transform=axx_c.transAxes,
-                       multialignment='left',                       
+                       multialignment='left',
                        verticalalignment='bottom',
                        horizontalalignment=halign,
                        bbox={'facecolor': 'white', 'pad': 4})
@@ -1096,41 +1097,6 @@ class MONplot:
         >>>                     marker='o', linestyle='', color='r')
         >>> plot.close()
         """
-        def draw_subplot(axx, xarr):
-            if '_plot' in xarr.attrs:
-                kwargs = xarr.attrs['_plot']
-            else:
-                kwargs = {'color': '#4477AA'}
-
-            label = xarr.attrs['long_name'] \
-                if 'long_name' in xarr.attrs else None
-            xlabel = xarr.dims[0]
-            ylabel = 'value'
-            if 'units' in xarr.attrs and xarr.attrs['units'] != '1':
-                ylabel += f' [{xarr.attrs["units"]}]'
-            axx.plot(xarr.coords[xlabel], xarr.values, label=label, **kwargs)
-            if label is not None:
-                _ = axx.legend(fontsize='small', loc='upper right')
-            axx.set_xlabel(xlabel)
-            axx.set_ylabel(ylabel)
-
-            if '_title' in xarr.attrs:
-                axx.set_title(xarr.attrs['_title'])
-            if '_yscale' in xarr.attrs:
-                axx.set_yscale(xarr.attrs['_yscale'])
-            if '_xlim' in xarr.attrs:
-                axx.set_xlim(xarr.attrs['_xlim'])
-            if '_ylim' in xarr.attrs:
-                axx.set_ylim(xarr.attrs['_ylim'])
-            if '_text' in xarr.attrs:
-                axx.text(0.05, 0.985, kwargs['text'],
-                         transform=axx.transAxes,
-                         fontsize='small', verticalalignment='top',
-                         bbox=dict(boxstyle='round',
-                                   facecolor='#FFFFFF',
-                                   edgecolor='#BBBBBB',
-                                   alpha=0.5))
-
         # generate figure using contrained layout
         fig = plt.figure(figsize=(10, 10))
 
@@ -1144,6 +1110,9 @@ class MONplot:
         else:
             if len(data_tuple) > gridspec.nrows * gridspec.ncols:
                 raise RuntimeError('grid too small for number of datasets')
+
+        # determine xylabels
+        xylabels = get_xylabels(gridspec, data_tuple)
 
         # add a centered suptitle to the figure
         self.__add_caption(fig)
@@ -1161,10 +1130,10 @@ class MONplot:
                         axx.set_title(title)
                     axx.plot(np.arange(data.size), data, **kwargs)
                 elif isinstance(data, xr.DataArray):
-                    draw_subplot(axx, data)
+                    draw_subplot(axx, data, xylabels[yy, xx, :])
                 else:
                     for name in data.data_vars:
-                        draw_subplot(axx, data[name])
+                        draw_subplot(axx, data[name], xylabels[yy, xx, :])
 
         # add annotation and save the figure
         self.__add_copyright(axx)

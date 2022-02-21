@@ -30,45 +30,47 @@ import matplotlib.pyplot as plt
 from moniplot.lib.fig_info import FIGinfo
 
 def add_img_fig_box(axx_c, aspect: int, fig_info) -> None:
-        """
-        Add a box with meta information for draw_signal and draw_quality
+    """
+    Add a box with meta information for draw_signal and draw_quality
 
-        Parameters
-        ----------
-        axx_c :  Matplotlib Axes instance of the colorbar
-        aspect :  int
-        fig_info :  FIGinfo
-           instance of moniplot.lib.fig_info to be displayed
-        """
-        if fig_info is None or fig_info.location != 'above':
-            return
+    Parameters
+    ----------
+    axx_c :  Matplotlib Axes instance of the colorbar
+    aspect :  int
+    fig_info :  FIGinfo
+        instance of moniplot.lib.fig_info to be displayed
+    """
+    if fig_info is None or fig_info.location != 'above':
+        return
 
-        if len(fig_info) <= 5:    # put text above colorbar
-            if aspect in (3, 4):
-                halign = 'right'
-                fontsize = 'xx-small' if len(fig_info) == 5 else 'x-small'
-            else:
-                halign = 'center'
-                fontsize = 'x-small'
+    # put text above colorbar
+    print(aspect, len(fig_info))
+    if len(fig_info) <= (7 if aspect == 1 else 5):
+        if aspect in (3, 4):
+            halign = 'right'
+            fontsize = 'xx-small' if len(fig_info) == 5 else 'x-small'
+        else:
+            halign = 'center'
+            fontsize = 'xx-small' if len(fig_info) > 5 else 'x-small'
                     
-            axx_c.text(0 if aspect == 2 else 1,
-                       1.025 + aspect * 0.005,
-                       fig_info.as_str(), fontsize=fontsize,
-                       transform=axx_c.transAxes,
-                       multialignment='left',                       
-                       verticalalignment='bottom',
-                       horizontalalignment=halign,
-                       bbox={'facecolor': 'white', 'pad': 4})
-        else:                     # put text below colorbar
-            fontsize = 'xx-small' if aspect in (3, 4) else 'x-small'
-            axx_c.text(0.125 + (aspect-1) * 0.2,
-                       -0.03 - (aspect-1) * 0.005,
-                       fig_info.as_str(), fontsize=fontsize,
-                       transform=axx_c.transAxes,
-                       multialignment='left',
-                       verticalalignment='top',
-                       horizontalalignment='left',
-                       bbox={'facecolor': 'white', 'pad': 4})
+        axx_c.text(0 if aspect == 2 else 1,
+                   1.02 + (aspect-1) * 0.0075,
+                   fig_info.as_str(), fontsize=fontsize,
+                   transform=axx_c.transAxes,
+                   multialignment='left',                       
+                   verticalalignment='bottom',
+                   horizontalalignment=halign,
+                   bbox={'facecolor': 'white', 'pad': 4})
+    else:                     # put text below colorbar
+        fontsize = 'xx-small' if aspect in (3, 4) else 'x-small'
+        axx_c.text(0.125 + (aspect-1) * 0.2,
+                   -0.03 - (aspect-1) * 0.005,
+                   fig_info.as_str(), fontsize=fontsize,
+                   transform=axx_c.transAxes,
+                   multialignment='left',
+                   verticalalignment='top',
+                   horizontalalignment='left',
+                   bbox={'facecolor': 'white', 'pad': 4})
 
 def draw_figure(aspect: int, side_panels='one'):
     """
@@ -125,7 +127,7 @@ def draw_figure(aspect: int, side_panels='one'):
     # use 5 to test x-small font (above)
     # use 7 to test xx-small font (above)
     # use 9 to test x-small font (below)
-    for ii in range(9):
+    for ii in range(5):
         fig_info.add(f'text line {ii+1}', 'blah blah blah')
     add_img_fig_box(axx_c, aspect, fig_info)
 
