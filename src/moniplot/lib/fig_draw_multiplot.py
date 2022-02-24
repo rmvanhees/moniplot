@@ -43,10 +43,10 @@ def get_xylabels(gridspec, data_tuple):
             ylabel = 'value'
             if 'units' in data.attrs and data.attrs['units'] != '1':
                 ylabel += f' [{data.attrs["units"]}]'
-                if xx > 0 and ylabel == res[-xx][1]:
-                    res += ([xlabel, ''],)
-                else:
-                    res += ([xlabel, ylabel],)
+            if xx > 0 and ylabel == res[-xx][1]:
+                res += ([xlabel, ''],)
+            else:
+                res += ([xlabel, ylabel],)
 
     res = np.array(res).reshape((gridspec.nrows, gridspec.ncols, 2))
     for xx in range(gridspec.ncols):
