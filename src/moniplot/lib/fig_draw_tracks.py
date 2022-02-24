@@ -27,6 +27,8 @@ Copyright (c) 2022 SRON - Netherlands Institute for Space Research
 
 License:  GPLv3
 """
+import numpy as np
+
 from cartopy import crs as ccrs
 
 from matplotlib.patches import Polygon
@@ -48,25 +50,21 @@ def fig_draw_tracks(axx, lons, lats, icids, saa_region) -> None:
     axx.coastlines(resolution='110m')
     axx.gridlines()
 
+    # draw satellite position(s)
+    icolor = 0
+    for val in np.unique(icids):
+        mask = icids == val
+        # pylint: disable=abstract-class-instantiated
+        plt.plot(lons[mask], lats[mask], linestyle='',
+                 marker='s', markersize=2,
+                 color=cset[icolor % 6], label=f'ICID: {val}',
+                 transform=ccrs.PlateCarree())
+        icolor += 1
+    axx.legend(loc='lower left')
+
     # draw SAA region
     if saa_region is not None:
         # pylint: disable=abstract-class-instantiated
         saa_poly = Polygon(xy=saa_region, closed=True, alpha=1.0,
                            facecolor=cset.grey, transform=ccrs.PlateCarree())
         axx.add_patch(saa_poly)
-
-    # draw satellite position(s)
-    icid_found = []
-    for lon, lat, icid in zip(lons, lats, icids):
-        if icid not in icid_found:
-            indx_color = len(icid_found)
-        else:
-            indx_color = icid_found.index(icid)
-        # pylint: disable=abstract-class-instantiated
-        line, = plt.plot(lon, lat, linestyle='-', linewidth=3,
-                         color=cset[indx_color % 6],
-                         transform=ccrs.PlateCarree())
-        if icid not in icid_found:
-            line.set_label(f'ICID: {icid}')
-            icid_found.append(icid)
-    axx.legend(loc='lower left')
