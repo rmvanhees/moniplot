@@ -43,6 +43,7 @@ except ModuleNotFoundError:
     FOUND_CARTOPY = False
 else:
     FOUND_CARTOPY = True
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.gridspec import GridSpec
@@ -126,6 +127,12 @@ class MONplot:
         pdf_title :  string
            Title of the PDF document (attribute of the PDF document)
            Default: 'Monitor report on Tropomi SWIR instrument'
+
+        Notes
+        -----
+        Currently, we have turned off the automatic offset notation of
+        Matplotlib. Maybe this should be the default, which the user may
+        override.
         """
         self.__cmap = None
         self.__caption = '' if caption is None else caption
@@ -147,6 +154,9 @@ class MONplot:
             doc['Author'] = '(c) SRON Netherlands Institute for Space Research'
         elif self.__institute:
             doc['Author'] = f'(c) {self.__institute}'
+
+        # turn off Matplotlib's automatic offset notation
+        mpl.rcParams['axes.formatter.useoffset'] = False
 
     def __repr__(self) -> None:
         pass
@@ -728,8 +738,8 @@ class MONplot:
         fig, axarr = plt.subplots(npanels, sharex=True, figsize=figsize)
         if npanels == 1:
             axarr = [axarr]
-        margin = min(1. / (1.8 * (npanels + 1)), .25)
-        fig.subplots_adjust(bottom=margin, top=1-margin, hspace=0.02)
+        margin = min(1. / (1.65 * (npanels + 1)), .25)
+        fig.subplots_adjust(bottom=margin, top=1-margin, hspace=0.05)
 
         # add a centered suptitle to the figure
         self.__add_caption(fig)
