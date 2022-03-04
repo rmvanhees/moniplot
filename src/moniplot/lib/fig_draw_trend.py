@@ -53,21 +53,26 @@ def set_labels_colors(xarr) -> tuple:
     hk_unit = xarr.attrs['units']
     if isinstance(hk_unit, bytes):
         hk_unit = hk_unit.decode()
+
     hk_title = xarr.attrs['long_name']
     if isinstance(hk_title, bytes):
         hk_title = hk_title.decode()
+
     if hk_unit == 'K':
-        hk_title = hk_title.rsplit(' ', 1)[0]
+        if (ii := hk_title.find(' temperature')) > 0:
+            hk_title = hk_title[:ii]
         hk_label = f'temperature [{hk_unit}]'
         lcolor = cset.blue
         fcolor = '#BBCCEE'
     elif hk_unit in ('A', 'mA'):
-        hk_title = hk_title.rsplit(' ', 1)[0]
+        if (ii := hk_title.find(' current')) > 0:
+            hk_title = hk_title[:ii]
         hk_label = f'current [{hk_unit}]'
         lcolor = cset.green
         fcolor = '#CCDDAA'
     elif hk_unit == '%':
-        hk_title = hk_title.rsplit(' ', 2)[0]
+        if (ii := hk_title.find(' duty')) > 0:
+            hk_title = hk_title[:ii]
         hk_label = f'duty cycle [{hk_unit}]'
         lcolor = cset.red
         fcolor = '#FFCCCC'
@@ -75,6 +80,10 @@ def set_labels_colors(xarr) -> tuple:
         hk_label = f'value [{hk_unit}]'
         lcolor = cset.purple
         fcolor = '#EEBBDD'
+
+    # overwrite ylabel 
+    if '_ylabel' in xarr.attrs:
+        hk_label = xarr.attrs['_ylabel']
 
     return hk_title, hk_label, lcolor, fcolor
 
