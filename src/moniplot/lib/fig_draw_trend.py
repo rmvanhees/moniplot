@@ -29,6 +29,7 @@ Copyright (c) 2022 SRON - Netherlands Institute for Space Research
 
 License:  GPLv3
 """
+from numbers import Integral
 import numpy as np
 
 from matplotlib.ticker import MultipleLocator
@@ -81,7 +82,7 @@ def set_labels_colors(xarr) -> tuple:
         lcolor = cset.purple
         fcolor = '#EEBBDD'
 
-    # overwrite ylabel 
+    # overwrite ylabel
     if '_ylabel' in xarr.attrs:
         hk_label = xarr.attrs['_ylabel']
 
@@ -154,6 +155,21 @@ def adjust_units(zunit: str):
     return zunit
 
 
+def get_gap_list(xdata: np.ndarray) -> list:
+    """
+    Identify data gaps
+    """
+    if not issubclass(xdata.dtype.type, Integral):
+        return []
+
+    uvals, counts = np.unique(np.diff(xdata), return_counts=True)
+    if counts.size > 1 and counts.max() / xdata.size > 0.5:
+        xstep = uvals[counts.argmax()]
+        return (np.diff(xdata) > xstep).nonzero()[0].tolist()
+
+    return []
+
+
 # - main functions ---------------------------------
 def add_subplot(axx, xarr) -> None:
     """
@@ -172,17 +188,15 @@ def add_subplot(axx, xarr) -> None:
     lcolor = xarr.attrs['_color'] if '_color' in xarr.attrs else cset.blue
     fcolor = '#BBCCEE'
 
-    # define xdata and determine gap_list (always one element!)
+    # define xdata and determine gap_list (always atleast one element!)
     if 'orbit' in xarr.coords:
         xdata = xarr.coords['orbit'].values
         isel = np.s_[:]
     else:
         xdata = xarr.coords['time'].values
         isel = np.s_[0, :]
-    xstep = np.gcd.reduce(np.diff(xdata))
-    gap_list = [] if np.all(np.diff(xdata) > xstep) else \
-        (np.diff(xdata) > xstep).nonzero()[0].tolist()
-    gap_list.append(len(xdata)-1)
+    gap_list = get_gap_list(xdata)
+    gap_list.append(xdata.size - 1)
 
     # define avg, err1, err2
     # check if xarr.values is a structured array:
@@ -230,7 +244,6 @@ def add_subplot(axx, xarr) -> None:
     axx.set_ylabel(ylabel)
     axx.grid(True)
 
-
 def add_hk_subplot(axx, xarr, vperc=None, vrange_last_orbits=-1) -> None:
     """
     Add a subplot for housekeeping data
@@ -239,7 +252,8 @@ def add_hk_subplot(axx, xarr, vperc=None, vrange_last_orbits=-1) -> None:
     ----------
     axx :  matplotlib.Axes
     xarr :  xarray.DataArray
-       Object holding housekeeping data data and attributes
+       Object holding housekeeping data data and attributes.
+       Dimension must be 'orbit', 'hours' or 'time'.
     vperc :  list, optional
        Reject outliers before determining vrange
        (neglected when vrange_last_orbits is used)
@@ -252,14 +266,16 @@ def add_hk_subplot(axx, xarr, vperc=None, vrange_last_orbits=-1) -> None:
     if 'orbit' in xarr.coords:
         xdata = xarr.coords['orbit'].values
         isel = np.s_[:]
+        gap_list = get_gap_list(xdata)
+    elif 'hours' in xarr.coords:
+        xdata = xarr.coords['hours'].values
+        isel = np.s_[0, :]
+        gap_list = get_gap_list(np.round(3600 * xdata).astype(int))
     else:
         xdata = xarr.coords['time'].values
         isel = np.s_[0, :]
-    xstep = np.gcd.reduce(np.diff(xdata))
-    gap_list = (np.diff(xdata) > xstep).nonzero()[0].tolist()
-    gap_list.append(len(xdata)-1)
-    if 'time' in xarr.coords:
-        xdata = xdata.astype(float) / 3600
+        gap_list = get_gap_list(xdata)
+    gap_list.append(xdata.size - 1)
 
     # define avg, err1, err2
     avg = xarr.values['mean'][isel]
@@ -276,7 +292,7 @@ def add_hk_subplot(axx, xarr, vperc=None, vrange_last_orbits=-1) -> None:
         ii = jj + 1
 
     # adjust data X-coordinate
-    if 'time' in xarr.coords:
+    if 'hours' in xarr.coords:
         minor_locator = MultipleLocator(1)
         major_locator = MultipleLocator(3)
         axx.xaxis.set_major_locator(major_locator)
