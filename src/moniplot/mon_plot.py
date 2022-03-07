@@ -93,20 +93,25 @@ class MONplot:
        Use the name of your institute as a signature.
     institute
        Return name of your institute.
-    draw_signal(data, zscale='linear', side_panels='nanmedian', fig_info=None,
-                title=None, **kwargs)
+    draw_signal(data, fig_info=None, side_panels='nanmedian', title=None,
+                **kwargs)
        Display 2D array data as an image and averaged column/row signal plots.
     draw_quality(data, ref_data=None, side_panels='quality', fig_info=None,
                  title=None, **kwargs)
        Display pixel-quality 2D data as an image and column/row statistics.
-    draw_trend(xds=None, hk_xds=None, vrange_last_orbits=-1, fig_info=None,
-               title=None, **kwargs)
+    draw_trend(xds=None, hk_xds=None, fig_info=None, title=None, **kwargs)
        Display trends of measurement data and/or housekeeping data.
-    draw_hist(data, data_sel=None, vrange=None, fig_info=None,
-              title=None, **kwargs)
-        Display data as histograms.
+    draw_hist(data, data_sel=None, vrange=None, fig_info=None, title=None,
+              **kwargs)
+        Display data as a histogram.
     draw_qhist(xds, data_sel=None, density=True, fig_info=None, title=None)
-       Display pixel-quality data as histograms.
+       Display pixel-quality data as a histogram.
+    draw_lplot(self, xdata, ydata, color=0, *, square=False, fig_info=None,
+               title=None, **kwargs)
+       Plot y versus x lines, maybe called multiple times to add lines.
+    draw_multiplot(self, data_tuple, gridspec=None, fig_info=None, title=None,
+                   **kwargs)
+       Display multiple subplots on one page using matplotlib.gridspec.GridSpec.
     draw_tracks(lons, lats, icids, saa_region=None, fig_info=None, title=None)
        Display tracks of satellite on a world map using a Robinson projection.
 
