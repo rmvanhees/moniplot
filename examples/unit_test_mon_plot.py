@@ -144,8 +144,8 @@ def run_draw_trend(plot):
     buff['err1'] = data - .0125
     buff['err2'] = data + .0075
     hk_attrs = {'long_name': 'SWIR detector temperature', 'units': 'K'}
-    res.append(xr.DataArray(buff, name='detector_temp', dims=['orbit'],
-                            coords=[np.arange(n_elmnt)], attrs=hk_attrs))
+    res.append(xr.DataArray(buff, name='detector_temp', attrs=hk_attrs,
+                            coords={'orbit': np.arange(n_elmnt)}))
 
     buff = np.empty(len(xx), dtype=hk_dtype)
     data = 202.1 + (100 - np.arange(n_elmnt)) / 1000
@@ -153,8 +153,8 @@ def run_draw_trend(plot):
     buff['err1'] = data - .15
     buff['err2'] = data + .175
     hk_attrs = {'long_name': 'SWIR grating temperature', 'units': 'K'}
-    res.append(xr.DataArray(buff, name='grating_temp', dims=['orbit'],
-                            coords=[np.arange(n_elmnt)], attrs=hk_attrs))
+    res.append(xr.DataArray(buff, name='grating_temp', attrs=hk_attrs,
+                            coords={'orbit': np.arange(n_elmnt)}))
 
     buff = np.empty(len(xx), dtype=hk_dtype)
     data = 208.2 + (100 - np.arange(n_elmnt)) / 1000
@@ -162,8 +162,8 @@ def run_draw_trend(plot):
     buff['err1'] = data - .15
     buff['err2'] = data + .175
     hk_attrs = {'long_name': 'SWIR OBM temperature', 'units': 'K'}
-    res.append(xr.DataArray(buff, name='obm_temp', dims=['orbit'],
-                            coords=[np.arange(n_elmnt)], attrs=hk_attrs))
+    res.append(xr.DataArray(buff, name='obm_temp', attrs=hk_attrs,
+                            coords={'orbit': np.arange(n_elmnt)}))
     hk_ds = xr.merge(res, combine_attrs="drop_conflicts")
 
     msm1 = data_to_xr(np.sin(xx * np.pi), name='msm1', dims=['orbit'])
