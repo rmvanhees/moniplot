@@ -180,7 +180,8 @@ def add_subplot(axx, xarr) -> None:
         xdata = xarr.coords['time'].values
         isel = np.s_[0, :]
     xstep = np.gcd.reduce(np.diff(xdata))
-    gap_list = (np.diff(xdata) > xstep).nonzero()[0].tolist()
+    gap_list = [] if np.all(np.diff(xdata) > xstep) else \
+        (np.diff(xdata) > xstep).nonzero()[0].tolist()
     gap_list.append(len(xdata)-1)
 
     # define avg, err1, err2
