@@ -364,7 +364,7 @@ class MONplot:
         title :  str, default=None
            Title of this figure (matplotlib: Axis.set_title)
         **kwargs :   other keywords
-           Pass keyword arguments: zscale, vperc or vrange
+           Pass keyword arguments: 'zscale', 'vperc' or 'vrange'
            to moniplot.lib.fig_draw_image.fig_data_to_xarr()
 
         The information provided in the parameter 'fig_info' will be displayed
@@ -694,7 +694,7 @@ class MONplot:
         title :  str, optional
            Title of this figure (matplotlib: Axis.set_title)
         **kwargs :   other keywords
-           Pass keyword arguments: vperc or vrange_last_orbits
+           Pass keyword arguments: 'vperc' or 'vrange_last_orbits'
            to moniplot.lib.fig_draw_trend.add_hk_subplot()
 
         xarray attributes
@@ -797,8 +797,10 @@ class MONplot:
         title :  str, optional
            Title of this figure (matplotlib: Axis.set_title)
         **kwargs :   other keywords
-           Pass keyword arguments matplotlib.pyplot.hist: a.o. bins, density
-           Note the keywords histtype, color, linewidth and fill are predefined.
+           Pass the following keyword arguments to matplotlib.pyplot.hist:
+              'bins', 'density' or 'log'.
+           Note that keywords: 'histtype', 'color', 'linewidth' and 'fill'
+           are predefined.
 
         xarray attributes
         -----------------
@@ -871,12 +873,12 @@ class MONplot:
             axx.hist(values, range=vrange, histtype='step',
                      edgecolor='#4477AA', facecolor='#77AADD',
                      fill=True, linewidth=1.5, **kwargs)
-            axx.grid(which='major', color='#AAAAAA', ls='--')
+            axx.grid(which='major', color='#AAAAAA', linestyle='--')
         else:
             axx.hist(values, range=vrange, histtype='bar',
                      edgecolor='#4477AA', facecolor='#77AADD',
                      linewidth=1.5, **kwargs)
-            axx.grid(which='major', axis='y', color='#AAAAAA', ls='--')
+            axx.grid(which='major', axis='y', color='#AAAAAA', linestyle='--')
         axx.set_xlabel(long_name if long_name else 'value')
         if 'density' in kwargs and kwargs['density']:
             axx.set_ylabel('density')
@@ -1032,7 +1034,7 @@ class MONplot:
                 fig_info = FIGinfo()
 
             if 'text' in kwargs:
-                axx.text(0.05, 0.985, kwargs['text'],
+                axx.text(0.05, 0.985, kwargs.pop('text'),
                          transform=axx.transAxes,
                          fontsize='small', verticalalignment='top',
                          bbox=dict(boxstyle='round', facecolor='#FFFFFF',

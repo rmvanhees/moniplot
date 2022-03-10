@@ -312,7 +312,7 @@ def fig_qdata_to_xarr(data, ref_data=None, data_sel=None,
         for CKD derivation.
     thres_bad :  float, default=0.8
         Threshold for bad pixels.
-    qlabels : tuple of strings
+    qlabels : tuple of strings, optional
         Labels for the pixel-quality classes, see below
 
     Notes
@@ -334,15 +334,15 @@ def fig_qdata_to_xarr(data, ref_data=None, data_sel=None,
     -------
     xarray.DataArray
     """
-    if data_sel is not None:
+    if data_sel is None:
+        exclude_region = None
+    else:
         if isinstance(data_sel, np.ndarray):
             # pylint: disable=invalid-unary-operand-type
             exclude_region = ~data_sel
         else:
             exclude_region = np.full(data.shape, True)
             exclude_region[data_sel] = False
-    else:
-        exclude_region = None
 
     def float_to_quality(arr):
         """
