@@ -35,7 +35,7 @@ class FIGinfo:
 
     Attributes
     ----------
-    location : string
+    location : str
        Location to draw the fig_info box: 'above' (default), 'none'
     fig_info : OrderedDict
        Dictionary holding the information for the fig_info box
@@ -59,6 +59,16 @@ class FIGinfo:
                  image or its colorbar at about 7+ entries.
     """
     def __init__(self, loc='above', info_dict=None) -> None:
+        """
+        Create FIGinfo instance to hold information on the current plot
+
+        Parameters
+        ----------
+        loc :  str, default='above'
+           Location to draw the fig_info box: 'above' (default), 'none'
+        info_dict :  OrderedDict, optional
+           Dictionary holding information to be displayed in the fig_info box
+        """
         self.fig_info = OrderedDict() if info_dict is None else info_dict
         self.set_location(loc)
 
@@ -98,9 +108,8 @@ class FIGinfo:
           Name of the fig_info key.
         value : Any python variable
           Value of the fig_info key. A tuple will be formatted as *value.
-        fmt : str
+        fmt : str, default='{}'
           Convert value to a string, using the string format method.
-          Default: '{}'.
         """
         if isinstance(value, tuple):
             self.fig_info.update({key: fmt.format(*value)})

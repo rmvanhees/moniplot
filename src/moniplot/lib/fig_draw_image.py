@@ -38,6 +38,7 @@ import numpy as np
 import xarray as xr
 
 import matplotlib.colors as mcolors
+from matplotlib.ticker import AutoMinorLocator
 
 from ..image_to_xarray import data_to_xr
 from ..tol_colors import tol_cmap, tol_cset
@@ -119,22 +120,16 @@ def adjust_img_ticks(axx, xarr, dims=None):
     if dims is None or dims == 'X':
         if (xarr.shape[1] % 10) == 0:
             axx.set_xticks(np.linspace(0, xarr.shape[1], 6, dtype=int))
-            axx.set_xticks(np.linspace(0, xarr.shape[1], 21, dtype=int),
-                           minor=True)
         elif (xarr.shape[1] % 8) == 0:
             axx.set_xticks(np.linspace(0, xarr.shape[1], 5, dtype=int))
-            axx.set_xticks(np.linspace(0, xarr.shape[1], 17, dtype=int),
-                           minor=True)
+        axx.xaxis.set_minor_locator(AutoMinorLocator())
 
     if dims is None or dims == 'Y':
         if (xarr.shape[0] % 10) == 0:
             axx.set_yticks(np.linspace(0, xarr.shape[0], 6, dtype=int))
-            axx.set_yticks(np.linspace(0, xarr.shape[0], 21, dtype=int),
-                           minor=True)
         elif (xarr.shape[0] % 8) == 0:
             axx.set_yticks(np.linspace(0, xarr.shape[0], 5, dtype=int))
-            axx.set_yticks(np.linspace(0, xarr.shape[0], 17, dtype=int),
-                           minor=True)
+        axx.yaxis.set_minor_locator(AutoMinorLocator())
 
 
 def fig_draw_panels(axx_p: dict, xarr, side_panels: str) -> None:

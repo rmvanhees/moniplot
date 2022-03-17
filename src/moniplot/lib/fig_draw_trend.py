@@ -32,7 +32,7 @@ License:  GPLv3
 from numbers import Integral
 import numpy as np
 
-from matplotlib.ticker import MultipleLocator
+from matplotlib.ticker import AutoMinorLocator, MultipleLocator
 
 from ..tol_colors import tol_cset
 
@@ -230,10 +230,10 @@ def add_subplot(axx, xarr) -> None:
 
     # adjust data X-coordinate
     if 'time' in xarr.coords:
-        minor_locator = MultipleLocator(1)
-        major_locator = MultipleLocator(3)
-        axx.xaxis.set_major_locator(major_locator)
-        axx.xaxis.set_minor_locator(minor_locator)
+        axx.xaxis.set_major_locator(MultipleLocator(3))
+        axx.xaxis.set_minor_locator(MultipleLocator(1))
+    else:
+        axx.xaxis.set_minor_locator(AutoMinorLocator())
     axx.set_xlim([xdata[0], xdata[-1]])
 
     # adjust data X-coordinate
@@ -293,10 +293,10 @@ def add_hk_subplot(axx, xarr, vperc=None, vrange_last_orbits=-1) -> None:
 
     # adjust data X-coordinate
     if 'hours' in xarr.coords:
-        minor_locator = MultipleLocator(1)
-        major_locator = MultipleLocator(3)
-        axx.xaxis.set_major_locator(major_locator)
-        axx.xaxis.set_minor_locator(minor_locator)
+        axx.xaxis.set_major_locator(MultipleLocator(3))
+        axx.xaxis.set_minor_locator(MultipleLocator(1))
+    else:
+        axx.xaxis.set_minor_locator(AutoMinorLocator())
     axx.set_xlim([xdata[0], xdata[-1]])
 
     # adjust data Y-coordinate

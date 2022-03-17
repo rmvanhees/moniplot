@@ -22,6 +22,7 @@ Copyright (c) 2022 SRON - Netherlands Institute for Space Research
 
 License:  GPLv3
 """
+from matplotlib.ticker import AutoMinorLocator
 import numpy as np
 
 from .fig_legend import blank_legend_key
@@ -53,6 +54,7 @@ def fig_draw_qhist(axx, qdata, label: str, density: bool):
     # add decoration
     axx.grid(which='major', axis='y', color='#AAAAAA', ls='--')
     axx.set_xlim([0, 1])
+    axx.xaxis.set_minor_locator(AutoMinorLocator(2))
     axx.set_ylabel('density' if density else 'count')
     axx.set_ylim([1e-4, 10])
     axx.set_yticks([1e-4, 1e-3, 1e-2, 1e-1, 1])
