@@ -59,7 +59,8 @@ from .lib.fig_draw_trend import add_subplot, add_hk_subplot
 from .lib.fig_draw_qhist import fig_draw_qhist
 from .lib.fig_draw_lplot import fig_draw_lplot, close_draw_lplot
 from .lib.fig_draw_multiplot import get_xylabels, draw_subplot
-from .lib.fig_draw_tracks import fig_draw_tracks
+if FOUND_CARTOPY:
+    from .lib.fig_draw_tracks import fig_draw_tracks
 
 
 # - local functions --------------------------------
