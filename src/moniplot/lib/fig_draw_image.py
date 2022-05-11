@@ -90,6 +90,11 @@ def set_norm(zscale: str, vmin: float, vmax: float):
     if zscale == 'log':
         return mcolors.LogNorm(vmin=max(vmin, 1e-6), vmax=vmax)
 
+    if vmin == vmax:
+        scale = max(1, abs(round((vmin + vmax) / 2)))
+        vmin -= 1e-3 * scale
+        vmax += 1e-3 * scale
+
     if zscale == 'diff':
         if vmin < 0 < vmax:
             vcntr = 0.
@@ -257,9 +262,13 @@ def fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None):
         vmin, vmax = vrange
 
     # set data units and scaling
-    dscale, zunits = adjust_zunit(xarr.attrs['units'], vmin, vmax)
-    xarr.values[np.isfinite(xarr.values)] /= dscale
-    xarr.attrs['_zunits'] = zunits
+    if 'units' in xarr.attrs:
+        dscale, zunits = adjust_zunit(xarr.attrs['units'], vmin, vmax)
+        xarr.values[np.isfinite(xarr.values)] /= dscale
+        xarr.attrs['_zunits'] = zunits
+    else:
+        dscale = 1.
+        xarr.attrs['_zunits'] = '1'
 
     # set data label
     if zscale == 'ratio' or xarr.attrs['_zunits'] == '1':
