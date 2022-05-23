@@ -11,7 +11,7 @@ Reference
 ---------
    https://personal.sron.nl/~pault/
 
-Copyright (c) 2019 Paul Tol (SRON)
+Copyright (c) 2019-2022 Paul Tol (SRON)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,15 +62,17 @@ class TOLcmaps():
         self.namelist = (
             'sunset_discrete', 'sunset', 'BuRd_discrete', 'BuRd',
             'PRGn_discrete', 'PRGn', 'YlOrBr_discrete', 'YlOrBr', 'WhOrBr',
-            'iridescent', 'rainbow_PuRd', 'rainbow_PuBr', 'rainbow_WhRd',
-            'rainbow_WhBr', 'rainbow_WhBr_condense', 'rainbow_discrete')
+            'iridescent', 'incandescent', 'rainbow_PuRd', 'rainbow_PuBr',
+            'rainbow_WhRd', 'rainbow_WhBr', 'rainbow_WhBr_condense',
+            'rainbow_discrete')
 
         self.funcdict = dict(
             zip(self.namelist,
                 (self.__sunset_discrete, self.__sunset, self.__BuRd_discrete,
                  self.__BuRd, self.__PRGn_discrete, self.__PRGn,
                  self.__YlOrBr_discrete, self.__YlOrBr, self.__WhOrBr,
-                 self.__iridescent, self.__rainbow_PuRd, self.__rainbow_PuBr,
+                 self.__iridescent, self.__incandescent,
+                 self.__rainbow_PuRd, self.__rainbow_PuBr,
                  self.__rainbow_WhRd, self.__rainbow_WhBr,
                  self.__rainbow_WhBr_condense, self.__rainbow_discrete)))
 
@@ -159,7 +161,7 @@ class TOLcmaps():
 
     def __iridescent(self):
         """
-        Define colormap 'iridescent'.
+        Define colormap 'Iridescent'.
         """
         clrs = ['#FEFBE9', '#FCF7D5', '#F5F3C1', '#EAF0B5', '#DDECBF',
                 '#D0E7CA', '#C2E3D2', '#B5DDD8', '#A8D8DC', '#9BD2E1',
@@ -168,6 +170,16 @@ class TOLcmaps():
                 '#805770', '#684957', '#46353A']
         self.cmap = LinearSegmentedColormap.from_list(self.cname, clrs)
         self.cmap.set_bad('#999999')
+
+    def __incandescent(self):
+        """
+        Define colormap 'Incandescent'.
+        """
+        clrs = ['#CEFFFF', '#C6F7D6', '#A2F49B', '#BBE453', '#D5CE04',
+                '#E7B503', '#F19903', '#F6790B', '#F94902', '#E40515',
+                '#A80003']
+        self.cmap = LinearSegmentedColormap.from_list(self.cname, clrs)
+        self.cmap.set_bad('#888888')
 
     def __rainbow_PuRd(self):
         """
