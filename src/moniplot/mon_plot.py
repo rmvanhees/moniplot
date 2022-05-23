@@ -301,49 +301,140 @@ class MONplot:
                  multialignment='left',
                  bbox={'facecolor': 'white', 'pad': 5})
 
-    @staticmethod
-    def __add_img_fig_box(axx_c, aspect: int, fig_info) -> None:
+    # -------------------------
+    def __draw_image__(self, xarr: xr.DataArray, side_panels: str,
+                       fig_info: FIGinfo, title: str) -> None:
         """
-        Add a box with meta information for draw_signal and draw_quality
-
-        Parameters
-        ----------
-        axx_c :  Matplotlib Axes instance of the colorbar
-        aspect :  int
-        fig_info :  FIGinfo
-           instance of moniplot.lib.fig_info to be displayed
+        Does the actual drawing of the image data for the public methods
+        'draw_signal' and 'draw_quality'.
         """
-        if fig_info is None or fig_info.location != 'above':
-            return
+        def add_fig_box() -> None:
+            """
+            Add a box with meta information in the current figure
+            """
+            if fig_info is None:
+                return
 
-        # put text above colorbar
-        if len(fig_info) <= 7 if aspect == 1 else 5 :
-            if aspect in (3, 4):
-                halign = 'right'
-                fontsize = 'xx-small' if len(fig_info) == 5 else 'x-small'
-            else:
-                halign = 'center'
-                fontsize = 'x-small'
+            if fig_info.location == 'above':
+                if aspect <= 2:
+                    halign = 'center'
+                    fontsize = 'x-small'
+                else:
+                    halign = 'right'
+                    fontsize = 'xx-small' if len(fig_info) > 6 else 'x-small'
 
-            axx_c.text(0 if aspect == 2 else 1,
-                       1.025 + (aspect-1) * 0.0075,
-                       fig_info.as_str(), fontsize=fontsize,
-                       transform=axx_c.transAxes,
-                       multialignment='left',
-                       verticalalignment='bottom',
-                       horizontalalignment=halign,
-                       bbox={'facecolor': 'white', 'pad': 4})
-        else:                     # put text below colorbar
-            fontsize = 'xx-small' if aspect in (3, 4) else 'x-small'
-            axx_c.text(0.125 + (aspect-1) * 0.2,
-                       -0.03 - (aspect-1) * 0.005,
-                       fig_info.as_str(), fontsize=fontsize,
-                       transform=axx_c.transAxes,
-                       multialignment='left',
-                       verticalalignment='top',
-                       horizontalalignment='left',
-                       bbox={'facecolor': 'white', 'pad': 4})
+                axx_c.text(0 if aspect == 2 else 1,
+                           1.04 + (aspect-1) * 0.0075,
+                           fig_info.as_str(), fontsize=fontsize,
+                           transform=axx_c.transAxes,
+                           multialignment='left',
+                           verticalalignment='bottom',
+                           horizontalalignment=halign,
+                           bbox={'facecolor': 'white', 'pad': 4})
+                return
 
+            if fig_info.location == 'below':
+                fontsize = 'xx-small' if aspect in (3, 4) else 'x-small'
+                axx_c.text(0.125 + (aspect-1) * 0.2,
+                           -0.03 - (aspect-1) * 0.005,
+                           fig_info.as_str(), fontsize=fontsize,
+                           transform=axx_c.transAxes,
+                           multialignment='left',
+                           verticalalignment='top',
+                           horizontalalignment='left',
+                           bbox={'facecolor': 'white', 'pad': 4})
+
+        # aspect of image data
+        aspect = min(4, max(1, int(round(xarr.shape[1] / xarr.shape[0]))))
+
+        # select figure attributes
+        attrs = {1: {'figsize': (10, 8),
+                     'w_ratios': (1., 7., 0.5, 1.5),
+                     'h_ratios': (7., 1.)},                  # 7 x 7
+                 2: {'figsize': (13, 6.25),
+                     'w_ratios': (1., 10., 0.5, 1.5),
+                     'h_ratios': (5., 1.)},                  # 10 x 5
+                 3: {'figsize': (15, 5.375),
+                     'w_ratios': (1., 12., 0.5, 1.5),
+                     'h_ratios': (4., 1.)},                  # 12 x 4
+                 4: {'figsize': (17, 5.125),
+                     'w_ratios': (1., 14., 0.5, 1.5),
+                     'h_ratios': (3.5, 1.)}}.get(aspect)     # 14 x 3.5
+
+        # define matplotlib figure
+        fig = plt.figure(figsize=attrs['figsize'])
+        if self.caption:
+            fig.suptitle(self.caption, fontsize='x-large',
+                         position=(0.5, 1 - 0.4 / fig.get_figheight()))
+
+        # Define a grid layout to place subplots within the figure.
+        # - gspec[0, 1] is reserved for the image
+        # - gspec[1, 1] is reserved for the x-panel
+        # - gspec[0, 0] is reserved for the y-panel
+        # - gspec[0, 2] is reserved for the colorbar
+        # - gspec[1, 2] is used to pace the small fig_info box (max 6/7 lines)
+        gspec = fig.add_gridspec(2, 4,
+                                 left=.135 + .005 * (aspect-1),
+                                 right=.9 - .005 * (aspect-1),
+                                 top=.865 - .025 * (aspect-1),
+                                 bottom=.115 + .01 * (aspect-1),
+                                 wspace=0.1 / max(2, aspect-1),
+                                 hspace=0.05,
+                                 width_ratios=attrs['w_ratios'],
+                                 height_ratios=attrs['h_ratios'])
+
+        # add image panel and draw image
+        axx = fig.add_subplot(gspec[0, 1])
+        if xarr.attrs['_zscale'] == 'quality':
+            img = axx.imshow(xarr.values, norm=xarr.attrs['_znorm'],
+                             aspect='auto', cmap=xarr.attrs['_cmap'],
+                             interpolation='none', origin='lower')
+        else:
+            cmap = self.cmap if self.cmap else xarr.attrs['_cmap']
+            img = axx.imshow(xarr.values, norm=xarr.attrs['_znorm'],
+                             aspect='auto', cmap=cmap,
+                             interpolation='none', origin='lower')
+
+        # add title to image panel
+        if title is not None:
+            axx.set_title(title)
+        elif 'long_name' in xarr.attrs:
+            axx.set_title(xarr.attrs['long_name'])
+        self.__add_copyright(axx)
+        # axx.grid(True)
+
+        # add side panels
+        if side_panels == 'none':
+            adjust_img_ticks(axx, xarr)
+            axx.set_xlabel(xarr.dims[1])
+            axx.set_ylabel(xarr.dims[0])
+        else:
+            for xtl in axx.get_xticklabels():
+                xtl.set_visible(False)
+            for ytl in axx.get_yticklabels():
+                ytl.set_visible(False)
+            axx_p = {'X': fig.add_subplot(gspec[1, 1], sharex=axx),
+                     'Y': fig.add_subplot(gspec[0, 0], sharey=axx)}
+            fig_draw_panels(axx_p, xarr, side_panels)
+            axx_p['X'].set_xlabel(xarr.dims[1])
+            axx_p['Y'].set_ylabel(xarr.dims[0])
+
+        # add colorbar
+        if xarr.attrs['_zscale'] == 'quality':
+            axx_c = fig.add_subplot(gspec[0, 2])
+            bounds = xarr.attrs['flag_values']
+            mbounds = [(bounds[ii+1] + bounds[ii]) / 2
+                       for ii in range(len(bounds)-1)]
+            _ = plt.colorbar(img, cax=axx_c, ticks=mbounds, boundaries=bounds)
+            axx_c.tick_params(axis='y', which='both', length=0)
+            axx_c.set_yticklabels(xarr.attrs['flag_meanings'])
+        else:
+            axx_c = fig.add_subplot(gspec[0, 2])
+            _ = plt.colorbar(img, cax=axx_c, label=xarr.attrs['_zlabel'])
+
+        # add annotation and save the figure
+        add_fig_box()
+        self.__close_this_page(fig)
 
     # --------------------------------------------------
     def draw_signal(self, data, *, fig_info=None, side_panels='nanmedian',
@@ -414,82 +505,16 @@ class MONplot:
         >>> plot.close()
 
         """
-        # initialize keyword parameters
-        if fig_info is None:
-            fig_info = FIGinfo()
-
         # convert, if necessary, input data to xarray.DataArray
         if isinstance(data, xr.DataArray) and '_zscale' in data.attrs:
             xarr = data.copy()
         else:
             xarr = fig_data_to_xarr(data, **kwargs)
 
-        # aspect of image data
-        aspect = min(4, max(1, int(round(xarr.shape[1] / xarr.shape[0]))))
-
-        # create a new figure
-        fig_sz = {1: (10, 8),
-                  2: (12, 6.15),
-                  3: (13, 5),
-                  4: (15, 4.65)}.get(aspect)
-        fig = plt.figure(figsize=fig_sz)
-        if self.caption:
-            fig.suptitle(self.caption)
-
-        # use a grid layout to place subplots within a figure, where
-        # - gspec[0, 1] is reserved for the image
-        # - gspec[1, 1] is reserved for the x-panel
-        # - gspec[0, 0] is reserved for the y-panel
-        # - gspec[0, 2] is reserved for the colorbar
-        # - gspec[1, 2] is used to pace the small fig_info box (max 4 lines)
-        # - gspec(:, 3] extra space for FigInfo and colorbar labels
-        if aspect == 1:
-            gspec = fig.add_gridspec(2, 4, wspace=0.05, hspace=0.025,
-                                     width_ratios=(.5, 4., .2, .8),
-                                     height_ratios=(4, .5),
-                                     bottom=.1, top=.875)
-        else:
-            gspec = fig.add_gridspec(2, 4, wspace=0.05 / aspect, hspace=0.025,
-                                     width_ratios=(1., 4. * aspect, .3, .7),
-                                     height_ratios=(4, 1),
-                                     bottom=.1 if aspect == 2 else .125,
-                                     top=.85 if aspect == 2 else 0.825)
-
-        # add image panel and draw image
-        axx = fig.add_subplot(gspec[0, 1])
-        img = axx.imshow(xarr.values, norm=xarr.attrs['_znorm'],
-                         cmap=self.cmap if self.cmap else xarr.attrs['_cmap'],
-                         aspect='auto', interpolation='none', origin='lower')
-        # axx.grid(True)
-
-        # add title to image panel
-        if title is not None:
-            axx.set_title(title)
-        elif 'long_name' in xarr.attrs:
-            axx.set_title(xarr.attrs['long_name'])
-        self.__add_copyright(axx)
-
-        # add colorbar
-        axx_c = fig.add_subplot(gspec[0, 2])
-        _ = plt.colorbar(img, cax=axx_c, label=xarr.attrs['_zlabel'])
-
-        # add side panels
-        if side_panels == 'none':
-            adjust_img_ticks(axx, xarr)
-            axx.set_xlabel(xarr.dims[1])
-            axx.set_ylabel(xarr.dims[0])
-        else:
-            for xtl in axx.get_xticklabels():
-                xtl.set_visible(False)
-            for ytl in axx.get_yticklabels():
-                ytl.set_visible(False)
-            axx_p = {'X': fig.add_subplot(gspec[1, 1], sharex=axx),
-                     'Y': fig.add_subplot(gspec[0, 0], sharey=axx)}
-            fig_draw_panels(axx_p, xarr, side_panels)
-            axx_p['X'].set_xlabel(xarr.dims[1])
-            axx_p['Y'].set_ylabel(xarr.dims[0])
-
         # add data statistics to fig_info
+        if fig_info is None:
+            fig_info = FIGinfo()
+
         median, spread = biweight(xarr.values, spread=True)
         if xarr.attrs['_zunits'] is None or xarr.attrs['_zunits'] == '1':
             fig_info.add('median', median, '{:.5g}')
@@ -498,9 +523,8 @@ class MONplot:
             fig_info.add('median', (median, xarr.attrs['_zunits']), '{:.5g} {}')
             fig_info.add('spread', (spread, xarr.attrs['_zunits']), '{:.5g} {}')
 
-        # add annotation and save figure
-        self.__add_img_fig_box(axx_c, aspect, fig_info)
-        self.__close_this_page(fig)
+        # draw actual image
+        self.__draw_image__(xarr, side_panels, fig_info, title)
 
     # --------------------------------------------------
     def draw_quality(self, data, ref_data=None, *, side_panels='quality',
@@ -537,7 +561,8 @@ class MONplot:
         flag_meanings :  description of the flag values
         thres_bad :  threshold between good and bad
         thres_worst :  threshold between bad and worst
-        _cmap :  contains the matplotlib colormap
+        _cmap :  contains the matplotlib colormap.
+        _zscale :  'quality'.
         _znorm :  matplotlib class to normalize the data between zero and one.
 
         Notes
@@ -580,83 +605,16 @@ class MONplot:
 
         >>> plot.close()
         """
-        if fig_info is None:
-            fig_info = FIGinfo()
-
         # convert, if necessary, input data to xarray.DataArray
         if isinstance(data, xr.DataArray) and '_zscale' in data.attrs:
             xarr = data
         else:
             xarr = fig_qdata_to_xarr(data, ref_data, **kwargs)
 
-        # aspect of image data
-        aspect = min(4, max(1, int(round(xarr.shape[1] / xarr.shape[0]))))
+        # add statistics on data quality to fig_info
+        if fig_info is None:
+            fig_info = FIGinfo()
 
-        # create a new figure
-        fig_sz = {1: (10, 8),
-                  2: (12, 6.15),
-                  3: (13, 5),
-                  4: (15, 4.65)}.get(aspect)
-        fig = plt.figure(figsize=fig_sz)
-        if self.caption:
-            fig.suptitle(self.caption)
-
-        # use a grid layout to place subplots within a figure, where
-        # - gspec[0, 1] is reserved for the image
-        # - gspec[1, 1] is reserved for the x-panel
-        # - gspec[0, 0] is reserved for the y-panel
-        # - gspec[0, 2] is reserved for the colorbar
-        # - gspec[1, 2] is used to pace the small fig_info box (max 4 lines)
-        if aspect == 1:
-            gspec = fig.add_gridspec(2, 4, wspace=0.05, hspace=0.025,
-                                     width_ratios=(.5, 4., .2, .8),
-                                     height_ratios=(4, .5), bottom=.1, top=.875)
-        else:
-            gspec = fig.add_gridspec(2, 4, wspace=0.05 / aspect, hspace=0.025,
-                                     width_ratios=(1., 4. * aspect, .3, .7),
-                                     height_ratios=(4, 1),
-                                     bottom=.1 if aspect == 2 else .125,
-                                     top=.85 if aspect == 2 else 0.825)
-
-        # add image panel and draw image
-        axx = fig.add_subplot(gspec[0, 1])
-        img = axx.imshow(xarr.values,
-                         cmap=xarr.attrs['_cmap'], norm=xarr.attrs['_znorm'],
-                         aspect='auto', interpolation='none', origin='lower')
-
-        # add title to image panel
-        if title is not None:
-            axx.set_title(title)
-        elif 'long_name' in xarr.attrs:
-            axx.set_title(xarr.attrs['long_name'])
-        self.__add_copyright(axx)
-
-        # add colorbar
-        axx_c = fig.add_subplot(gspec[0, 2])
-        bounds = xarr.attrs['flag_values']
-        mbounds = [(bounds[ii+1] + bounds[ii]) / 2
-                   for ii in range(len(bounds)-1)]
-        _ = plt.colorbar(img, cax=axx_c, ticks=mbounds, boundaries=bounds)
-        axx_c.tick_params(axis='y', which='both', length=0)
-        axx_c.set_yticklabels(xarr.attrs['flag_meanings'])
-
-        # add side panels
-        if side_panels == 'none':
-            adjust_img_ticks(axx, xarr)
-            axx.set_xlabel(xarr.dims[1])
-            axx.set_ylabel(xarr.dims[0])
-        else:
-            for xtl in axx.get_xticklabels():
-                xtl.set_visible(False)
-            for ytl in axx.get_yticklabels():
-                ytl.set_visible(False)
-            axx_p = {'X': fig.add_subplot(gspec[1, 1], sharex=axx),
-                     'Y': fig.add_subplot(gspec[0, 0], sharey=axx)}
-            fig_draw_panels(axx_p, xarr, side_panels)
-            axx_p['X'].set_xlabel(xarr.dims[1])
-            axx_p['Y'].set_ylabel(xarr.dims[0])
-
-        # add data statistics to fig_info
         if ref_data is None:
             fig_info.add(
                 f'{xarr.attrs["flag_meanings"][2]}'
@@ -674,9 +632,8 @@ class MONplot:
             fig_info.add(xarr.attrs['flag_meanings'][1],
                          np.sum(xarr.values == 1))
 
-        # add annotation and save the figure
-        self.__add_img_fig_box(axx_c, aspect, fig_info)
-        self.__close_this_page(fig)
+        # draw actual image
+        self.__draw_image__(xarr, side_panels, fig_info, title)
 
     # --------------------------------------------------
     def draw_trend(self, xds=None, hk_xds=None, *,

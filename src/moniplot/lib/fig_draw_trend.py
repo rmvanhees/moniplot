@@ -244,6 +244,7 @@ def add_subplot(axx, xarr) -> None:
     axx.set_ylabel(ylabel)
     axx.grid(True)
 
+
 def add_hk_subplot(axx, xarr, vperc=None, vrange_last_orbits=-1) -> None:
     """
     Add a subplot for housekeeping data

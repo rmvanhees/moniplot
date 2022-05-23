@@ -29,6 +29,7 @@ import numpy as np
 import xarray as xr
 
 from moniplot.image_to_xarray import data_to_xr
+from moniplot.lib.fig_info import FIGinfo
 from moniplot.mon_plot import MONplot
 
 
@@ -120,12 +121,17 @@ def run_draw_quality(plot):
     data[75:125, 900:925] = 0.05
     data[75:125, 825:875] = 0.4
 
+    figinfo_in = FIGinfo()
+    figinfo_in.add('orbits', (17, [23662, 23707]), fmt='{} in {}')
+    figinfo_in.add('coverage', ('2022-05-08', '2022-05-10'), fmt='{} / {}')
+
     plot.draw_quality(data, data_sel=np.s_[11:228, 16:991],
-                      title='no reference')
+                      title='no reference', fig_info=figinfo_in.copy())
     plot.draw_quality(data, ref_data=ref_data, data_sel=np.s_[11:228, 16:991],
-                      title='with reference')
+                      title='with reference', fig_info=figinfo_in.copy())
     plot.draw_quality(data, data_sel=np.s_[11:228, 16:991],
-                      side_panels='none', title='no reference')
+                      side_panels='none', title='no reference',
+                      fig_info=figinfo_in.copy())
 
 
 def run_draw_trend(plot):

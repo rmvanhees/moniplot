@@ -199,7 +199,7 @@ def fig_draw_panels(axx_p: dict, xarr, side_panels: str) -> None:
                                     r'All-NaN (slice|axis) encountered')
             axx_p['Y'].plot(func_panels(xarr.values, axis=1), ydata,
                             linewidth=0.75, color=cset.blue)
-    #axx_p['Y'].xaxis.tick_top()
+    # axx_p['Y'].xaxis.tick_top()
     axx_p['X'].tick_params(axis='y', labelrotation=45, labelsize='small')
     axx_p['Y'].tick_params(axis='x', bottom=False, top=True,
                            labelbottom=False, labeltop=True,

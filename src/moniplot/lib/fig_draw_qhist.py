@@ -45,7 +45,7 @@ def fig_draw_qhist(axx, qdata, label: str, density: bool):
     qdata[np.isnan(qdata)] = 0.
     # draw histogram
     axx.hist(qdata, bins=10, range=[0, 1], density=density,
-             histtype='bar',align='mid', log=True, fill=True,
+             histtype='bar', align='mid', log=True, fill=True,
              edgecolor='#4477AA', facecolor='#77AADD', linewidth=1.5)
     # add label
     legenda = axx.legend([blank_legend_key()],

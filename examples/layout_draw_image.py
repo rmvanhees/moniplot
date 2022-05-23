@@ -29,7 +29,8 @@ import matplotlib.pyplot as plt
 
 from moniplot.lib.fig_info import FIGinfo
 
-def add_img_fig_box(axx_c, aspect: int, fig_info: FIGinfo) -> None:
+
+def add_fig_box(axx_c, aspect: int, fig_info: FIGinfo) -> None:
     """
     Add a box with meta information for draw_signal and draw_quality
 
@@ -40,27 +41,29 @@ def add_img_fig_box(axx_c, aspect: int, fig_info: FIGinfo) -> None:
     fig_info :  FIGinfo
         instance of moniplot.lib.fig_info to be displayed
     """
-    if fig_info is None or fig_info.location != 'above':
+    if fig_info is None:
         return
 
     # put text above colorbar
-    if len(fig_info) <= (7 if aspect == 1 else 6):
+    if fig_info.location == 'above':
         if aspect <= 2:
             halign = 'center'
-            fontsize = 'xx-small' if len(fig_info) > 5 else 'x-small'
+            fontsize = 'x-small'
         else:
             halign = 'right'
-            fontsize = 'xx-small' if len(fig_info) == 6 else 'x-small'
-                    
+            fontsize = 'xx-small' if len(fig_info) > 6 else 'x-small'
+
         axx_c.text(0 if aspect == 2 else 1,
                    1.04 + (aspect-1) * 0.0075,
                    fig_info.as_str(), fontsize=fontsize,
                    transform=axx_c.transAxes,
-                   multialignment='left',                       
+                   multialignment='left',
                    verticalalignment='bottom',
                    horizontalalignment=halign,
                    bbox={'facecolor': 'white', 'pad': 4})
-    else:                     # put text below colorbar
+        return
+
+    if fig_info.location == 'below':
         fontsize = 'xx-small' if aspect in (3, 4) else 'x-small'
         axx_c.text(0.125 + (aspect-1) * 0.2,
                    -0.03 - (aspect-1) * 0.005,
@@ -71,24 +74,25 @@ def add_img_fig_box(axx_c, aspect: int, fig_info: FIGinfo) -> None:
                    horizontalalignment='left',
                    bbox={'facecolor': 'white', 'pad': 4})
 
+
 # -------------------------
 def draw_figure(aspect: int, side_panels='one') -> None:
     """
     Show figure with given aspect ratio
     """
     attrs = {1: {'figsize': (10, 8),
-                 'w_ratios': (1. , 7. , 0.5, 1.5),
+                 'w_ratios': (1., 7., 0.5, 1.5),
                  'h_ratios': (7., 1.)},                  # 7 x 7
              2: {'figsize': (13, 6.25),
-                 'w_ratios': (1. , 10. , 0.5, 1.5),
+                 'w_ratios': (1., 10., 0.5, 1.5),
                  'h_ratios': (5., 1.)},                  # 10 x 5
              3: {'figsize': (15, 5.375),
-                 'w_ratios': (1. , 12. , 0.5, 1.5),
+                 'w_ratios': (1., 12., 0.5, 1.5),
                  'h_ratios': (4., 1.)},                  # 12 x 4
              4: {'figsize': (17, 5.125),
-                 'w_ratios': (1. , 14. , 0.5, 1.5),
+                 'w_ratios': (1., 14., 0.5, 1.5),
                  'h_ratios': (3.5, 1.)}}.get(aspect)     # 14 x 3.5
-    
+
     fig = plt.figure(figsize=attrs['figsize'])
     fig.suptitle('test of matplotlib gridspec', fontsize='x-large',
                  position=(0.5, 1 - 0.4 / fig.get_figheight()))
@@ -128,7 +132,7 @@ def draw_figure(aspect: int, side_panels='one') -> None:
                              left=.135 + .005 * (aspect-1),
                              right=.9 - .005 * (aspect-1),
                              bottom=.115 + .01 * (aspect-1),
-                             top=.865 - .025 * (aspect-1) )
+                             top=.865 - .025 * (aspect-1))
     # else:
     #    gspec = fig.add_gridspec(2, 4, wspace=0.05 / aspect, hspace=0.025,
     #                             width_ratios=(1., 4. * aspect, .3, .7),
@@ -166,18 +170,20 @@ def draw_figure(aspect: int, side_panels='one') -> None:
     fig_info = FIGinfo()
     for ii in range(5):
         fig_info.add(f'text line {ii+1}', 'blah blah blah')
-    add_img_fig_box(axx_c, aspect, fig_info)
+    add_fig_box(axx_c, aspect, fig_info)
 
     plt.show()
 
 
 def main():
     """
+    Main function
     """
     draw_figure(1)
     draw_figure(2)
     draw_figure(3)
     draw_figure(4)
+
 
 # --------------------------------------------------
 if __name__ == '__main__':
