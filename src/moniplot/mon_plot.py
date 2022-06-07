@@ -120,7 +120,7 @@ class MONplot:
     -----
     ...
     """
-    def __init__(self, figname, caption=None, pdf_title=None):
+    def __init__(self, figname, caption=None):
         """
         Initialize multi-page PDF document or a single-page PNG
 
@@ -130,9 +130,6 @@ class MONplot:
            Name of PDF or PNG file (extension required)
         caption :  str
            Caption repeated on each page of the PDF
-        pdf_title :  string
-           Title of the PDF document (attribute of the PDF document)
-           Default: 'Monitor report on Tropomi SWIR instrument'
 
         Notes
         -----
@@ -150,16 +147,6 @@ class MONplot:
             return
 
         self.__pdf = PdfPages(figname)
-        # add PDF annotations
-        doc = self.__pdf.infodict()
-        if pdf_title is None:
-            doc['Title'] = 'Monitor report on Tropomi SWIR instrument'
-        else:
-            doc['Title'] = pdf_title
-        if self.__institute == 'SRON':
-            doc['Author'] = '(c) SRON Netherlands Institute for Space Research'
-        elif self.__institute:
-            doc['Author'] = f'(c) {self.__institute}'
 
         # turn off Matplotlib's automatic offset notation
         mpl.rcParams['axes.formatter.useoffset'] = False
@@ -185,6 +172,16 @@ class MONplot:
         if self.__pdf is None:
             return
 
+        # add PDF annotations
+        doc = self.__pdf.infodict()
+        if self.__caption is not None:
+            doc['Title'] = self.__caption
+        doc['Subject'] = \
+            'Generated using https://github.com/rmvanhees/moniplot.git'
+        if self.__institute == 'SRON':
+            doc['Author'] = '(c) SRON Netherlands Institute for Space Research'
+        elif self.__institute:
+            doc['Author'] = f'(c) {self.__institute}'
         self.__pdf.close()
         plt.close('all')
 
