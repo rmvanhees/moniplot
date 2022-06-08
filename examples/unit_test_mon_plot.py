@@ -140,11 +140,11 @@ def run_draw_trend(plot):
     """
     print('Run unit tests on MONplot::draw_trend')
     n_elmnt = 200
-    xx = np.arange(n_elmnt) / 100
+    xval = np.arange(n_elmnt) / 100
 
     res = []
     hk_dtype = np.dtype([('mean', 'f8'), ('err1', 'f8'), ('err2', 'f8')])
-    buff = np.empty(len(xx), dtype=hk_dtype)
+    buff = np.empty(len(xval), dtype=hk_dtype)
     data = 140. + (100 - np.arange(n_elmnt)) / 1000
     buff['mean'] = data
     buff['err1'] = data - .0125
@@ -153,7 +153,7 @@ def run_draw_trend(plot):
     res.append(xr.DataArray(buff, name='detector_temp', attrs=hk_attrs,
                             coords={'orbit': np.arange(n_elmnt)}))
 
-    buff = np.empty(len(xx), dtype=hk_dtype)
+    buff = np.empty(len(xval), dtype=hk_dtype)
     data = 202.1 + (100 - np.arange(n_elmnt)) / 1000
     buff['mean'] = data
     buff['err1'] = data - .15
@@ -162,7 +162,7 @@ def run_draw_trend(plot):
     res.append(xr.DataArray(buff, name='grating_temp', attrs=hk_attrs,
                             coords={'orbit': np.arange(n_elmnt)}))
 
-    buff = np.empty(len(xx), dtype=hk_dtype)
+    buff = np.empty(len(xval), dtype=hk_dtype)
     data = 208.2 + (100 - np.arange(n_elmnt)) / 1000
     buff['mean'] = data
     buff['err1'] = data - .15
@@ -172,8 +172,8 @@ def run_draw_trend(plot):
                             coords={'orbit': np.arange(n_elmnt)}))
     hk_ds = xr.merge(res, combine_attrs="drop_conflicts")
 
-    msm1 = data_to_xr(np.sin(xx * np.pi), name='msm1', dims=['orbit'])
-    msm2 = data_to_xr(np.cos(xx * np.pi), name='msm2', dims=['orbit'])
+    msm1 = data_to_xr(np.sin(xval * np.pi), name='msm1', dims=['orbit'])
+    msm2 = data_to_xr(np.cos(xval * np.pi), name='msm2', dims=['orbit'])
     msm_ds = xr.merge((msm1, msm2), combine_attrs="drop_conflicts")
 
     # plot.draw_trend(msm_ds, title='one dataset, no house-keeping')
@@ -187,29 +187,29 @@ def run_draw_lplot(plot):
     Run unit tests on MONplot::draw_lplot
     """
     print('Run unit tests on MONplot::draw_lplot')
-    xx = np.arange(200) / 100
-    plot.draw_lplot(xx, np.sin(xx * np.pi), color=0,
+    xval = np.arange(200) / 100
+    plot.draw_lplot(xval, np.sin(xval * np.pi), color=0,
                     label='sinus', marker='o', linestyle='-')
-    plot.draw_lplot(xx, np.cos(xx * np.pi), color=1,
+    plot.draw_lplot(xval, np.cos(xval * np.pi), color=1,
                     label='cosinus', marker='o', linestyle='-')
     plot.draw_lplot(None, None, ylim=[-1.05, 1.05],
                     xlabel='x-axis [Pi]', ylabel='y-axis',
                     title='draw_lplot [no time_axis]')
 
-    xx = np.arange(500) / 100
-    plot.draw_lplot(xx, np.sin(xx * np.pi), color=0,
+    xval = np.arange(500) / 100
+    plot.draw_lplot(xval, np.sin(xval * np.pi), color=0,
                     label='sinus', marker='o', linestyle='-')
-    plot.draw_lplot(xx, np.cos(xx * np.pi), color=1,
+    plot.draw_lplot(xval, np.cos(xval * np.pi), color=1,
                     label='cosinus', marker='o', linestyle='-')
     plot.draw_lplot(None, None, ylim=[-1.05, 1.05],
                     xlabel='x-axis [Pi]', ylabel='y-axis',
                     title='draw_lplot [no time_axis]')
 
     customdate = datetime(2016, 1, 1, 13, 0, 0)
-    yy = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
-    xx = [customdate + timedelta(hours=i, minutes=4*i)
-          for i in range(len(yy))]
-    plot.draw_lplot(xx, yy, color=0, label='mydata',
+    yval = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+    xval = [customdate + timedelta(hours=i, minutes=4*i)
+            for i in range(len(yval))]
+    plot.draw_lplot(xval, yval, color=0, label='mydata',
                     marker='o', linestyle='-')
     plot.draw_lplot(None, None, title='draw_lplot [time_axis]',
                     xlabel='x-axis', ylabel='y-axis')

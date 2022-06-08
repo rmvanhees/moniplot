@@ -960,8 +960,8 @@ class MONplot:
         --------
         General example:
         >>> plot = MONplot(fig_name)
-        >>> for ii, xx, yy in enumerate(data_of_each_line):
-        >>>    plot.draw_lplot(xx, yy, color=ii, label=mylabel[ii],
+        >>> for ii, ix, iy in enumerate(data_of_each_line):
+        >>>    plot.draw_lplot(ix, iy, color=ii, label=mylabel[ii],
         >>>                    marker='o', linestyle='None')
         >>> plot.draw_lplot(None, None, xlim=[0, 0.5], ylim=[-10, 10],
         >>>                 xlabel=my_xlabel, ylabel=my_ylabel)
@@ -971,7 +971,7 @@ class MONplot:
         >>> from datetime import datetime, timedelta
         >>> tt0 = (datetime(year=2020, month=10, day=1)
         >>>        + timedelta(seconds=sec_in_day))
-        >>> tt = [tt0 + xx * t_step for xx in range(yy.size)]
+        >>> tt = [tt0 + iy * t_step for iy in range(yy.size)]
         >>> plot = MONplot(fig_name)
         >>> plot.draw_lplot(tt, yy, color=1, label=mylabel,
         >>>                 marker='o', linestyle='None')
@@ -1091,21 +1091,21 @@ class MONplot:
 
         # add subplots, cycle the DataArrays of the Dataset
         data_iter = iter(data_tuple)
-        for yy in range(gridspec.nrows):
-            for xx in range(gridspec.ncols):
-                axx = fig.add_subplot(gridspec[yy, xx])
+        for iy in range(gridspec.nrows):
+            for ix in range(gridspec.ncols):
+                axx = fig.add_subplot(gridspec[iy, ix])
                 axx.grid(True)
 
                 data = next(data_iter)
                 if isinstance(data, np.ndarray):
-                    if xx == yy == 0 and title is not None:
+                    if ix == iy == 0 and title is not None:
                         axx.set_title(title)
                     axx.plot(np.arange(data.size), data, **kwargs)
                 elif isinstance(data, xr.DataArray):
-                    draw_subplot(axx, data, xylabels[yy, xx, :])
+                    draw_subplot(axx, data, xylabels[iy, ix, :])
                 else:
                     for name in data.data_vars:
-                        draw_subplot(axx, data[name], xylabels[yy, xx, :])
+                        draw_subplot(axx, data[name], xylabels[iy, ix, :])
 
         # add annotation and save the figure
         self.__add_copyright(axx)
