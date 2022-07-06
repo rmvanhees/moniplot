@@ -13,17 +13,17 @@ Or you can use git do download the repository:
     git clone https://github.com/rmvanhees/moniplot.git
 	
 Before you can install moniplot, you need:
-
- * Python v3.8+ with development headers
- * HDF5 v1.10+, installed with development headers
+* Python v3.8+ with development headers
+* HDF5 v1.10+, installed with development headers
 
 And the following Python modules have to be available:
- * setuptools v60+
- * setuptools-scm v6+
- * numpy v1.21+
- * h5py v3.5+
- * xarray v0.20+
- * matplotlib v3.5+
+* setuptools v60+
+* setuptools-scm v6+
+* numpy v1.19+
+* h5py v3.5+
+* xarray v0.20+
+* matplotlib v3.5+
+* cartopy v0.20+
 	
 You can install moniplot once you have satisfied the requirements listed
 above. Run at the top of the source tree:
