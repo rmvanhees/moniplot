@@ -103,10 +103,13 @@ def __get_coords(dset, data_sel: tuple) -> list:
                 if name.startswith('row') or name.startswith('column'):
                     name = name.split(' ')[0]
 
-                buff = dim[0][()]
-                if np.all(buff == 0):
-                    buff = np.arange(dim[0].size, dtype=dim[0].dtype)
-                elif data_sel is not None:
+                if dim[0].size == 0:
+                    buff = np.arange(dset.shape[ii], dtype=dim[0].dtype)
+                else:
+                    buff = dim[0][()]
+                    if np.all(buff == 0):
+                        buff = np.arange(dim[0].size, dtype=dim[0].dtype)
+                if data_sel is not None:
                     buff = buff[data_sel[ii]]
 
                 coords.append((name, buff))
