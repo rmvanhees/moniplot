@@ -58,7 +58,7 @@ def __get_attrs(dset, field: str) -> dict:
     attrs = {}
     for key in dset.attrs:
         if key in ('CLASS', 'DIMENSION_LIST', 'NAME', 'REFERENCE_LIST',
-                   '_Netcdf4Dimid'):
+                   '_Netcdf4Dimid', '_Netcdf4Coordinates'):
             continue
 
         attr_value = dset.attrs[key]
@@ -103,12 +103,13 @@ def __get_coords(dset, data_sel: tuple) -> list:
                 if name.startswith('row') or name.startswith('column'):
                     name = name.split(' ')[0]
 
+                co_dtype = 'u2' if ((dset.shape[ii]-1) >> 16) == 0 else 'u4'
                 if dim[0].size == 0:
-                    buff = np.arange(dset.shape[ii], dtype=dim[0].dtype)
+                    buff = np.arange(dset.shape[ii], dtype=co_dtype)
                 else:
                     buff = dim[0][()]
                     if np.all(buff == 0):
-                        buff = np.arange(dim[0].size, dtype=dim[0].dtype)
+                        buff = np.arange(dim[0].size, dtype=co_dtype)
                 if data_sel is not None:
                     buff = buff[data_sel[ii]]
 
