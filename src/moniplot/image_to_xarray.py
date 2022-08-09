@@ -102,6 +102,9 @@ def __get_coords(dset, data_sel: tuple) -> list:
                 name = PurePath(dim[0].name).name
                 if name.startswith('row') or name.startswith('column'):
                     name = name.split(' ')[0]
+                else:
+                    coords.append((name, None))
+                    continue
 
                 co_dtype = 'u2' if ((dset.shape[ii]-1) >> 16) == 0 else 'u4'
                 if dim[0].size == 0:
@@ -147,7 +150,8 @@ def __set_coords(dset, data_sel: tuple, dims: list) -> list:
 
     coords = []
     for ii in range(dset.ndim):
-        buff = np.arange(dset.shape[ii], dtype='u4')
+        co_dtype = 'u2' if ((dset.shape[ii]-1) >> 16) == 0 else 'u4'
+        buff = np.arange(dset.shape[ii], dtype=co_dtype)
         if data_sel is not None:
             buff = buff[data_sel[ii]]
         coords.append((dims[ii], buff))
@@ -284,7 +288,15 @@ def h5_to_xr(h5_dset, data_sel=None, *, dims=None, field=None):
             if np.isscalar(coords[ii][1]):
                 del coords[ii]
 
-    return xr.DataArray(data, name=name, attrs=attrs, coords=coords)
+    # remove empty coordinates
+    dims=[]
+    co_dict = {}
+    for key, val in coords:
+        dims.append(key)
+        if val is not None:
+            co_dict[key] = val
+
+    return xr.DataArray(data, name=name, attrs=attrs, coords=co_dict, dims=dims)
 
 
 def data_to_xr(data, *, dims=None, name=None, long_name=None, units=None):
