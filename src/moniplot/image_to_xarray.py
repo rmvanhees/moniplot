@@ -4,7 +4,24 @@ This file is part of moniplot
 https://github.com/rmvanhees/moniplot.git
 
 Implements a lite interface with the xarray::DataArray, should work for all
-2-D detector images
+2-D detector images, sequences of detector measurements and trend data.
+
+Data values
+-----------
+* All floating dataset are converted to Python-compatible floating-point number.
+
+Dimensions and Coordinates
+--------------------------
+* The functions in this module should work with netCDF4 and HDF5 files.
+* In a HDF5 file the 'coordinates' of a dataset can be defined using
+ dimension scales.
+* In a netCDF4 file this is required: all variables have dimensions, which
+ can have coordinates. But under the hood also netCDF4 uses dimension scales.
+* The xarray DataArray structure will have as dimensions, the names of the
+ dimension scales and as coordinates the names and data of the dimensions
+ scales, except when the data only contains zero's.
+* The default dimensions of an image are 'row' and 'column' with evenly spaced
+ values created with np.arange(len(dim), dtype=uint).
 
 Copyright (c) 2022 SRON - Netherlands Institute for Space Research
 
@@ -81,7 +98,7 @@ def __get_attrs(dset, field: str) -> dict:
 
 def __get_coords(dset, data_sel: tuple) -> list:
     """
-    Return coordinates of the HDF5 dataset
+    Return coordinates of the HDF5 dataset with dimension scales
 
     Parameters
     ----------
@@ -99,21 +116,20 @@ def __get_coords(dset, data_sel: tuple) -> list:
     if len(dset.dims) == dset.ndim:
         try:
             for ii, dim in enumerate(dset.dims):
+                # get name of dimension
                 name = PurePath(dim[0].name).name
                 if name.startswith('row') or name.startswith('column'):
                     name = name.split(' ')[0]
-                else:
-                    coords.append((name, None))
-                    continue
 
-                co_dtype = 'u2' if ((dset.shape[ii]-1) >> 16) == 0 else 'u4'
-                if dim[0].size == 0:
-                    buff = np.arange(dset.shape[ii], dtype=co_dtype)
-                else:
+                # determine coordinate
+                buff = None
+                if dim[0].size > 0 and not np.all(dim[0][()] == 0):
                     buff = dim[0][()]
-                    if np.all(buff == 0):
-                        buff = np.arange(dim[0].size, dtype=co_dtype)
-                if data_sel is not None:
+                elif name in ('row', 'column'):
+                    co_dtype = 'u2' if ((dset.shape[ii]-1) >> 16) == 0 else 'u4'
+                    buff = np.arange(dset.shape[ii], dtype=co_dtype)
+
+                if not (buff is None or data_sel is None):
                     buff = buff[data_sel[ii]]
 
                 coords.append((name, buff))
@@ -199,6 +215,41 @@ def __get_data(dset, data_sel: tuple, field: str):
     return data
 
 
+def __check_selection(data_sel: tuple, ndim: int) -> tuple:
+    """
+    Check and correct user provided data selection
+
+    Notes
+    -----
+    If data_sel is used to select data from a dataset then the number of
+    dimensions of data_sel should agree with the HDF5 dataset or one and
+    only one Ellipsis has to be used.
+    Thus allowed values for data_sel are:
+    * [always]: (), np.s_[:], np.s_[...]
+    * [1-D dataset]: np.s_[:-1], np.s_[0]
+    * [2-D dataset]: np.s_[:-1, :], np.s_[0, :], np.s_[:-1, 0]
+    * [3-D dataset]: np.s_[:-1, :, 2:4], np.s_[0, :, :], np.s_[:-1, 0, 2:4]
+    * [Ellipsis] np.s_[0, ...], np.s_[..., 4], np.s_[0, ..., 4]
+    """
+    if data_sel in (np.s_[:], np.s_[...], np.s_[()]):
+        return None
+
+    if np.isscalar(data_sel):
+        return (np.s_[data_sel:data_sel+1],)
+
+    buff = ()
+    for val in data_sel:
+        if val == Ellipsis:
+            for _ in range(ndim - len(data_sel) + 1):
+                buff += np.index_exp[:]
+        elif np.isscalar(val):
+            buff += (np.s_[val:val+1],)
+        else:
+            buff += (val,)
+
+    return buff
+
+
 def h5_to_xr(h5_dset, data_sel=None, *, dims=None, field=None):
     """
     Create xarray::DataArray from a HDF5 dataset (with dimension scales)
@@ -217,18 +268,6 @@ def h5_to_xr(h5_dset, data_sel=None, *, dims=None, field=None):
     Returns
     -------
     xarray.DataArray
-
-    Notes
-    -----
-    If data_sel is used to select data from a dataset then the number of
-    dimensions of data_sel should agree with the HDF5 dataset or one and
-    only one Ellipsis has to be used.
-    Thus allowed values for data_sel are:
-    * [always]: (), np.s_[:], np.s_[...]
-    * [1-D dataset]: np.s_[:-1], np.s_[0]
-    * [2-D dataset]: np.s_[:-1, :], np.s_[0, :], np.s_[:-1, 0]
-    * [3-D dataset]: np.s_[:-1, :, 2:4], np.s_[0, :, :], np.s_[:-1, 0, 2:4]
-    * [Ellipsis] np.s_[0, ...], np.s_[..., 4], np.s_[0, ..., 4]
 
     Examples
     --------
@@ -249,22 +288,9 @@ def h5_to_xr(h5_dset, data_sel=None, *, dims=None, field=None):
     >>> xdata = xdata.assign_coords(
     >>> ... column=np.arange(xdata.column.size, dtype='u4'))
     """
+    # Check data selection
     if data_sel is not None:
-        if data_sel in (np.s_[:], np.s_[...], np.s_[()]):
-            data_sel = None
-        elif np.isscalar(data_sel):
-            data_sel = (np.s_[data_sel:data_sel+1],)
-        else:
-            buff = ()
-            for val in data_sel:
-                if val == Ellipsis:
-                    for _ in range(h5_dset.ndim - len(data_sel) + 1):
-                        buff += np.index_exp[:]
-                elif np.isscalar(val):
-                    buff += (np.s_[val:val+1],)
-                else:
-                    buff += (val,)
-            data_sel = buff
+        data_sel = __check_selection(data_sel, h5_dset.ndim)
 
     # Name of this array
     name = PurePath(h5_dset.name).name
@@ -279,24 +305,25 @@ def h5_to_xr(h5_dset, data_sel=None, *, dims=None, field=None):
     if not coords:
         coords = __set_coords(h5_dset, data_sel, dims)
 
-    # Attributes to assign to the array
-    attrs = __get_attrs(h5_dset, field)
-
-    # check if dimension of dataset and coordinates agree
+    # - check if dimension of dataset and coordinates agree
     if data.ndim < len(coords):
         for ii in reversed(range(len(coords))):
             if np.isscalar(coords[ii][1]):
                 del coords[ii]
 
-    # remove empty coordinates
-    dims=[]
+    # - remove empty coordinates
+    dims = []
     co_dict = {}
     for key, val in coords:
         dims.append(key)
         if val is not None:
             co_dict[key] = val
 
-    return xr.DataArray(data, name=name, attrs=attrs, coords=co_dict, dims=dims)
+    # Attributes to assign to the array
+    attrs = __get_attrs(h5_dset, field)
+
+    return xr.DataArray(data,
+                        coords=co_dict, dims=dims, name=name, attrs=attrs)
 
 
 def data_to_xr(data, *, dims=None, name=None, long_name=None, units=None):
@@ -325,4 +352,5 @@ def data_to_xr(data, *, dims=None, name=None, long_name=None, units=None):
     attrs['units'] = '1' if units is None else units
     attrs['long_name'] = '' if long_name is None else long_name
 
-    return xr.DataArray(data, name=name, attrs=attrs, coords=coords)
+    return xr.DataArray(data,
+                        coords=coords, name=name, attrs=attrs)
