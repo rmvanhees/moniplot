@@ -28,7 +28,7 @@ Copyright (c) 2019-2022 Paul Tol (SRON)
 
 License:  GPLv3
 """
-from collections import namedtuple
+from typing import NamedTuple
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -359,34 +359,43 @@ def tol_cset(colorset=None):
               f'Using {colorset}.')
 
     if colorset == 'high-contrast':
-        cset = namedtuple('Hcset',
-                          'blue yellow red black')
+        cset = NamedTuple('Hcset', [('blue', str), ('yellow', str),
+                                    ('red', str), ('black', str)])
         return cset('#004488', '#DDAA33', '#BB5566', '#000000')
 
     if colorset == 'vibrant':
-        cset = namedtuple('Vcset',
-                          'orange blue cyan magenta red teal grey black')
+        cset = NamedTuple('Vcset', [('orange', str), ('blue', str),
+                                    ('cyan', str), ('magenta', str),
+                                    ('red', str), ('teal', str),
+                                    ('grey', str), ('black', str)])
         return cset('#EE7733', '#0077BB', '#33BBEE', '#EE3377', '#CC3311',
                     '#009988', '#BBBBBB', '#000000')
 
     if colorset == 'muted':
-        cset = namedtuple('Mcset',
-                          ('rose indigo sand green cyan wine teal'
-                           ' olive purple pale_grey black'))
+        cset = NamedTuple('Mcset', [('rose', str), ('indigo', str),
+                                    ('sand', str), ('green', str),
+                                    ('cyan', str), ('wine', str),
+                                    ('teal', str), ('olive', str),
+                                    ('purple', str), ('pale_grey', str),
+                                    ('black', str)])
         return cset('#CC6677', '#332288', '#DDCC77', '#117733', '#88CCEE',
                     '#882255', '#44AA99', '#999933', '#AA4499', '#DDDDDD',
                     '#000000')
 
     if colorset == 'light':
-        cset = namedtuple('Lcset',
-                          ('light_blue orange light_yellow pink light_cyan'
-                           ' mint pear olive pale_grey black'))
+        cset = NamedTuple('Lcset', [('light_blue', str), ('orange', str),
+                                    ('light_yellow', str), ('pink', str),
+                                    ('light_cyan', str), ('mint', str),
+                                    ('pear', str), ('olive', str),
+                                    ('pale_grey', str), ('black', str)])
         return cset('#77AADD', '#EE8866', '#EEDD88', '#FFAABB', '#99DDFF',
                     '#44BB99', '#BBCC33', '#AAAA00', '#DDDDDD', '#000000')
 
     # Default: return colorset is 'bright'
-    cset = namedtuple('Bcset',
-                      'blue red green yellow cyan purple grey black')
+    cset = NamedTuple('Bcset', [('blue', str), ('red', str),
+                                ('green', str), ('yellow', str),
+                                ('cyan', str), ('purple', str),
+                                ('grey', str), ('black', str)])
     return cset('#4477AA', '#EE6677', '#228833', '#CCBB44', '#66CCEE',
                 '#AA3377', '#BBBBBB', '#000000')
 
