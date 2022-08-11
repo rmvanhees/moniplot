@@ -22,7 +22,6 @@ Copyright (c) 2022 SRON - Netherlands Institute for Space Research
 
 License:  GPLv3
 """
-from collections import OrderedDict
 from copy import deepcopy
 from datetime import datetime
 
@@ -37,7 +36,7 @@ class FIGinfo:
     ----------
     location : str
        Location to draw the fig_info box: 'above' (default), 'none'
-    fig_info : OrderedDict
+    fig_info : dict
        Dictionary holding the information for the fig_info box
 
     Methods
@@ -66,10 +65,10 @@ class FIGinfo:
         ----------
         loc :  str, default='above'
            Location to draw the fig_info box: 'above' (default), 'none'
-        info_dict :  OrderedDict, optional
+        info_dict :  dict, optional
            Dictionary holding information to be displayed in the fig_info box
         """
-        self.fig_info = OrderedDict() if info_dict is None else info_dict
+        self.fig_info = {} if info_dict is None else info_dict
         self.set_location(loc)
 
     def __bool__(self) -> bool:
@@ -112,9 +111,9 @@ class FIGinfo:
           Convert value to a string, using the string format method.
         """
         if isinstance(value, tuple):
-            self.fig_info.update({key: fmt.format(*value)})
+            self.fig_info[key] = fmt.format(*value)
         else:
-            self.fig_info.update({key: fmt.format(value)})
+            self.fig_info[key] = fmt.format(value)
 
     def as_str(self) -> str:
         """
