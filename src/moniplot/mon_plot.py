@@ -1011,7 +1011,7 @@ class MONplot:
             else:
                 figsize = {0: (8, 7),
                            1: (10, 7),
-                           2: (12, 7)}.get(len(xdata) // 256, (14, 7))
+                           2: (12, 7)}.get(len(xdata) // 256, (14, 8))
 
             self.__mpl = dict(zip(('fig', 'axx'),
                                   plt.subplots(1, figsize=figsize)))
