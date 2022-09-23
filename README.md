@@ -19,4 +19,7 @@ Several modules from the package [pys5p](https://pypi.org/project/pys5p) have be
 people by [Paul Tol](https://personal.sron.nl/~pault/).
 * module s5p_plot.py - the class S5Pplot is rewritten and now available as MONplot in the module mon_plot.py.
 
-The module pys5p requires Python3.8+ and Python modules: cartopy, h5py, matplotlib, numpy and xarray.
+## Installation
+The module moniplot requires Python3.8+ and Python modules: cartopy, h5py, matplotlib, numpy and xarray.
+
+Installation instructions are provided in the INSTALL file.
