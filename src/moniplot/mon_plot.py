@@ -787,10 +787,10 @@ class MONplot:
                 values = data.values.reshape(-1)
             else:
                 values = data.values[data_sel].reshape(-1)
-            if 'long_name' in data.attrs:
-                long_name = data.attrs['long_name']
             if 'units' in data.attrs:
                 zunits = data.attrs['units']
+            if 'long_name' in data.attrs:
+                long_name = data.attrs['long_name']
         else:
             if data_sel is None:
                 values = data.reshape(-1)
@@ -810,14 +810,17 @@ class MONplot:
             fig_info.add('spread', (spread, zunits), '{:.5g} {}')
 
         # create figure
-        fig, axx = plt.subplots(1, figsize=(8, 7))
+        fig, axx = plt.subplots(1, figsize=(9, 8))
 
         # add a centered suptitle to the figure
         self.__add_caption(fig)
 
-        # add title to image panel
+        # add title to image panel and set xlabel
+        xlabel = 'value' if zunits == '1' else f'value [{zunits}]'
         if title is None:
-            title = f'Histograms of {long_name} values'
+            title = f'Histogram of {long_name}'
+        elif long_name:
+            xlabel = long_name if zunits == '1' else f'{long_name} [{zunits}]'
         axx.set_title(title)
 
         # add histogram
@@ -834,11 +837,14 @@ class MONplot:
                      edgecolor='#4477AA', facecolor='#77AADD',
                      linewidth=1.5, **kwargs)
             axx.grid(which='major', axis='y', color='#AAAAAA', linestyle='--')
-        axx.set_xlabel(long_name if long_name else 'value')
+        axx.set_xlabel(xlabel)
         if 'density' in kwargs and kwargs['density']:
             axx.set_ylabel('density')
         else:
-            axx.set_ylabel('count')
+            axx.set_ylabel('number')
+
+        if len(fig_info) > 3:
+            plt.subplots_adjust(top=.875)
 
         # add annotation and save the figure
         self.__add_copyright(axx)
