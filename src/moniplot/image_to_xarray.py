@@ -13,10 +13,15 @@ Data values
 Dimensions and Coordinates
 --------------------------
 * The functions in this module should work with netCDF4 and HDF5 files.
-* In a HDF5 file the 'coordinates' of a dataset can be defined using dimension scales.
-* In a netCDF4 file this is required: all variables have dimensions, which can have coordinates. But under the hood also netCDF4 uses dimension scales.
-* The xarray DataArray structure will have as dimensions, the names of the dimension scales and as coordinates the names and data of the dimensions  scales, except when the data only contains zero's.
-* The default dimensions of an image are 'row' and 'column' with evenly spaced values created with np.arange(len(dim), dtype=uint).
+* In a HDF5 file the 'coordinates' of a dataset can be defined using \
+  dimension scales.
+* In a netCDF4 file this is required: all variables have dimensions, which \
+  can have coordinates. But under the hood also netCDF4 uses dimension scales.
+* The xarray DataArray structure will have as dimensions, the names of the \
+  dimension scales and as coordinates the names and data of the dimensions \
+  scales, except when the data only contains zero's.
+* The default dimensions of an image are 'row' and 'column' with evenly \
+  spaced values created with np.arange(len(dim), dtype=uint).
 
 Copyright (c) 2022 SRON - Netherlands Institute for Space Research
 
@@ -42,8 +47,7 @@ import xarray as xr
 
 
 def __get_attrs(dset, field: str) -> dict:
-    """
-    Return attributes of the HDF5 dataset
+    """Return attributes of the HDF5 dataset.
 
     Parameters
     ----------
@@ -92,8 +96,7 @@ def __get_attrs(dset, field: str) -> dict:
 
 
 def __get_coords(dset, data_sel: tuple) -> list:
-    """
-    Return coordinates of the HDF5 dataset with dimension scales
+    """Return coordinates of the HDF5 dataset with dimension scales.
 
     Parameters
     ----------
@@ -134,8 +137,7 @@ def __get_coords(dset, data_sel: tuple) -> list:
 
 
 def __set_coords(dset, data_sel: tuple, dims: list) -> list:
-    """
-    Set coordinates of the HDF5 dataset
+    """Set coordinates of the HDF5 dataset.
 
     Parameters
     ----------
@@ -169,8 +171,7 @@ def __set_coords(dset, data_sel: tuple, dims: list) -> list:
 
 
 def __get_data(dset, data_sel: tuple, field: str):
-    """
-    Return data of the HDF5 dataset
+    """Return data of the HDF5 dataset.
 
     Parameters
     ----------
@@ -208,8 +209,7 @@ def __get_data(dset, data_sel: tuple, field: str):
 
 
 def __check_selection(data_sel: tuple, ndim: int) -> tuple:
-    """
-    Check and correct user provided data selection
+    """Check and correct user provided data selection.
 
     Notes
     -----
@@ -243,8 +243,7 @@ def __check_selection(data_sel: tuple, ndim: int) -> tuple:
 
 
 def h5_to_xr(h5_dset, data_sel=None, *, dims=None, field=None):
-    """
-    Create xarray::DataArray from a HDF5 dataset (with dimension scales)
+    """Create xarray::DataArray from a HDF5 dataset (with dimension scales).
 
     Parameters
     ----------
@@ -268,6 +267,7 @@ def h5_to_xr(h5_dset, data_sel=None, *, dims=None, field=None):
     >>> fid.close()
 
     Combine Tropomi SWIR data of band7 and band8
+
     >>> fid = h5py.File(s5p_b7_prod, 'r')   # Tropomi band7 product
     >>> xdata7 = h5_to_xr(fid['signal'])
     >>> fid.close()
@@ -277,8 +277,10 @@ def h5_to_xr(h5_dset, data_sel=None, *, dims=None, field=None):
     >>> xdata = xr.concat((xdata7, xdata8), dim='spectral_channel')
 
     Optionally, fix the 'column' dimension
+
     >>> xdata = xdata.assign_coords(
     >>> ... column=np.arange(xdata.column.size, dtype='u4'))
+
     """
     # Check data selection
     if data_sel is not None:
@@ -319,8 +321,7 @@ def h5_to_xr(h5_dset, data_sel=None, *, dims=None, field=None):
 
 
 def data_to_xr(data, *, dims=None, name=None, long_name=None, units=None):
-    """
-    Create xarray::DataArray from a dataset
+    """Create xarray::DataArray from a dataset.
 
     Parameters
     ----------
