@@ -16,7 +16,6 @@ cloudpickle==1.6.0
 colorama==0.4.4
 constantly==15.1.0
 cryptography==3.3.2
-cupshelpers
 cycler==0.10.0
 dask==2021.1.0+dfsg
 dblatex==0.3.12

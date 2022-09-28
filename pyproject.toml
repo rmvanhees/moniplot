@@ -26,7 +26,7 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Atmospheric Scienc",
 ]
 dependencies = [
-  "cartopy>=0.20",
+  # "cartopy>=0.20",
   "h5py>=3.5",
   "matplotlib>=3.5",
   "numpy>=1.19",

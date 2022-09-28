@@ -9,6 +9,7 @@ Install all necessary software on a Debian/Ubuntu system:
 * sudo apt install python3-matplotlib python3-cartopy
 * sudo apt install python3-xarray
 * sudo apt install python3-sphinx-rtd-theme
+* /usr/bin/pip freeze > requirements.txt
 
 ## INSTALL
 Here we install the documentaion from scratch using sphinx.

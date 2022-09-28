@@ -37,7 +37,12 @@ from pathlib import PurePath
 import numpy as np
 import xarray as xr
 
-from cartopy import crs as ccrs
+try:
+    from cartopy import crs as ccrs
+except ModuleNotFoundError:
+    FOUND_CARTOPY = False
+else:
+    FOUND_CARTOPY = True
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
@@ -54,7 +59,8 @@ from .lib.fig_draw_trend import add_subplot, add_hk_subplot
 from .lib.fig_draw_qhist import fig_draw_qhist
 from .lib.fig_draw_lplot import fig_draw_lplot, close_draw_lplot
 from .lib.fig_draw_multiplot import get_xylabels, draw_subplot
-from .lib.fig_draw_tracks import fig_draw_tracks
+if FOUND_CARTOPY:
+    from .lib.fig_draw_tracks import fig_draw_tracks
 
 
 # - local functions --------------------------------
@@ -1135,6 +1141,9 @@ class MONplot:
         The information provided in the parameter 'fig_info' will be displayed
         in a small box.
         """
+        if not FOUND_CARTOPY:
+            raise RuntimeError("You need Cartopy to use this method")
+
         if fig_info is None:
             fig_info = FIGinfo()
 
