@@ -6,11 +6,19 @@
 Welcome to moniplot's documentation!
 ====================================
 
+Moniplot is a Python data visualization library based on
+[matplotlib](https://matplotlib.org) and [xarray](https://xarray.pydata.org).
+It provides a high-level interface for drawing attractive and informative
+graphics for onground calibration data analysis or inflight instrument
+monitoring.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   readme
    modules
+
 
 Indices and tables
 ==================
