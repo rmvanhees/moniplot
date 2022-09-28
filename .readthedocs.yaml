@@ -1,0 +1,6 @@
+version: 2
+
+build:
+  os: "debian-11.5"
+  tools:
+    python: "3.8"
