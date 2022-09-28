@@ -37,12 +37,7 @@ from pathlib import PurePath
 import numpy as np
 import xarray as xr
 
-try:
-    from cartopy import crs as ccrs
-except ModuleNotFoundError:
-    FOUND_CARTOPY = False
-else:
-    FOUND_CARTOPY = True
+from cartopy import crs as ccrs
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
@@ -59,8 +54,7 @@ from .lib.fig_draw_trend import add_subplot, add_hk_subplot
 from .lib.fig_draw_qhist import fig_draw_qhist
 from .lib.fig_draw_lplot import fig_draw_lplot, close_draw_lplot
 from .lib.fig_draw_multiplot import get_xylabels, draw_subplot
-if FOUND_CARTOPY:
-    from .lib.fig_draw_tracks import fig_draw_tracks
+from .lib.fig_draw_tracks import fig_draw_tracks
 
 
 # - local functions --------------------------------
@@ -74,51 +68,43 @@ class MONplot:
     Attributes
     ----------
     figname : str
-       Name of the PDF or PNG file
+       Name of the PDF or PNG file.
+    caption
+       Return figure caption.
+    cmap
+       Return matplotlib colormap.
+    institute
+       Return name of your institute.
 
     Methods
     -------
     close()
-       Close PNG or (multipage) PDF document.
+       Save the current figure and close the MONplot instance.
     set_caption(caption)
        Set caption of each page of the PDF.
-    caption
-       Return figure caption.
     set_cmap(cmap)
        Use alternative color-map for MONplot::draw_image.
     unset_cmap()
        Unset user supplied color-map, and use default color-map.
-    cmap
-       Return matplotlib colormap.
     set_institute(institute)
        Use the name of your institute as a signature.
-    institute
-       Return name of your institute.
-    draw_signal(data, fig_info=None, side_panels='nanmedian', title=None,
-                **kwargs)
-       Display 2D array data as an image and averaged column/row signal plots.
-    draw_quality(data, ref_data=None, side_panels='quality', fig_info=None,
-                 title=None, **kwargs)
-       Display pixel-quality 2D data as an image and column/row statistics.
-    draw_trend(xds=None, hk_xds=None, fig_info=None, title=None, **kwargs)
+    draw_signal(data, fig_info, side_panels, title, **kwargs)
+       Display 2D array data as image and averaged column/row signal plots.
+    draw_quality(data, ref_data, side_panels, fig_info, title, **kwargs)
+       Display pixel-quality 2D array data as image and column/row statistics.
+    draw_trend(xds, hk_xds, fig_info, title, **kwargs)
        Display trends of measurement data and/or housekeeping data.
-    draw_hist(data, data_sel=None, vrange=None, fig_info=None, title=None,
-              **kwargs)
-        Display data as a histogram.
-    draw_qhist(xds, data_sel=None, density=True, fig_info=None, title=None)
-       Display pixel-quality data as a histogram.
-    draw_lplot(self, xdata, ydata, color=0, *, square=False, fig_info=None,
-               title=None, **kwargs)
+    draw_hist(data, data_sel, vrange, fig_info, title, **kwargs)
+       Display data as histograms.
+    draw_qhist(xds, data_sel, density, fig_info, title)
+       Display pixel-quality data as histograms.
+    draw_lplot(self, xdata, ydata, color, square, fig_info, title, **kwargs)
        Plot y versus x lines, maybe called multiple times to add lines.
-    draw_multiplot(self, data_tuple, gridspec=None, fig_info=None, title=None,
-                   **kwargs)
+    draw_multiplot(self, data_tuple, gridspec, fig_info, title, **kwargs)
        Display multiple subplots on one page using matplotlib.gridspec.GridSpec.
-    draw_tracks(lons, lats, icids, saa_region=None, fig_info=None, title=None)
+    draw_tracks(lons, lats, icids, saa_region, fig_info, title)
        Display tracks of satellite on a world map using a Robinson projection.
 
-    Notes
-    -----
-    ...
     """
     def __init__(self, figname, caption=None):
         """
@@ -156,7 +142,7 @@ class MONplot:
 
     def __close_this_page(self, fig) -> None:
         """
-        Close current matplotlib figure or page in a PDF document
+        Save the current figure and close the MONplot instance.
         """
         # add save figure
         if self.__pdf is None:
@@ -197,8 +183,8 @@ class MONplot:
         """
         Set caption of each page of the PDF
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         institute :  str
            Provide abbreviation of the name of your institute to be used in
            the copyright statement in the main panel of the figures.
@@ -227,9 +213,9 @@ class MONplot:
         """
         Use alternative color-map for MONplot::draw_image
 
-        Parameter
-        ---------
-         cmap :  matplotlib color-map
+        Parameters
+        ----------
+        cmap :  matplotlib color-map
         """
         self.__cmap = cmap
 
@@ -251,8 +237,8 @@ class MONplot:
         """
         Use the name of your institute as a signature
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         institute :  str
            Provide abbreviation of the name of your institute to be used in
            the copyright statement in the main panel of the figures.
@@ -460,17 +446,17 @@ class MONplot:
         in a text box. In addition, we display the creation date and the data
         (biweight) median & spread.
 
-        xarray attributes
-        -----------------
-        Attributes starting with an underscore are added by fig_data_to_xarr
+        Notes
+        -----
+        When data is an xarray.DataArray then the following attributes are used:
 
-        long_name :  used as the title of the main panel when parameter 'title'
-            is not defined.
-        _cmap :  contains the matplotlib colormap
-        _zlabel :  contains the label of the color bar
-        _znorm :  matplotlib class to normalize the data between zero and one.
-        _zscale :  scaling of the data values: linear, log, diff, ratio, ...
-        _zunits :  adjusted units of the data
+        - long_name: used as the title of the main panel when parameter 'title'\
+          is not defined.
+        - _cmap: contains the matplotlib colormap
+        - _zlabel: contains the label of the color bar
+        - _znorm: matplotlib class to normalize the data between zero and one.
+        - _zscale: scaling of the data values: linear, log, diff, ratio, ...
+        - _zunits: adjusted units of the data
 
         Examples
         --------
@@ -548,22 +534,20 @@ class MONplot:
            Pass keyword arguments: 'data_sel', 'thres_worst', 'thres_bad'
            or 'qlabels' to moniplot.lib.fig_draw_image.fig_qdata_to_xarr()
 
-        xarray attributes
-        -----------------
-        Attributes starting with an underscore are added by fig_qdata_to_xarr
-
-        long_name :  used as the title of the main panel when parameter 'title'
-            is not defined.
-        flag_values :  values of the flags used to qualify the pixel quality
-        flag_meanings :  description of the flag values
-        thres_bad :  threshold between good and bad
-        thres_worst :  threshold between bad and worst
-        _cmap :  contains the matplotlib colormap.
-        _zscale :  'quality'.
-        _znorm :  matplotlib class to normalize the data between zero and one.
-
         Notes
         -----
+        When data is an xarray.DataArray then the following attributes are used:
+
+        - long_name: used as the title of the main panel when parameter 'title'\
+          is not defined.
+        - flag_values: values of the flags used to qualify the pixel quality
+        - flag_meanings: description of the flag values
+        - thres_bad: threshold between good and bad
+        - thres_worst: threshold between bad and worst
+        - _cmap: contains the matplotlib colormap.
+        - _zscale: should be 'quality'.
+        - _znorm: matplotlib class to normalize the data between zero and one.
+
         The quality ranking labels are ['unusable', 'worst', 'bad', 'good'],
         in case nor reference dataset is provided. Where:
         - 'unusable'  : pixels outside the illuminated region
@@ -601,6 +585,7 @@ class MONplot:
         Finalize the PDF file
 
         >>> plot.close()
+
         """
         # convert, if necessary, input data to xarray.DataArray
         if isinstance(data, xr.DataArray) and '_zscale' in data.attrs:
@@ -652,11 +637,13 @@ class MONplot:
            Pass keyword arguments: 'vperc' or 'vrange_last_orbits'
            to moniplot.lib.fig_draw_trend.add_hk_subplot()
 
-        xarray attributes
-        -----------------
-        long_name :  used as the title of the main panel when parameter 'title'
-            is not defined.
-        units :  units of the data
+        Notes
+        -----
+        When data is an xarray.DataArray then the following attributes are used:
+
+        - long_name: used as the title of the main panel when parameter 'title'\
+          is not defined.
+        - units: units of the data
 
         Examples
         --------
@@ -743,42 +730,43 @@ class MONplot:
         data_sel :  mask or index tuples for arrays, optional
            Select a region on the detector by fancy indexing (using a
            boolean/interger arrays), or using index tuples for arrays
-           (generated with numpy.s_).
+           (generated with numpy.s\_).
         vrange :  list, default=[data.min(), data.max()]
            The lower and upper range of the bins.
            Note data will also be clipped according to this range.
         fig_info :  FIGinfo, optional
            OrderedDict holding meta-data to be displayed in the figure
         title :  str, optional
-           Title of this figure (matplotlib: Axis.set_title)
+           Title of this figure (matplotlib: Axis.set_title).
+           Default title is 'f'Histogram of {data.attrs["long_name"]}'.
         **kwargs :   other keywords
            Pass the following keyword arguments to matplotlib.pyplot.hist:
-              'bins', 'density' or 'log'.
+           'bins', 'density' or 'log'.
            Note that keywords: 'histtype', 'color', 'linewidth' and 'fill'
            are predefined.
 
-        xarray attributes
-        -----------------
-        long_name :  used as the title of the main panel when parameter 'title'
-            is not defined.
-        units :  units of the data
+        Notes
+        -----
+        When data is an xarray.DataArray then the following attributes are used:
+
+        - long_name: used as the title of the main panel when parameter 'title'\
+          is not defined.
+        - units: units of the data
 
         Examples
         --------
-        Create a PDF document 'test.pdf' and add figure with a histogram
-        of array 'data' (np.ndarray or xr.DataArray). And a second page
-        with also a histogram where data is a xarray with attribute
-        'long_name' then the title is
-        f'Histograms of {xarr.attrs["long_name"]} values'
+        Create a PDF document 'test.pdf' with two pages.
+        Both pages have the caption "My Caption", the title of the figure on
+        the first page is "my title" and on the second page the title of the
+        figure is f'Histogram of {xarr.attrs['long_name']}" when xarr has
+        attribute "long_name".
 
-        The array will be flattend the the histogram is created with
-        matplotlib.pyplot.hist.
-
-        >>> plot = MONplot('test.pdf', caption='my caption')
+        >>> plot = MONplot('test.pdf', caption='My Caption')
         >>> plot.set_institute('SRON')
         >>> plot.draw_hist(data, title='my title')
         >>> plot.draw_hist(xarr)
         >>> plot.close()
+
         """
         long_name = ''
         zunits = '1'
@@ -864,7 +852,7 @@ class MONplot:
         data_sel :  mask or index tuples for arrays, optional
            Select a region on the detector by fancy indexing (using a
            boolean/interger arrays), or using index tuples for arrays
-           (generated with numpy.s_).
+           (generated with numpy.s\_).
         density : bool, default=True
            If True, draw and return a probability density: each bin will
            display the bin's raw count divided by the total number of counts
@@ -874,11 +862,13 @@ class MONplot:
         title :  str, optional
            Title of this figure (matplotlib: Axis.set_title)
 
-        xarray attributes
-        -----------------
-        long_name :  used as the title of the main panel when parameter 'title'
-            is not defined.
-        units :  units of the data
+        Notes
+        -----
+        When data is an xarray.DataArray then the following attributes are used:
+
+        - long_name: used as the title of the main panel when parameter 'title'\
+          is not defined.
+        - units: units of the data
 
         Examples
         --------
@@ -948,8 +938,8 @@ class MONplot:
         ydata :  ndarray
            [add line] Y data
         square :  bool
-           [first call, only] create a square figure, independent of
-           number of data-points.
+           [first call, only] create a square figure,\
+           independent of number of data-points.
         color :  integer, default=0
            [add line] Index to color in tol_colors.tol_cset('bright')
         fig_info  :  FIGinfo, optional
@@ -959,12 +949,12 @@ class MONplot:
         **kwargs :   other keywords
            [add line] Keywords are passed to mpl.pyplot.plot()
            [close figure] Kewords are passed to appropriate mpl.Axes method
-           [close figure] keyword 'text' can be used to add addition text in
-               the upper left corner.
+           [close figure] keyword 'text' can be used to add addition text in the upper left corner.
 
         Examples
         --------
         General example:
+
         >>> plot = MONplot(fig_name)
         >>> for ii, ix, iy in enumerate(data_of_each_line):
         >>>    plot.draw_lplot(ix, iy, color=ii, label=mylabel[ii],
@@ -974,6 +964,7 @@ class MONplot:
         >>> plot.close()
 
         Using a time-axis:
+
         >>> from datetime import datetime, timedelta
         >>> tt0 = (datetime(year=2020, month=10, day=1)
         >>>        + timedelta(seconds=sec_in_day))
@@ -984,6 +975,7 @@ class MONplot:
         >>> plot.draw_line(None, None, ylim=[-10, 10],
         >>>                xlabel=my_xlabel, ylabel=my_ylabel)
         >>> plot.close()
+
         """
         if xdata is None:
             if self.__mpl is None:
@@ -1033,8 +1025,7 @@ class MONplot:
     def draw_multiplot(self, data_tuple: tuple, gridspec=None, *,
                        fig_info=None, title=None, **kwargs) -> None:
         """
-        Display multiple subplots on one page using
-        matplotlib.gridspec.GridSpec
+        Display multiple subplots on one page using matplotlib.gridspec.GridSpec
 
         Parameters
         ----------
@@ -1051,29 +1042,30 @@ class MONplot:
            Keywords are passed to mpl.pyplot.plot().
            Ignored when data is a xarray data structure
 
-        xarray attributes
-        -----------------
-        long_name :  used as the title of the main panel when parameter 'title'
-            is not defined.
-        units :  units of the data
-        _plot :  dictionary with parameters for matplotlib.pyplot.plot
-        _title :  title of the subplot (matplotlib: Axis.set_title)
-        _text :  text shown in textbox placed in the upper left corner
-        _yscale :  y-axis scale type, default 'linear'
-        _xlim :  range of the x-axis
-        _ylim :  range of the y-axis
-
         Notes
         -----
+        When data is an xarray.DataArray then the following attributes are used:
+
+        - long_name: used as the title of the main panel when parameter 'title'\
+          is not defined.
+        - units: units of the data
+        - _plot: dictionary with parameters for matplotlib.pyplot.plot
+        - _title: title of the subplot (matplotlib: Axis.set_title)
+        - _text: text shown in textbox placed in the upper left corner
+        - _yscale: y-axis scale type, default 'linear'
+        - _xlim: range of the x-axis
+        - _ylim: range of the y-axis
 
         Examples
         --------
         Show two numpy arrays:
+
         >>> data_tuple = (ndarray1, ndarray2)
         >>> plot = MONplot(fig_name)
         >>> plot.draw_multiplot(data_tuple: tuple, title='my title',
         >>>                     marker='o', linestyle='', color='r')
         >>> plot.close()
+
         """
         # generate figure using contrained layout
         fig = plt.figure(figsize=(10, 10))
@@ -1143,9 +1135,6 @@ class MONplot:
         The information provided in the parameter 'fig_info' will be displayed
         in a small box.
         """
-        if not FOUND_CARTOPY:
-            raise RuntimeError('You need Cartopy to run this function')
-
         if fig_info is None:
             fig_info = FIGinfo()
 

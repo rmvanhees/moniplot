@@ -3,16 +3,7 @@ This file is part of moniplot
 
 https://github.com/rmvanhees/moniplot.git
 
-This module
-
-Functions
----------
-fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None, cmap=None)
-   Prepare image data for plotting.
-
-fig_qdata_to_xarr(data, ref_data=None, thres_worst=0.1, thres_bad=0.8,
-                  qlabels=None)
-   Prepare pixel-quality data for plotting.
+This module contains functions to support method MONplot::draw_signal(...).
 
 Copyright (c) 2022 SRON - Netherlands Institute for Space Research
 
@@ -59,7 +50,7 @@ def adjust_zunit(zunit: str, vmin: float, vmax: float):
 
     Returns
     -------
-    tuple:
+    tuple
         dscale, zunit
     """
     if zunit is None or zunit == '1':
@@ -84,8 +75,7 @@ def adjust_zunit(zunit: str, vmin: float, vmax: float):
 
 
 def set_norm(zscale: str, vmin: float, vmax: float):
-    """
-    Set data-range normalization
+    """Set data-range normalization.
     """
     if zscale == 'log':
         return mcolors.LogNorm(vmin=max(vmin, 1e-6), vmax=vmax)
@@ -119,8 +109,7 @@ def set_norm(zscale: str, vmin: float, vmax: float):
 
 
 def adjust_img_ticks(axx, xarr, dims=None):
-    """
-    Adjust ticks of the image axis
+    """Adjust ticks of the image axis.
     """
     if dims is None or dims == 'X':
         if (xarr.shape[1] % 10) == 0:
@@ -138,8 +127,7 @@ def adjust_img_ticks(axx, xarr, dims=None):
 
 
 def fig_draw_panels(axx_p: dict, xarr, side_panels: str) -> None:
-    """
-    Draw two side-panels, one left and one under the main image panel
+    """Draw two side-panels, one left and one under the main image panel.
 
     Parameters
     ----------
@@ -210,8 +198,7 @@ def fig_draw_panels(axx_p: dict, xarr, side_panels: str) -> None:
 
 # - main functions ---------------------------------
 def fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None):
-    """
-    Prepare image data for plotting.
+    """Prepare image data for plotting.
 
     Parameters
     ----------
@@ -295,8 +282,7 @@ def fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None):
 # pylint: disable=too-many-arguments
 def fig_qdata_to_xarr(data, ref_data=None, data_sel=None,
                       thres_worst=0.1, thres_bad=0.8, qlabels=None):
-    """
-    Prepare pixel-quality data for plotting
+    """Prepare pixel-quality data for plotting.
 
     Parameters
     ----------
@@ -309,7 +295,7 @@ def fig_qdata_to_xarr(data, ref_data=None, data_sel=None,
     data_sel :  mask or index tuples for arrays, optional
         Select a region on the detector by fancy indexing (using a
         boolean/interger arrays), or using index tuples for arrays
-        (generated with numpy.s_).
+        (generated with 'numpy.s\_').
         Outside this region the pixels will be labeled: 'unusable'.
     thres_worst :  float, default=0.1
         Threshold to reject only the worst of the bad pixels, intended
@@ -322,12 +308,14 @@ def fig_qdata_to_xarr(data, ref_data=None, data_sel=None,
     Notes
     -----
     Without a reference dataset, the default quality ranking labels are:
+
     - 'unusable' :  pixels outside the illuminated region
     - 'worst'    :  0 <= value < thres_worst
     - 'bad'      :  0 <= value < thres_bad
     - 'good'     :  thres_bad <= value <= 1
 
     Otherwise the default quality ranking labels are:
+
     - 'unusable'    :  pixels outside the illuminated region
     - 'to worst'    :  from good or bad to worst
     - 'good to bad' :  from good to bad

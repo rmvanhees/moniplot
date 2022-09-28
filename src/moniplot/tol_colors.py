@@ -9,7 +9,7 @@ best usage of the schemes.
 
 Reference
 ---------
-   https://personal.sron.nl/~pault/
+* https://personal.sron.nl/~pault/
 
 Copyright (c) 2019-2022 Paul Tol (SRON)
 
@@ -51,11 +51,29 @@ def discretemap(colormap, hexclrs):
 
 # pylint: disable=invalid-name
 class TOLcmaps():
-    """
-    Class TOLcmaps definition.
+    """Class TOLcmaps definition.
+
+    Attributes
+    ----------
+    cmap
+       Current colormap.
+    cname
+       Name of the current colormap.
+    funcdict
+       Map available colormaps to private methods.
+    nameList
+       Listing of all available colormaps.
+
+    Methods
+    -------
+    get(cname='rainbow_PuRd', lut=None)
+       Return requested colormap, default is 'rainbow_PuRd'.
+    show()
+       List names of available colormaps.
+
     """
     def __init__(self):
-        """
+        """Initialize TOLcmaps object.
         """
         self.cmap = None
         self.cname = None
@@ -77,8 +95,7 @@ class TOLcmaps():
                  self.__rainbow_WhBr_condense, self.__rainbow_discrete)))
 
     def __sunset_discrete(self):
-        """
-        Define colormap 'sunset_discrete'.
+        """Define colormap 'sunset_discrete'.
         """
         clrs = ['#364B9A', '#4A7BB7', '#6EA6CD', '#98CAE1', '#C2E4EF',
                 '#EAECCC', '#FEDA8B', '#FDB366', '#F67E4B', '#DD3D2D',
@@ -87,8 +104,7 @@ class TOLcmaps():
         self.cmap.set_bad('#FFFFFF')
 
     def __sunset(self):
-        """
-        Define colormap 'sunset'.
+        """Define colormap 'sunset'.
         """
         clrs = ['#364B9A', '#4A7BB7', '#6EA6CD', '#98CAE1', '#C2E4EF',
                 '#EAECCC', '#FEDA8B', '#FDB366', '#F67E4B', '#DD3D2D',
@@ -106,8 +122,7 @@ class TOLcmaps():
         self.cmap.set_bad('#FFEE99')
 
     def __BuRd(self):
-        """
-        Define colormap 'BuRd'.
+        """Define colormap 'BuRd'.
         """
         clrs = ['#2166AC', '#4393C3', '#92C5DE', '#D1E5F0', '#F7F7F7',
                 '#FDDBC7', '#F4A582', '#D6604D', '#B2182B']
@@ -124,8 +139,7 @@ class TOLcmaps():
         self.cmap.set_bad('#FFEE99')
 
     def __PRGn(self):
-        """
-        Define colormap 'PRGn'.
+        """Define colormap 'PRGn'.
         """
         clrs = ['#762A83', '#9970AB', '#C2A5CF', '#E7D4E8', '#F7F7F7',
                 '#D9F0D3', '#ACD39E', '#5AAE61', '#1B7837']
@@ -133,8 +147,7 @@ class TOLcmaps():
         self.cmap.set_bad('#FFEE99')
 
     def __YlOrBr_discrete(self):
-        """
-        Define colormap 'YlOrBr_discrete'.
+        """Define colormap 'YlOrBr_discrete'.
         """
         clrs = ['#FFFFE5', '#FFF7BC', '#FEE391', '#FEC44F', '#FB9A29',
                 '#EC7014', '#CC4C02', '#993404', '#662506']
@@ -142,8 +155,7 @@ class TOLcmaps():
         self.cmap.set_bad('#888888')
 
     def __YlOrBr(self):
-        """
-        Define colormap 'YlOrBr'.
+        """Define colormap 'YlOrBr'.
         """
         clrs = ['#FFFFE5', '#FFF7BC', '#FEE391', '#FEC44F', '#FB9A29',
                 '#EC7014', '#CC4C02', '#993404', '#662506']
@@ -151,8 +163,7 @@ class TOLcmaps():
         self.cmap.set_bad('#888888')
 
     def __WhOrBr(self):
-        """
-        Define colormap 'WhOrBr'.
+        """Define colormap 'WhOrBr'.
         """
         clrs = ['#FFFFFF', '#FFF7BC', '#FEE391', '#FEC44F', '#FB9A29',
                 '#EC7014', '#CC4C02', '#993404', '#662506']
@@ -160,8 +171,7 @@ class TOLcmaps():
         self.cmap.set_bad('#888888')
 
     def __iridescent(self):
-        """
-        Define colormap 'Iridescent'.
+        """Define colormap 'Iridescent'.
         """
         clrs = ['#FEFBE9', '#FCF7D5', '#F5F3C1', '#EAF0B5', '#DDECBF',
                 '#D0E7CA', '#C2E3D2', '#B5DDD8', '#A8D8DC', '#9BD2E1',
@@ -172,8 +182,7 @@ class TOLcmaps():
         self.cmap.set_bad('#999999')
 
     def __incandescent(self):
-        """
-        Define colormap 'Incandescent'.
+        """Define colormap 'Incandescent'.
         """
         clrs = ['#CEFFFF', '#C6F7D6', '#A2F49B', '#BBE453', '#D5CE04',
                 '#E7B503', '#F19903', '#F6790B', '#F94902', '#E40515',
@@ -182,8 +191,7 @@ class TOLcmaps():
         self.cmap.set_bad('#888888')
 
     def __rainbow_PuRd(self):
-        """
-        Define colormap 'rainbow_PuRd'.
+        """Define colormap 'rainbow_PuRd'.
         """
         clrs = ['#6F4C9B', '#6059A9', '#5568B8', '#4E79C5', '#4D8AC6',
                 '#4E96BC', '#549EB3', '#59A5A9', '#60AB9E', '#69B190',
@@ -194,8 +202,7 @@ class TOLcmaps():
         self.cmap.set_bad('#FFFFFF')
 
     def __rainbow_PuBr(self):
-        """
-        Define colormap 'rainbow_PuBr'.
+        """Define colormap 'rainbow_PuBr'.
         """
         clrs = ['#6F4C9B', '#6059A9', '#5568B8', '#4E79C5', '#4D8AC6',
                 '#4E96BC', '#549EB3', '#59A5A9', '#60AB9E', '#69B190',
@@ -207,8 +214,7 @@ class TOLcmaps():
         self.cmap.set_bad('#FFFFFF')
 
     def __rainbow_WhRd(self):
-        """
-        Define colormap 'rainbow_WhRd'.
+        """Define colormap 'rainbow_WhRd'.
         """
         clrs = ['#E8ECFB', '#DDD8EF', '#D1C1E1', '#C3A8D1', '#B58FC2',
                 '#A778B4', '#9B62A7', '#8C4E99', '#6F4C9B', '#6059A9',
@@ -220,8 +226,7 @@ class TOLcmaps():
         self.cmap.set_bad('#666666')
 
     def __rainbow_WhBr(self):
-        """
-        Define colormap 'rainbow_WhBr'.
+        """Define colormap 'rainbow_WhBr'.
         """
         clrs = ['#E8ECFB', '#DDD8EF', '#D1C1E1', '#C3A8D1', '#B58FC2',
                 '#A778B4', '#9B62A7', '#8C4E99', '#6F4C9B', '#6059A9',
@@ -234,8 +239,7 @@ class TOLcmaps():
         self.cmap.set_bad('#666666')
 
     def __rainbow_WhBr_condense(self):
-        """
-        Define colormap 'rainbow_WhBr_condense'.
+        """Define colormap 'rainbow_WhBr_condense'.
         """
         clrs = ['#E8ECFB', '#E4E5F7', '#E1DFF3', '#DDD8EF', '#D9D0EA',
                 '#D5C8E5', '#D1C1E1', '#CCB8DB', '#C7B0D6', '#C3A8D1',
@@ -261,8 +265,7 @@ class TOLcmaps():
         self.cmap.set_bad('#666666')
 
     def __rainbow_discrete(self, lut=None):
-        """
-        Define colormap 'rainbow_discrete'.
+        """Define colormap 'rainbow_discrete'.
         """
         clrs = ['#E8ECFB', '#D9CCE3', '#D1BBD7', '#CAACCB', '#BA8DB4',
                 '#AE76A3', '#AA6F9E', '#994F88', '#882E72', '#1965B0',
@@ -304,14 +307,12 @@ class TOLcmaps():
             self.cmap.set_bad('#FFFFFF')
 
     def show(self):
-        """
-        List names of defined colormaps.
+        """List names of defined colormaps.
         """
         print(' '.join(repr(n) for n in self.namelist))
 
     def get(self, cname='rainbow_PuRd', lut=None):
-        """
-        Return requested colormap, default is 'rainbow_PuRd'.
+        """Return requested colormap, default is 'rainbow_PuRd'.
         """
         self.cname = cname
         if cname == 'rainbow_discrete':
@@ -322,11 +323,15 @@ class TOLcmaps():
 
 
 def tol_cmap(colormap=None, lut=None):
-    """
-    Continuous and discrete color sets for ordered data.
+    """Continuous and discrete color sets for ordered data.
 
-    Return a matplotlib colormap.
+    Notes
+    -----
     Parameter lut is ignored for all colormaps except 'rainbow_discrete'.
+
+    Returns
+    -------
+    a matplotlib colormap.
     """
     obj = TOLcmaps()
     if colormap is None:
@@ -340,14 +345,25 @@ def tol_cmap(colormap=None, lut=None):
 
 
 def tol_cset(colorset=None):
-    """
-    Discrete color sets for qualitative data.
+    """Discrete color sets for qualitative data.
 
-    Define a namedtuple instance with the colors.
-    Examples for: cset = tol_cset(<scheme>)
-      - cset.red and cset[1] give the same color (in default 'bright' colorset)
-      - cset._fields gives a tuple with all color names
-      - list(cset) gives a list with all colors
+    Returns
+    -------
+    NamedTuple:
+       a namedtuple instance with the colors.
+
+    Notes
+    -----
+
+    * cset.red and cset[1] give the same color (in default 'bright' colorset)
+    * cset._fields gives a tuple with all color names
+    * list(cset) gives a list with all colors
+
+    Examples
+    --------
+
+    >>> cset = tol_cset(<scheme>)
+
     """
     namelist = ('bright', 'high-contrast', 'vibrant', 'muted', 'light')
     if colorset is None:

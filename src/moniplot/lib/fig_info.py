@@ -53,13 +53,13 @@ class FIGinfo:
     Notes
     -----
     The box with the figure information can only hold a limited number of keys:
-      'above' :  The figure information is displayed in a small box. This box
-                 grows with the number of lines and will overlap with the main
-                 image or its colorbar at about 7+ entries.
+
+    - above:  The figure information is displayed in a small box. This box \
+      grows with the number of lines and will overlap with the main image or \
+      its colorbar at about 7+ entries.
     """
     def __init__(self, loc='above', info_dict=None) -> None:
-        """
-        Create FIGinfo instance to hold information on the current plot
+        """Create FIGinfo instance to hold information on the current plot.
 
         Parameters
         ----------
@@ -78,14 +78,12 @@ class FIGinfo:
         return len(self.fig_info)
 
     def copy(self):
-        """
-        Return a deep copy of the current object
+        """Return a deep copy of the current object.
         """
         return deepcopy(self)
 
     def set_location(self, loc: str) -> None:
-        """
-        Set the location of the fig_info box
+        """Set the location of the fig_info box.
 
         Parameters
         ----------
@@ -98,17 +96,16 @@ class FIGinfo:
         self.location = loc
 
     def add(self, key: str, value, fmt='{}') -> None:
-        """
-        Extent fig_info with a new line
+        """Extent fig_info by adding a new line.
 
         Parameters
         ----------
         key : str
-          Name of the fig_info key.
+          Name of the fig_info key
         value : Any python variable
-          Value of the fig_info key. A tuple will be formatted as *value.
+          Value of the fig_info key. A tuple will be formatted as \*value
         fmt : str, default='{}'
-          Convert value to a string, using the string format method.
+          Convert value to a string, using the string format method
         """
         if isinstance(value, tuple):
             self.fig_info[key] = fmt.format(*value)
@@ -116,8 +113,7 @@ class FIGinfo:
             self.fig_info[key] = fmt.format(value)
 
     def as_str(self) -> str:
-        """
-        Return figure information as one long string
+        """Return figure information as one long string
         """
         info_str = ''
         for key, value in self.fig_info.items():

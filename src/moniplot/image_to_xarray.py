@@ -13,15 +13,10 @@ Data values
 Dimensions and Coordinates
 --------------------------
 * The functions in this module should work with netCDF4 and HDF5 files.
-* In a HDF5 file the 'coordinates' of a dataset can be defined using
- dimension scales.
-* In a netCDF4 file this is required: all variables have dimensions, which
- can have coordinates. But under the hood also netCDF4 uses dimension scales.
-* The xarray DataArray structure will have as dimensions, the names of the
- dimension scales and as coordinates the names and data of the dimensions
- scales, except when the data only contains zero's.
-* The default dimensions of an image are 'row' and 'column' with evenly spaced
- values created with np.arange(len(dim), dtype=uint).
+* In a HDF5 file the 'coordinates' of a dataset can be defined using dimension scales.
+* In a netCDF4 file this is required: all variables have dimensions, which can have coordinates. But under the hood also netCDF4 uses dimension scales.
+* The xarray DataArray structure will have as dimensions, the names of the dimension scales and as coordinates the names and data of the dimensions  scales, except when the data only contains zero's.
+* The default dimensions of an image are 'row' and 'column' with evenly spaced values created with np.arange(len(dim), dtype=uint).
 
 Copyright (c) 2022 SRON - Netherlands Institute for Space Research
 
@@ -105,8 +100,7 @@ def __get_coords(dset, data_sel: tuple) -> list:
     dset :  h5py.Dataset
        h5py dataset from which the data is read
     data_sel :  tuple of slice(s)
-       A numpy slice generated for example numpy.s_
-       Default read while array
+       A numpy slice generated for example 'numpy.s\_'
 
     Returns
     -------
@@ -148,8 +142,7 @@ def __set_coords(dset, data_sel: tuple, dims: list) -> list:
     dset :  h5py.Dataset or numpy.array
        h5py dataset from which the data is read
     data_sel :  tuple of slice(s)
-       A numpy slice generated for example numpy.s_
-       Default read while array
+       A numpy slice generated for example 'numpy.s\_'
     dims : list of strings
        Alternative names for the dataset dimensions if not attached to dataset
        Default coordinate names are ['time', ['row', ['column']]]
@@ -184,8 +177,7 @@ def __get_data(dset, data_sel: tuple, field: str):
     dset :  h5py.Dataset
        h5py dataset from which the data is read
     data_sel :  numpy slice
-       A numpy slice generated for example numpy.s_
-       Default read while array
+       A numpy slice generated for example 'numpy.s\_'
     field : str
        Name of field in compound dataset or None
 
@@ -225,11 +217,11 @@ def __check_selection(data_sel: tuple, ndim: int) -> tuple:
     dimensions of data_sel should agree with the HDF5 dataset or one and
     only one Ellipsis has to be used.
     Thus allowed values for data_sel are:
-    * [always]: (), np.s_[:], np.s_[...]
-    * [1-D dataset]: np.s_[:-1], np.s_[0]
-    * [2-D dataset]: np.s_[:-1, :], np.s_[0, :], np.s_[:-1, 0]
-    * [3-D dataset]: np.s_[:-1, :, 2:4], np.s_[0, :, :], np.s_[:-1, 0, 2:4]
-    * [Ellipsis] np.s_[0, ...], np.s_[..., 4], np.s_[0, ..., 4]
+    * [always]: (), np.s\_[:], np.s\_[...]
+    * [1-D dataset]: np.s\_[:-1], np.s\_[0]
+    * [2-D dataset]: np.s\_[:-1, :], np.s\_[0, :], np.s\_[:-1, 0]
+    * [3-D dataset]: np.s\_[:-1, :, 2:4], np.s\_[0, :, :], np.s\_[:-1, 0, 2:4]
+    * [Ellipsis] np.s\_[0, ...], np.s\_[..., 4], np.s\_[0, ..., 4]
     """
     if data_sel in (np.s_[:], np.s_[...], np.s_[()]):
         return None
@@ -259,7 +251,7 @@ def h5_to_xr(h5_dset, data_sel=None, *, dims=None, field=None):
     h5_dset :  h5py.Dataset
        Data, dimensions, coordinates and attributes are read for this dataset
     data_sel :  slice, optional
-       A numpy slice generated for example numpy.s_
+       A numpy slice generated for example 'numpy.s\_'
     dims :  list of strings, optional
        Alternative names for the dataset dimensions if not attached to dataset
     field : str, optional

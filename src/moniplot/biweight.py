@@ -30,8 +30,7 @@ import numpy as np
 
 # ----- local functions -------------------------
 def __biweight(data, spread=False):
-    """
-    Calculate biweight parameters for the whole dataset
+    """Calculate biweight parameters for the whole dataset.
     """
     # calculate median and median absolute difference
     if np.isnan(data).any():
@@ -67,8 +66,7 @@ def __biweight(data, spread=False):
 
 
 def __biweight_axis(data, axis, spread=False):
-    """
-    Calculate biweight parameters, along a given axis
+    """Calculate biweight parameters, along a given axis.
 
     Notes
     -----
@@ -116,23 +114,23 @@ def __biweight_axis(data, axis, spread=False):
 
 # ----- main function -------------------------
 def biweight(data, axis=None, spread=False):
-    """
-    Calculate Tukey's biweight.
+    """Calculate Tukey's biweight.
+
     Implementation based on Eqn. 7.6 and 7.7 in the SWIR OCAL ATBD.
 
     Parameters
     ----------
-    data   :   array_like
+    data : array_like
        input array
-    axis   :   int, optional
+    axis : int, optional
        axis along which the biweight medians are computed.
-        - Note that axis will be ignored when data is a 1-D array.
-    spread :   bool, optional
+       Note that axis will be ignored when data is a 1-D array.
+    spread : bool, optional
        if True, then return also the biweight spread.
 
     Returns
     -------
-    out    :   ndarray or tuple
+    out : ndarray or tuple
        biweight median and biweight spread if parameter "spread" is True
     """
     if axis is None or data.ndim == 1:
