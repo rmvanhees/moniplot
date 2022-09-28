@@ -30,6 +30,7 @@ dependencies = [
   "h5py>=3.5",
   "matplotlib>=3.5",
   "numpy>=1.19",
+  "numpydoc>=1.0",
   "xarray>=0.21",
 ]
 dynamic = ["version"]
