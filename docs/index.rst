@@ -24,12 +24,11 @@ Quick-start
     quick
     build
 
-Module descriptions
--------------------
+Module Documentation
+--------------------
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
    modules
 
