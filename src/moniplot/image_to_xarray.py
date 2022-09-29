@@ -1,51 +1,29 @@
-"""
-This file is part of moniplot
+#
+# https://github.com/rmvanhees/moniplot.git
+#
+# Copyright (c) 2022 SRON - Netherlands Institute for Space Research
+#
+# License:  GPLv3
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-https://github.com/rmvanhees/moniplot.git
-
-Implements a lite interface with the xarray::DataArray, should work for all
-2-D detector images, sequences of detector measurements and trend data.
-
-Data values
------------
-* All floating dataset are converted to Python-compatible floating-point number.
-
-Dimensions and Coordinates
---------------------------
-* The functions in this module should work with netCDF4 and HDF5 files.
-* In a HDF5 file the 'coordinates' of a dataset can be defined using \
-  dimension scales.
-* In a netCDF4 file this is required: all variables have dimensions, which \
-  can have coordinates. But under the hood also netCDF4 uses dimension scales.
-* The xarray DataArray structure will have as dimensions, the names of the \
-  dimension scales and as coordinates the names and data of the dimensions \
-  scales, except when the data only contains zero's.
-* The default dimensions of an image are 'row' and 'column' with evenly \
-  spaced values created with np.arange(len(dim), dtype=uint).
-
-Copyright (c) 2022 SRON - Netherlands Institute for Space Research
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-License:  GPLv3
-"""
 from pathlib import PurePath
 
 import numpy as np
 import xarray as xr
 
 
+# - local functions --------------------------------
 def __get_attrs(dset, field: str) -> dict:
     """Return attributes of the HDF5 dataset.
 
@@ -242,8 +220,12 @@ def __check_selection(data_sel: tuple, ndim: int) -> tuple:
     return buff
 
 
+# - main function ----------------------------------
 def h5_to_xr(h5_dset, data_sel=None, *, dims=None, field=None):
     """Create xarray::DataArray from a HDF5 dataset (with dimension scales).
+
+    Implements a lite interface with the xarray::DataArray, should work for all
+    2-D detector images, sequences of detector measurements and trend data.
 
     Parameters
     ----------
@@ -259,6 +241,24 @@ def h5_to_xr(h5_dset, data_sel=None, *, dims=None, field=None):
     Returns
     -------
     xarray.DataArray
+
+    Notes
+    -----
+    All floating datasets are converted to Python type 'float'
+
+    Dimensions and Coordinates:
+
+    * The functions in this module should work with netCDF4 and HDF5 files.
+    * In a HDF5 file the 'coordinates' of a dataset can be defined using \
+      dimension scales.
+    * In a netCDF4 file this is required: all variables have dimensions, \
+      which can have coordinates. But under the hood also netCDF4 uses \
+      dimension scales.
+    * The xarray DataArray structure will have as dimensions, the names of \
+      the dimension scales and as coordinates the names and data of the \
+      dimensions scales, except when the data only contains zero's.
+    * The default dimensions of an image are 'row' and 'column' with evenly \
+      spaced values created with np.arange(len(dim), dtype=uint).
 
     Examples
     --------
@@ -323,6 +323,9 @@ def h5_to_xr(h5_dset, data_sel=None, *, dims=None, field=None):
 def data_to_xr(data, *, dims=None, name=None, long_name=None, units=None):
     """Create xarray::DataArray from a dataset.
 
+    Implements a lite interface with the xarray::DataArray, should work for all
+    2-D detector images, sequences of detector measurements and trend data.
+
     Parameters
     ----------
     data :  array-like
@@ -339,6 +342,10 @@ def data_to_xr(data, *, dims=None, name=None, long_name=None, units=None):
     Returns
     -------
     xarray.DataArray
+
+    Notes
+    -----
+    All floating datasets are converted to Python type 'float'
     """
     coords = __set_coords(data, None, dims)
     attrs = {}

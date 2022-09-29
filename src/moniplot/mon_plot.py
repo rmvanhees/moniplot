@@ -1,36 +1,24 @@
-"""
-This file is part of moniplot
+#
+# This file is part of moniplot
+#
+# https://github.com/rmvanhees/moniplot.git
+#
+# Copyright (c) 2022 SRON - Netherlands Institute for Space Research
+#
+# License:  GPLv3
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-https://github.com/rmvanhees/moniplot.git
-
-The class MONplot contains generic plot functions.
-
-Notes
------
-The methods of the class MONplot will accept numpy arrays as input and display
-your data without knowledge on the data units and coordinates. In most cases,
-this will be enough for a quick inspection of your data.
-However, when you use xarray labeled arrays and datasets then the software
-will use the name of the xarray arrays, coordinate names and data attributes,
-such as 'long_name' and 'units'.
-
-Copyright (c) 2022 SRON - Netherlands Institute for Space Research
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-License:  GPLv3
-"""
 from datetime import datetime
 from pathlib import PurePath
 
@@ -68,8 +56,8 @@ if FOUND_CARTOPY:
 # - main function ----------------------------------
 class MONplot:
     """
-    Generate figure(s) for SRON onground calibration anlysis or
-    inflight instrument monitoring
+    Generate PDF reports (or figures) to facilitate instrument calibration
+    or monitoring.
 
     Attributes
     ----------
@@ -89,9 +77,9 @@ class MONplot:
     set_caption(caption)
        Set caption of each page of the PDF.
     set_cmap(cmap)
-       Use alternative color-map for MONplot::draw_image.
+       Use alternative colormap for MONplot::draw_image.
     unset_cmap()
-       Unset user supplied color-map, and use default color-map.
+       Unset user supplied colormap, and use default colormap.
     set_institute(institute)
        Use the name of your institute as a signature.
     draw_signal(data, fig_info, side_panels, title, **kwargs)
@@ -110,6 +98,15 @@ class MONplot:
        Display multiple subplots on one page using matplotlib.gridspec.GridSpec.
     draw_tracks(lons, lats, icids, saa_region, fig_info, title)
        Display tracks of satellite on a world map using a Robinson projection.
+
+    Notes
+    -----
+    The methods of the class MONplot will accept numpy arrays as input and
+    display your data without knowledge on the data units and coordinates.
+    In most cases, this will be enough for a quick inspection of your data.
+    However, when you use xarray labeled arrays and datasets then the software
+    will use the name of the xarray arrays, coordinate names and data
+    attributes, such as 'long_name' and 'units'.
 
     """
     def __init__(self, figname, caption=None):
@@ -217,17 +214,17 @@ class MONplot:
 
     def set_cmap(self, cmap) -> None:
         """
-        Use alternative color-map for MONplot::draw_image
+        Use alternative colormap for MONplot::draw_image
 
         Parameters
         ----------
-        cmap :  matplotlib color-map
+        cmap :  matplotlib colormap
         """
         self.__cmap = cmap
 
     def unset_cmap(self) -> None:
         """
-        Unset user supplied color-map, and use default color-map
+        Unset user supplied colormap, and use default colormap
         """
         self.__cmap = None
 
@@ -448,10 +445,6 @@ class MONplot:
            Pass keyword arguments: 'zscale', 'vperc' or 'vrange'
            to moniplot.lib.fig_draw_image.fig_data_to_xarr()
 
-        The information provided in the parameter 'fig_info' will be displayed
-        in a text box. In addition, we display the creation date and the data
-        (biweight) median & spread.
-
         Notes
         -----
         When data is an xarray.DataArray then the following attributes are used:
@@ -463,6 +456,10 @@ class MONplot:
         - _znorm: matplotlib class to normalize the data between zero and one.
         - _zscale: scaling of the data values: linear, log, diff, ratio, ...
         - _zunits: adjusted units of the data
+
+        The information provided in the parameter 'fig_info' will be displayed
+        in a text box. In addition, we display the creation date and the data
+        (biweight) median & spread.
 
         Examples
         --------

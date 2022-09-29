@@ -3,14 +3,29 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to moniplot's documentation!
-====================================
+Moniplot User Manual
+====================
 
-Moniplot is a Python data visualization library based on
-[matplotlib](https://matplotlib.org) and [xarray](https://xarray.pydata.org).
+.. _matplotlib: https://matplotlib.org
+.. _xarray: https://docs.xarray.dev/en/stable/
+
+Moniplot is a Python data visualization library based on matplotlib_
+and xarray_.
 It provides a high-level interface for drawing attractive and informative
 graphics for onground calibration data analysis or inflight instrument
 monitoring.
+
+Quick-start
+-----------
+
+.. toctree::
+    :maxdepth: 1
+
+    quick
+    build
+
+Module descriptions
+-------------------
 
 .. toctree::
    :maxdepth: 2

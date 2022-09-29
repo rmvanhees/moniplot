@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('../src'))
 # -- Project information -----------------------------------------------------
 
 project = 'moniplot'
-copyright = '2022, Richard van Hees'
+copyright = '2022, SRON'
 author = 'Richard van Hees'
 
 # The full version, including alpha/beta/rc tags
@@ -32,9 +32,9 @@ release = '0.5.2'
 # ones.
 extensions = [
     'numpydoc',
-    # 'sphinx.ext.autodoc',
+    'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
-    # 'sphinx.ext.napoleon'
+    'sphinx.ext.napoleon'
 ]
 
 # Add any paths that contain templates here, relative to this directory.

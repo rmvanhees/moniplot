@@ -27,16 +27,17 @@ classifiers = [
 ]
 dependencies = [
   # "cartopy>=0.20",
-  "h5py>=3.5",
-  "matplotlib>=3.5",
+  "h5py>=2.1",
+  "matplotlib>=3.3",
   "numpy>=1.19",
-  "numpydoc>=1.0",
-  "xarray>=0.21",
+  "numpydoc>=1.1",
+  "xarray>=0.19",
 ]
 dynamic = ["version"]
 
 [project.urls]
 homepage = "https://github.com/rmvanhees/moniplot"
+documentation = "https://moniplot.readthedocs.io/en/latest/"
 # Source = "https://github.com/rmvanhees/moniplot"
 # Changelog = "https://github.com/rmvanhees/moniplot/HISTORY.rst"
 "Issue tracker" = "https://github.com/rmvanhees/moniplot/issues"

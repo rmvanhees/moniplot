@@ -1,33 +1,22 @@
-"""
-This file is part of moniplot
+#
+# https://github.com/rmvanhees/moniplot.git
+#
+# Copyright (c) 2019-2022 SRON - Netherlands Institute for Space Research
+#
+# License:  GPLv3
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-https://github.com/rmvanhees/moniplot.git
-
-Definition of colour schemes for lines and maps that also work for colour-blind
-people. See https://personal.sron.nl/~pault/ for background information and
-best usage of the schemes.
-
-Reference
----------
-* https://personal.sron.nl/~pault/
-
-Copyright (c) 2019-2022 Paul Tol (SRON)
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-License:  GPLv3
-"""
 from typing import NamedTuple
 
 import numpy as np
@@ -51,7 +40,7 @@ def discretemap(colormap, hexclrs):
 
 # pylint: disable=invalid-name
 class TOLcmaps():
-    """Class TOLcmaps definition.
+    """Class TOLcmaps definitions.
 
     Attributes
     ----------
@@ -325,27 +314,48 @@ class TOLcmaps():
 def tol_cmap(colormap=None, lut=None):
     """Continuous and discrete color sets for ordered data.
 
-    Notes
-    -----
-    Parameter lut is ignored for all colormaps except 'rainbow_discrete'.
+    Definition of colour schemes for lines which also work for colour-blind
+    people. See https://personal.sron.nl/~pault/ for background information
+    and best usage of the schemes.
+
+    Parameters
+    ----------
+    colormap : str, optional
+       Return predefined colormap with given name.
+       If not given, all possible values for colormap.
+    lut : int, optional
+       Number of discrete colors in colormap.
+       Parameter lut is ignored for all colormaps except 'rainbow_discrete'.
 
     Returns
     -------
-    a matplotlib colormap.
+    matplotlib.colormaps
     """
     obj = TOLcmaps()
     if colormap is None:
         return obj.namelist
+
     if colormap not in obj.namelist:
         colormap = 'rainbow_PuRd'
         print('*** Warning: requested colormap not defined,',
               f'known colormaps are {obj.namelist}.',
               f'Using {colormap}.')
+
     return obj.get(colormap, lut)
 
 
 def tol_cset(colorset=None):
     """Discrete color sets for qualitative data.
+
+    Definition of colour schemes for lines which also work for colour-blind
+    people. See https://personal.sron.nl/~pault/ for background information
+    and best usage of the schemes.
+
+    Parameters
+    ----------
+    colorset : str
+       return color sets with name colorset. If not given, all possible values
+       for colorset.
 
     Returns
     -------

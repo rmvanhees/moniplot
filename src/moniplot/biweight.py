@@ -1,27 +1,22 @@
-"""
-This file is part of moniplot
+#
+# https://github.com/rmvanhees/moniplot.git
+#
+# Copyright (c) 2019-2022 SRON - Netherlands Institute for Space Research
+#
+# License:  GPLv3
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-https://github.com/rmvanhees/moniplot.git
-
-Python implementation of the Tukey's biweight algorithm.
-
-Copyright (c) 2022 SRON - Netherlands Institute for Space Research
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-License:  GPLv3
-"""
 import gc
 import warnings
 
@@ -114,9 +109,7 @@ def __biweight_axis(data, axis, spread=False):
 
 # ----- main function -------------------------
 def biweight(data, axis=None, spread=False):
-    """Calculate Tukey's biweight.
-
-    Implementation based on Eqn. 7.6 and 7.7 in the SWIR OCAL ATBD.
+    """Python implementation of the Tukey's biweight algorithm.
 
     Parameters
     ----------
