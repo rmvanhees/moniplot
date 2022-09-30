@@ -3,19 +3,6 @@
 Installation
 ============
 
-We develop the code using `Python <https://www.python.org/>`_ 3.10 using the
-latest stable release of the `HDF5 <https://hdfgroup.org/solutions/hdf5>`_
-library and Python packages:
-`numpy <https://numpy.org>`_, `h5py <https://www.h5py.org>`_,
-`xarray <https://xarray.dev/>`_, `matplotlib <https://matplotlib.org/>`_
-and `Cartopy <https://scitools.org.uk/cartopy/docs/latest/>`_.
-
-.. important::
-   The installation of Cartopy is needed by MONplot::draw_tracks. However,
-   we could not get our documentation installed on `Read the Docs`, because
-   the build of `moniplot` failed during the installation of Cartopy.
-   Therefore, we made the availability of Cartopy optional.
-
 Wheels
 ------
 
@@ -53,6 +40,19 @@ The latest release of `moniplot` is available from
 You can obtain the source code using::
 
   git clone https://github.com/rmvanhees/moniplot.git
+
+We develop the code using `Python <https://www.python.org/>`_ 3.10 using the
+latest stable release of the `HDF5 <https://hdfgroup.org/solutions/hdf5>`_
+library and Python packages:
+`numpy <https://numpy.org>`_, `h5py <https://www.h5py.org>`_,
+`xarray <https://xarray.dev/>`_, `matplotlib <https://matplotlib.org/>`_
+and `Cartopy <https://scitools.org.uk/cartopy/docs/latest/>`_.
+
+.. important::
+   The installation of Cartopy is needed by MONplot::draw_tracks. However,
+   we could not get our documentation installed on `Read the Docs`, because
+   the build of `moniplot` failed during the installation of Cartopy.
+   Therefore, we made the availability of Cartopy optional.
 
 To compile the code you need the Python packages: setuptools, setuptools-scm
 and wheels. Then you can install `moniplot` as follows::

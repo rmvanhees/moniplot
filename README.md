@@ -4,7 +4,6 @@
 [![Package Status](https://img.shields.io/pypi/status/moniplot.svg)](https://pypi.org/project/moniplot/)
 [![License](https://img.shields.io/pypi/l/moniplot.svg)](https://github.com/rmvanhees/moniplot/LICENSE)
 [![Downloads](https://static.pepy.tech/personalized-badge/moniplot?period=month&units=international_system&left_color=black&right_color=orange&left_text=PyPI%20downloads%20per%20month)](https://pepy.tech/project/moniplot)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 Moniplot is a Python data visualization library based on
 [matplotlib](https://matplotlib.org) and [xarray](https://xarray.pydata.org).
