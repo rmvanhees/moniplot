@@ -1,8 +1,7 @@
 # moniplot
-[![PyPI Latest Release](https://img.shields.io/pypi/v/moniplot.svg)](https://pypi.org/project/moniplot/)
-[![Package Status](https://img.shields.io/pypi/status/moniplot.svg)](https://pypi.org/project/moniplot/)
-[![License](https://img.shields.io/pypi/l/moniplot.svg)](https://github.com/rmvanhees/moniplot/LICENSE)
-[![PyPI Downloads:](https://img.shields.io/pypi/dm/moniplot.svg?label=PyPI%20downloads)](https://github.com/rmvanhees/moniplot/)
+[![Package Release](https://img.shields.io/pypi/v/moniplot.svg?label=version)](https://pypi.org/project/moniplot/)
+[![Package Status](https://img.shields.io/pypi/status/moniplot.svg?label=status)](https://pypi.org/project/moniplot/)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/moniplot.svg?label=PyPI%20downloads)](https://github.com/rmvanhees/moniplot/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7024743.svg)](https://doi.org/10.5281/zenodo.7024743)
 
 Moniplot is a Python data visualization library based on
