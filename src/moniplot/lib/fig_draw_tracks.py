@@ -34,8 +34,20 @@ from ..tol_colors import tol_cset
 # - main functions ---------------------------------
 if FOUND_CARTOPY:
     def fig_draw_tracks(axx, lons, lats, icids, saa_region) -> None:
-        """
-        Draw satellite tracks projected on the Earth surface.
+        """Draw satellite tracks projected on the Earth surface.
+
+        Parameters
+        ----------
+        axx : matplotlib.Axes
+           Matplotlib Axes object of plot window
+        lons : array_like
+           Longitude coordinates
+        lats : array_like
+           Latitude coordinates
+        icids :  array_like
+           ICID of each ground pixel
+        saa_region :
+           Polygon of the SAA region
         """
         # define colors
         cset = tol_cset('bright')

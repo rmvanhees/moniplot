@@ -21,8 +21,19 @@ import numpy as np
 
 
 def get_xylabels(gridspec, data_tuple):
-    """
-    Define xlabel and ylabel for each subplot panel
+    """Define xlabel and ylabel for each subplot panel.
+
+    Parameters
+    ----------
+    gridspec : matplotlib.gridspec.GridSpec
+       Matplotlib gridspec object
+    data_tuple : tuple
+       X,Y data for each panel
+
+    Returns
+    -------
+    numpy.ndarray
+       X,Y labels for each panel
     """
     res = ()
     data_iter = iter(data_tuple)
@@ -49,9 +60,17 @@ def get_xylabels(gridspec, data_tuple):
     return res
 
 
-def draw_subplot(axx, xarr, xylabels):
-    """
-    Draw a subplot figure
+def draw_subplot(axx, xarr, xylabels) -> None:
+    """Draw a subplot figure.
+
+    Parameters
+    ----------
+    axx : matplotlib.Axes
+       Matplotlib Axes object of subplot
+    xarr
+      Data with attrubutes of subplot
+    xylabels
+      X,Y labels of subplot
     """
     if '_plot' in xarr.attrs:
         kwargs = xarr.attrs['_plot']

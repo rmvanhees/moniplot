@@ -29,13 +29,16 @@ from .fig_legend import blank_legend_key
 
 # - local functions --------------------------------
 def set_labels_colors(xarr) -> tuple:
-    """
-    Determine name and units of housekeeping data and line and fill color
+    """Determine name and units of housekeeping data and line and fill color.
+
+    Parameters
+    ----------
+    xarr :  xarray.DataArray
 
     Returns
     -------
     tuple
-       sub_title, ylabel, line color and fill color
+       plot parameters: hk_title, hk_label, lcolor, fcolor
     """
     cset = tol_cset('bright')
 
@@ -77,9 +80,26 @@ def set_labels_colors(xarr) -> tuple:
     return hk_title, hk_label, lcolor, fcolor
 
 
-def adjust_ylim(avg, err1, err2, vperc: list, vrange_last_orbits: int):
-    """
-    Return the limits of the Y-coordinate
+def adjust_ylim(data, err1, err2, vperc: list, vrange_last_orbits: int):
+    """Set minimum and maximum values of ylim.
+
+    Parameters
+    ----------
+    data :  array_like
+       Values of the data to be plotted
+    err1 :  array_like
+       Values of the data minus its uncertainty, None if without uncertainty
+    err2 :  array_like
+       Values of the data plus its uncertainty, None if without uncertainty
+    vperc : list
+       Limit the data range to the given percentiles
+    vrange_last_orbits: int
+       Use only data of the last N orbits
+
+    Returns
+    -------
+    list
+       Return the limits of the Y-coordinate
     """
     if err1 is not None and err2 is not None:
         indx = np.isfinite(err1) & np.isfinite(err2)
@@ -96,17 +116,17 @@ def adjust_ylim(avg, err1, err2, vperc: list, vrange_last_orbits: int):
             ylim = [err1[indx].min(), err2[indx].max()]
         factor = 10
     else:
-        indx = np.isfinite(avg)
+        indx = np.isfinite(data)
         if np.all(~indx):
             ylim = [0., 0.]
         elif np.sum(indx) > vrange_last_orbits > 0:
             ni = vrange_last_orbits
-            ylim = [min(avg[indx][0:ni].min(), avg[indx][-ni:].min()),
-                    max(avg[indx][0:ni].max(), avg[indx][-ni:].max())]
+            ylim = [min(data[indx][0:ni].min(), data[indx][-ni:].min()),
+                    max(data[indx][0:ni].max(), data[indx][-ni:].max())]
         elif isinstance(vperc, list) and len(vperc) == 2:
-            ylim = np.percentile(avg[indx], vperc)
+            ylim = np.percentile(data[indx], vperc)
         else:
-            ylim = [avg[indx].min(), avg[indx].max()]
+            ylim = [data[indx].min(), data[indx].max()]
         factor = 5
 
     if ylim[0] == ylim[1]:
@@ -117,9 +137,8 @@ def adjust_ylim(avg, err1, err2, vperc: list, vrange_last_orbits: int):
     return (ylim[0] - delta, ylim[1] + delta)
 
 
-def adjust_units(zunit: str):
-    """
-    Adjust units: electron to 'e' and Volt to 'V'
+def adjust_units(zunit: str) -> str:
+    """Adjust units: electron to 'e' and Volt to 'V'.
 
     Parameters
     ----------
@@ -129,6 +148,7 @@ def adjust_units(zunit: str):
     Returns
     -------
     str
+       Units with consistent abriviations of electron(s) and Volt
     """
     if zunit is None or zunit == '1':
         return '1'
@@ -144,8 +164,17 @@ def adjust_units(zunit: str):
 
 
 def get_gap_list(xdata: np.ndarray) -> list:
-    """
-    Identify data gaps
+    """Identify data gaps for data where xdata = offs + N * xstep.
+
+    Parameters
+    ----------
+    xdata: numpy.ndarray
+       Independent variable where the data is measured
+
+    Returns
+    -------
+    list
+       Indices to xdata where np.diff(xdata) greater than xstep
     """
     if not issubclass(xdata.dtype.type, Integral):
         return []
@@ -160,12 +189,12 @@ def get_gap_list(xdata: np.ndarray) -> list:
 
 # - main functions ---------------------------------
 def add_subplot(axx, xarr) -> None:
-    """
-    Add a subplot for measurement data
+    """Add a subplot for measurement data.
 
     Parameters
     ----------
     axx :  matplotlib.Axes
+       Matplotlib Axes object of the current panel
     xarr :  xarray.DataArray
        Object holding measurement data and attributes
     """
@@ -234,12 +263,12 @@ def add_subplot(axx, xarr) -> None:
 
 
 def add_hk_subplot(axx, xarr, vperc=None, vrange_last_orbits=-1) -> None:
-    """
-    Add a subplot for housekeeping data
+    """Add a subplot for housekeeping data.
 
     Parameters
     ----------
     axx :  matplotlib.Axes
+       Matplotlib Axes object of the current panel
     xarr :  xarray.DataArray
        Object holding housekeeping data data and attributes.
        Dimension must be 'orbit', 'hours' or 'time'.

@@ -28,6 +28,17 @@ from matplotlib.colors import LinearSegmentedColormap, to_rgba_array
 def discretemap(colormap, hexclrs):
     """
     Produce a colormap from a list of discrete colors without interpolation.
+
+    Parameters
+    ---------
+    colormap : matplotlib.colormaps
+       Original colormap
+    hexclrs : array_like
+       Matplotlib color or array of colors
+
+    Returns
+    -------
+    matplotlib.colors.LinearSegmentedColormap
     """
     clrs = to_rgba_array(hexclrs)
     clrs = np.vstack([clrs[0], clrs, clrs[-1]])
@@ -41,25 +52,6 @@ def discretemap(colormap, hexclrs):
 # pylint: disable=invalid-name
 class TOLcmaps():
     """Class TOLcmaps definitions.
-
-    Attributes
-    ----------
-    cmap
-       Current colormap.
-    cname
-       Name of the current colormap.
-    funcdict
-       Map available colormaps to private methods.
-    nameList
-       Listing of all available colormaps.
-
-    Methods
-    -------
-    get(cname='rainbow_PuRd', lut=None)
-       Return requested colormap, default is 'rainbow_PuRd'.
-    show()
-       List names of available colormaps.
-
     """
     def __init__(self):
         """Initialize TOLcmaps object.

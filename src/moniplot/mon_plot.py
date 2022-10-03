@@ -59,45 +59,12 @@ class MONplot:
     Generate PDF reports (or figures) to facilitate instrument calibration
     or monitoring.
 
-    Attributes
+    Parameters
     ----------
-    figname : str
-       Name of the PDF or PNG file.
-    caption
-       Return figure caption.
-    cmap
-       Return matplotlib colormap.
-    institute
-       Return name of your institute.
-
-    Methods
-    -------
-    close()
-       Save the current figure and close the MONplot instance.
-    set_caption(caption)
-       Set caption of each page of the PDF.
-    set_cmap(cmap)
-       Use alternative colormap for MONplot::draw_image.
-    unset_cmap()
-       Unset user supplied colormap, and use default colormap.
-    set_institute(institute)
-       Use the name of your institute as a signature.
-    draw_signal(data, fig_info, side_panels, title, **kwargs)
-       Display 2D array data as image and averaged column/row signal plots.
-    draw_quality(data, ref_data, side_panels, fig_info, title, **kwargs)
-       Display pixel-quality 2D array data as image and column/row statistics.
-    draw_trend(xds, hk_xds, fig_info, title, **kwargs)
-       Display trends of measurement data and/or housekeeping data.
-    draw_hist(data, data_sel, vrange, fig_info, title, **kwargs)
-       Display data as histograms.
-    draw_qhist(xds, data_sel, density, fig_info, title)
-       Display pixel-quality data as histograms.
-    draw_lplot(self, xdata, ydata, color, square, fig_info, title, **kwargs)
-       Plot y versus x lines, maybe called multiple times to add lines.
-    draw_multiplot(self, data_tuple, gridspec, fig_info, title, **kwargs)
-       Display multiple subplots on one page using matplotlib.gridspec.GridSpec.
-    draw_tracks(lons, lats, icids, saa_region, fig_info, title)
-       Display tracks of satellite on a world map using a Robinson projection.
+    figname :  str
+        Name of PDF or PNG file (extension required)
+    caption :  str, optional
+        Caption repeated on each page of the PDF
 
     Notes
     -----
@@ -106,25 +73,14 @@ class MONplot:
     In most cases, this will be enough for a quick inspection of your data.
     However, when you use xarray labeled arrays and datasets then the software
     will use the name of the xarray arrays, coordinate names and data
-    attributes, such as 'long_name' and 'units'.
+    attributes, such as `long_name` and `units`.
 
+    Currently, we have turned off the automatic offset notation of
+    Matplotlib. Maybe this should be the default, which the user may
+    override.
     """
     def __init__(self, figname, caption=None):
-        """
-        Initialize multi-page PDF document or a single-page PNG
-
-        Parameters
-        ----------
-        figname :  str
-           Name of PDF or PNG file (extension required)
-        caption :  str
-           Caption repeated on each page of the PDF
-
-        Notes
-        -----
-        Currently, we have turned off the automatic offset notation of
-        Matplotlib. Maybe this should be the default, which the user may
-        override.
+        """Initialize multi-page PDF document or a single-page PNG.
         """
         self.__cmap = None
         self.__caption = '' if caption is None else caption
@@ -144,8 +100,7 @@ class MONplot:
         pass
 
     def __close_this_page(self, fig) -> None:
-        """
-        Save the current figure and close the MONplot instance.
+        """Save the current figure and close the MONplot instance.
         """
         # add save figure
         if self.__pdf is None:
@@ -155,8 +110,7 @@ class MONplot:
             self.__pdf.savefig()
 
     def close(self) -> None:
-        """
-        Close PNG or (multipage) PDF document
+        """Close PNG or (multipage) PDF document.
         """
         if self.__pdf is None:
             return
@@ -177,14 +131,12 @@ class MONplot:
     # --------------------------------------------------
     @property
     def caption(self) -> str:
-        """
-        Return figure caption
+        """Return figure caption.
         """
         return self.__caption
 
     def set_caption(self, caption: str) -> None:
-        """
-        Set caption of each page of the PDF
+        """Set caption of each page of the PDF.
 
         Parameters
         ----------
@@ -195,8 +147,7 @@ class MONplot:
         self.__caption = caption
 
     def __add_caption(self, fig):
-        """
-        Add figure caption
+        """Add figure caption.
         """
         if not self.caption:
             return
@@ -207,14 +158,12 @@ class MONplot:
     # --------------------------------------------------
     @property
     def cmap(self):
-        """
-        Return matplotlib colormap
+        """Return matplotlib colormap.
         """
         return self.__cmap
 
     def set_cmap(self, cmap) -> None:
-        """
-        Use alternative colormap for MONplot::draw_image
+        """Use alternative colormap for MONplot::draw_image.
 
         Parameters
         ----------
@@ -223,22 +172,19 @@ class MONplot:
         self.__cmap = cmap
 
     def unset_cmap(self) -> None:
-        """
-        Unset user supplied colormap, and use default colormap
+        """Unset user supplied colormap, and use default colormap.
         """
         self.__cmap = None
 
     # --------------------------------------------------
     @property
     def institute(self) -> str:
-        """
-        Return name of your institute
+        """Return name of your institute.
         """
         return self.__institute
 
     def set_institute(self, institute: str) -> None:
-        """
-        Use the name of your institute as a signature
+        """Use the name of your institute as a signature.
 
         Parameters
         ----------
@@ -265,8 +211,7 @@ class MONplot:
 
     @staticmethod
     def __add_fig_box(fig, fig_info) -> None:
-        """
-        Add a box with meta information in the current figure
+        """Add a box with meta information in the current figure.
 
         Parameters
         ----------
@@ -290,13 +235,11 @@ class MONplot:
     # -------------------------
     def __draw_image__(self, xarr: xr.DataArray, side_panels: str,
                        fig_info: FIGinfo, title: str) -> None:
-        """
-        Does the actual drawing of the image data for the public methods
-        'draw_signal' and 'draw_quality'.
+        """Does the actual drawing of the image data for the public methods
+        `draw_signal` and `draw_quality`.
         """
         def add_fig_box() -> None:
-            """
-            Add a box with meta information in the current figure
+            """Add a box with meta information in the current figure.
             """
             if fig_info is None:
                 return
@@ -425,8 +368,7 @@ class MONplot:
     # --------------------------------------------------
     def draw_signal(self, data, *, fig_info=None, side_panels='nanmedian',
                     title=None, **kwargs) -> None:
-        """
-        Display 2D array data as image and averaged column/row signal plots
+        """Display 2D array data as image and averaged column/row signal plots.
 
         Parameters
         ----------
@@ -434,37 +376,39 @@ class MONplot:
            Object holding measurement data and attributes
         fig_info :  FIGinfo, default=None
            OrderedDict holding meta-data to be displayed in the figure
-        side_panels :  str, default='nanmedian'
+        side_panels :  str, default=`nanmedian`
            Show image row and column statistics in two side panels.
-           Use 'none' when you do not want the side panels.
-           Other valid values are: 'median', 'nanmedian', 'mean', 'nanmean',
-           'quality', 'std' and 'nanstd'.
+           Use `none` when you do not want the side panels.
+           Other valid values are: `median`, `nanmedian`, `mean`, `nanmean`,
+           `quality`, `std` and `nanstd`.
         title :  str, default=None
            Title of this figure (matplotlib: Axis.set_title)
         **kwargs :   other keywords
-           Pass keyword arguments: 'zscale', 'vperc' or 'vrange'
+           Pass keyword arguments: `zscale`, `vperc` or `vrange`
            to moniplot.lib.fig_draw_image.fig_data_to_xarr()
 
         Notes
         -----
-        When data is an xarray.DataArray then the following attributes are used:
+        When data is an xarray.DataArray then the following attributes
+        are used::
 
-        - long_name: used as the title of the main panel when parameter 'title'\
-          is not defined.
-        - _cmap: contains the matplotlib colormap
-        - _zlabel: contains the label of the color bar
-        - _znorm: matplotlib class to normalize the data between zero and one.
-        - _zscale: scaling of the data values: linear, log, diff, ratio, ...
-        - _zunits: adjusted units of the data
+        'long_name' : used as the title of the main panel when parameter \
+                      `title` is not defined.
+        '_cmap'     : contains the matplotlib colormap
+        '_zlabel'   : contains the label of the color bar
+        '_znorm'    : matplotlib class to normalize the data between zero \
+                      and one.
+        '_zscale'   : scaling of the data values: linear, log, diff, ratio, ...
+        '_zunits'   : adjusted units of the data
 
-        The information provided in the parameter 'fig_info' will be displayed
+        The information provided in the parameter `fig_info` will be displayed
         in a text box. In addition, we display the creation date and the data
         (biweight) median & spread.
 
         Examples
         --------
-        Create a PDF document 'test.pdf' and add figure of dataset 'img'
-        (np.ndarray or xr.DataArray) with side-panels and title
+        Create a PDF document `test.pdf` and add figure of dataset `img`
+        (numpy.ndarray or xarray.DataArray) with side-panels and title
 
         >>> plot = MONplot('test.pdf', caption='my caption')
         >>> plot.set_institute('SRON')
@@ -528,51 +472,56 @@ class MONplot:
            respect to the reference data.
         fig_info :  FIGinfo, default=None
            OrderedDict holding meta-data to be displayed in the figure
-        side_panels :  str, default='quality'
+        side_panels :  str, default=`quality`
            Show image row and column statistics in two side panels.
-           Use 'none' when you do not want the side panels.
+           Use `none` when you do not want the side panels.
         title :  str, default=None
            Title of this figure (matplotlib: Axis.set_title)
         **kwargs :   other keywords
-           Pass keyword arguments: 'data_sel', 'thres_worst', 'thres_bad'
-           or 'qlabels' to moniplot.lib.fig_draw_image.fig_qdata_to_xarr()
+           Pass keyword arguments: `data_sel`, `thres_worst`, `thres_bad`
+           or `qlabels` to moniplot.lib.fig_draw_image.fig_qdata_to_xarr()
 
         Notes
         -----
-        When data is an xarray.DataArray then the following attributes are used:
+        When data is an xarray.DataArray then the following attributes
+        are used::
 
-        - long_name: used as the title of the main panel when parameter 'title'\
-          is not defined.
-        - flag_values: values of the flags used to qualify the pixel quality
-        - flag_meanings: description of the flag values
-        - thres_bad: threshold between good and bad
-        - thres_worst: threshold between bad and worst
-        - _cmap: contains the matplotlib colormap.
-        - _zscale: should be 'quality'.
-        - _znorm: matplotlib class to normalize the data between zero and one.
+        'long_name'     : used as the title of the main panel when parameter \
+                          `title` is not defined.
+        'flag_values'   : values of the flags used to qualify the pixel quality
+        'flag_meanings' : description of the flag values
+        'thres_bad'     : threshold between good and bad
+        'thres_worst'   : threshold between bad and worst
+        '_cmap'         : contains the matplotlib colormap
+        '_zscale'       : should be `quality`
+        '_znorm'        : matplotlib class to normalize the data between zero \
+                          and one
 
-        The quality ranking labels are ['unusable', 'worst', 'bad', 'good'],
-        in case nor reference dataset is provided. Where:
-        - 'unusable'  : pixels outside the illuminated region
-        - 'worst'     : 0 <= value < thres_worst
-        - 'bad'       : 0 <= value < thres_bad
-        - 'good'      : thres_bad <= value <= 1
+        The quality ranking labels are [`unusable`, `worst`, `bad`, `good`],
+        in case nor reference dataset is provided. Where::
+
+        'unusable'  : pixels outside the illuminated region
+        'worst'     : 0 <= value < thres_worst
+        'bad'       : 0 <= value < thres_bad
+        'good'      : thres_bad <= value <= 1
+
         Otherwise the labels for quality ranking indicate which pixels have
-        changed w.r.t. reference. The labels are:
-        - 'unusable'  : pixels outside the illuminated region
-        - 'worst'     : from good or bad to worst
-        - 'bad'       : from good to bad
-        - 'good'      : from any rank to good
-        - 'unchanged' : no change in rank
+        changed w.r.t. reference. The labels are::
 
-        The information provided in the parameter 'fig_info' will be displayed
+        'unusable'  : pixels outside the illuminated region
+        'worst'     : from good or bad to worst
+        'bad'       : from good to bad
+        'good'      : from any rank to good
+        'unchanged' : no change in rank
+
+        The information provided in the parameter `fig_info` will be displayed
         in a small box. Where creation date and statistics on the number of
         bad and worst pixels are displayed.
 
         Examples
         --------
-        Create a PDF document 'test.pdf' and add figure of dataset 'img'
-        (np.ndarray or xr.DataArray) with side-panels and title
+        Create a PDF document `test.pdf` and add figure of dataset `img`
+        (numpy.ndarray or xarray.DataArray) with side-panels and title
 
         >>> plot = MONplot('test.pdf', caption='my caption', institute='SRON')
         >>> plot.draw_quality(img, title='my title')
@@ -651,9 +600,9 @@ class MONplot:
         Examples
         --------
         Create a PDF document 'test.pdf' and add figure of dataset 'xds'
-        (np.ndarray or xr.DataArray) with a title. The dataset 'xds' may
-        contain multiple DataArrays with a common X-coordinate. Each DataArray
-        will be displayed in a seperate sub-panel.
+        (numpy.ndarray or xarray.DataArray) with a title. The dataset 'xds'
+        may contain multiple DataArrays with a common X-coordinate. Each
+        DataArray will be displayed in a seperate sub-panel.
 
         >>> plot = MONplot('test.pdf', caption='my caption', institute='SRON')
         >>> plot.draw_trend(xds, hk_xds=None, title='my title')
@@ -876,9 +825,9 @@ class MONplot:
         Examples
         --------
         Create a PDF document 'test.pdf' and add figure of dataset 'xds'
-        (np.ndarray or xr.DataArray) with a title. The dataset 'xds' may
-        contain multiple DataArrays with a common X-coordinate. Each DataArray
-        will be displayed in a seperate sub-panel.
+        (numpy.ndarray or xarray.DataArray) with a title. The dataset 'xds'
+        may contain multiple DataArrays with a common X-coordinate. Each
+        DataArray will be displayed in a seperate sub-panel.
 
         >>> plot = MONplot('test.pdf', caption='my caption', institute='SRON')
         >>> plot.draw_qhist(xds, title='my title')

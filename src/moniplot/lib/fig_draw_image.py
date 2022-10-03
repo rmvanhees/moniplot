@@ -31,9 +31,9 @@ from ..tol_colors import tol_cmap, tol_cset
 
 
 # - local functions --------------------------------
-def adjust_zunit(zunit: str, vmin: float, vmax: float):
+def adjust_zunit(zunit: str, vmin: float, vmax: float) -> tuple:
     """
-    Adjust units: electron to 'e' and Volt to 'V'
+    Adjust units: electron to `e` and Volt to `V`
     and scale data range to <-1000, 1000>.
 
     Parameters
@@ -71,6 +71,20 @@ def adjust_zunit(zunit: str, vmin: float, vmax: float):
 
 def set_norm(zscale: str, vmin: float, vmax: float):
     """Set data-range normalization.
+
+    Parameters
+    ----------
+    zscale : str
+        Scaling of the data values. Recognized values are: 'linear', 'log',
+        'diff' or 'ratio'.  
+    vmin : float
+        Mininum of the data range
+    vmax : float
+        Mininum of the data range
+
+    Returns
+    -------
+    matplotlib.colors.mcolors
     """
     if zscale == 'log':
         return mcolors.LogNorm(vmin=max(vmin, 1e-6), vmax=vmax)
@@ -103,8 +117,17 @@ def set_norm(zscale: str, vmin: float, vmax: float):
     return mcolors.Normalize(vmin=vmin, vmax=vmax)
 
 
-def adjust_img_ticks(axx, xarr, dims=None):
+def adjust_img_ticks(axx, xarr, dims=None) -> None:
     """Adjust ticks of the image axis.
+
+    Parameters
+    ----------
+    axx : matplotlib.Axes
+       Matplotlib Axes object for the central image panel
+    xarr : xarray.DataArray
+       Object holding measurement data and attributes.
+    dims : str, optional
+       Name of the plot dimension (`X` or `Y`). 
     """
     if dims is None or dims == 'X':
         if (xarr.shape[1] % 10) == 0:
@@ -127,7 +150,7 @@ def fig_draw_panels(axx_p: dict, xarr, side_panels: str) -> None:
     Parameters
     ----------
     axx_p :  dict
-       dictionary holding matplotlib Axes for panel 'X' and 'Y'
+       dictionary holding matplotlib Axes for panel `X` and `Y`
     xarr :  xarray.DataArray
        Object holding measurement data and attributes
     side_panels :  str
@@ -135,7 +158,7 @@ def fig_draw_panels(axx_p: dict, xarr, side_panels: str) -> None:
     """
     cset = tol_cset('bright')
 
-    # get numpy function to apply on image rows and columns for side pannels
+    # get numpy function to apply on image rows and columns for side panels
     func_panels = {
         'median': np.median,
         'nanmedian': np.nanmedian,
@@ -147,7 +170,7 @@ def fig_draw_panels(axx_p: dict, xarr, side_panels: str) -> None:
     if func_panels is None:
         raise KeyError(f'unknown function for side_panels: {side_panels}')
 
-    # draw panel below the image pannel
+    # draw panel below the image panel
     xdata = np.arange(xarr.shape[1])
     if side_panels == 'quality':
         ydata = np.sum(((xarr.values == 1) | (xarr.values == 2)), axis=0)
@@ -166,7 +189,7 @@ def fig_draw_panels(axx_p: dict, xarr, side_panels: str) -> None:
     adjust_img_ticks(axx_p['X'], xarr, dims='X')
     axx_p['X'].grid()
 
-    # draw panel left of the image pannel
+    # draw panel left of the image panel
     ydata = np.arange(xarr.shape[0])
     if side_panels == 'quality':
         xdata = np.sum(((xarr.values == 1) | (xarr.values == 2)), axis=1)
@@ -207,6 +230,11 @@ def fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None):
     vrange :  list, default=None
         Range to normalize luminance data between vmin and vmax.
 
+    Returns
+    -------
+    xarray.DataArray
+        DataArray with image data and attributes ready for plotting
+
     Notes
     -----
     The input data should have two dimensions. If the input data is array-like,
@@ -217,10 +245,6 @@ def fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None):
 
     The default values of vperc are used when both vrange and vperc are None.
     When vrange and vperc are provided, then vrange is used.
-
-    Returns
-    -------
-    xarray.DataArray
     """
     # make sure that we are working with a xarray DataArray
     xarr = data.copy() if isinstance(data, xr.DataArray) else data_to_xr(data)
@@ -300,26 +324,27 @@ def fig_qdata_to_xarr(data, ref_data=None, data_sel=None,
     qlabels : tuple of strings, optional
         Labels for the pixel-quality classes, see below
 
-    Notes
-    -----
-    Without a reference dataset, the default quality ranking labels are:
-
-    - 'unusable' :  pixels outside the illuminated region
-    - 'worst'    :  0 <= value < thres_worst
-    - 'bad'      :  0 <= value < thres_bad
-    - 'good'     :  thres_bad <= value <= 1
-
-    Otherwise the default quality ranking labels are:
-
-    - 'unusable'    :  pixels outside the illuminated region
-    - 'to worst'    :  from good or bad to worst
-    - 'good to bad' :  from good to bad
-    - 'to good'     :  from any rank to good
-    - 'unchanged'   :  no change in rank
-
     Returns
     -------
     xarray.DataArray
+        DataArray with image data and attributes ready for plotting
+
+    Notes
+    -----
+    Without a reference dataset, the default quality ranking labels are::
+
+    'unusable' :  pixels outside the illuminated region
+    'worst'    :  0 <= value < thres_worst
+    'bad'      :  0 <= value < thres_bad
+    'good'     :  thres_bad <= value <= 1
+
+    Otherwise the default quality ranking labels are::
+
+    'unusable'    :  pixels outside the illuminated region
+    'to worst'    :  from good or bad to worst
+    'good to bad' :  from good to bad
+    'to good'     :  from any rank to good
+    'unchanged'   :  no change in rank
     """
     if data_sel is None:
         exclude_region = None

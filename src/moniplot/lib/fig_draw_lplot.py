@@ -26,8 +26,25 @@ from ..tol_colors import tol_cset
 
 
 def fig_draw_lplot(axx, xdata, ydata, icol: str, use_steps=False, **kwargs):
-    """
-    add line plot to figure
+    """Add line plot to figure.
+
+    Parameters
+    ----------
+    axx : matplotlib.Axes
+       Matplotlib Axes object of plot window
+    xdata : array_like
+       X data
+    ydata : array_like
+       Y data
+    icol : str
+       color index
+    use_steps : bool, default=False
+       use plt.stairs() instead of plt.plot() 
+    **kwargs : keyword arguments
+
+    See Also
+    --------
+    matplotlib.pyplot.plot, matplotlib.pyplot.stairs 
     """
     # define colors
     cset = tol_cset('bright')
@@ -42,8 +59,18 @@ def fig_draw_lplot(axx, xdata, ydata, icol: str, use_steps=False, **kwargs):
 
 
 def close_draw_lplot(axx, time_axis: bool, title: str, **kwargs):
-    """
-    close the figure created with MONplot::draw_lplot()
+    """Close the figure created with MONplot::draw_lplot().
+
+    Parameters
+    ----------
+    axx : matplotlib.Axes
+       Matplotlib Axes object of plot window
+    time_axis : bool
+       The xlabels represent date/time
+    title : str
+       Title of the figure
+    **kwargs : keyword arguments
+       Recognized are 'xlabel', 'ylabel', 'xlim', 'ylim', 'xscale', 'yscale'
     """
     # add title to image panel
     if title is not None:

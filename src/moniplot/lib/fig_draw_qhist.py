@@ -23,13 +23,13 @@ import numpy as np
 from .fig_legend import blank_legend_key
 
 
-def fig_draw_qhist(axx, qdata, label: str, density: bool):
-    """
-    Add a subplot showing pixel-quality data as a histogram
+def fig_draw_qhist(axx, qdata, label: str, density: bool) -> None:
+    """Add a subplot showing pixel-quality data as a histogram.
 
     Parameters
     ----------
     axx :  matplotlib.Axes
+       Matplotlib Axes object of plot window
     qdata :  numpy.ndarray
        Object holding pixel-quality data and attributes
     label :  str
