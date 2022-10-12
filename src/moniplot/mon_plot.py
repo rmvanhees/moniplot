@@ -370,24 +370,29 @@ class MONplot:
     # --------------------------------------------------
     def draw_signal(self, data, *, fig_info=None, side_panels='nanmedian',
                     title=None, **kwargs) -> None:
-        """Display 2D array data as image and averaged column/row signal plots.
+        """Display 2D array as an image and averaged column/row signal
+        in the side-panels (optional).
 
         Parameters
         ----------
         data :  numpy.ndarray or xarray.DataArray
-           Object holding measurement data and attributes
+           Object holding measurement data and attributes.
         fig_info :  FIGinfo, default=None
-           OrderedDict holding meta-data to be displayed in the figure
+           OrderedDict holding meta-data to be displayed in the figure.
         side_panels :  str, default='nanmedian'
            Show image row and column statistics in two side panels.
            Use 'none' when you do not want the side panels.
            Other valid values are: 'median', 'nanmedian', 'mean', 'nanmean',
            'quality', 'std' and 'nanstd'.
         title :  str, default=None
-           Title of this figure (matplotlib: Axis.set_title)
+           Title of this figure using `Axis.set_title`.
         **kwargs :   other keywords
            Pass keyword arguments: `zscale`, `vperc` or `vrange`
-           to moniplot.lib.fig_draw_image.fig_data_to_xarr()
+           to `moniplot.lib.fig_draw_image.fig_data_to_xarr()`.
+
+        See also
+        --------
+        fig_data_to_xarr : Prepare image data for plotting.
 
         Notes
         -----
@@ -414,7 +419,7 @@ class MONplot:
         Examples
         --------
         Create a PDF document 'test.pdf' and add figure of dataset img
-        (`numpy.ndarray` or `xarray.DataArray`) with side-panels and title
+        (`numpy.ndarray` or `xarray.DataArray`) with side-panels and title.
 
         >>> plot = MONplot('test.pdf', caption='my caption')
         >>> plot.set_institute('SRON')
@@ -465,27 +470,30 @@ class MONplot:
     # --------------------------------------------------
     def draw_quality(self, data, ref_data=None, *, side_panels='quality',
                      fig_info=None, title=None, **kwargs) -> None:
-        """
-        Display pixel-quality 2D array data as image and column/row statistics
+        """Display pixel-quality 2D array as image with column/row statistics.
 
         Parameters
         ----------
         data :  numpy.ndarray or xarray.DataArray
-           Object holding measurement data and attributes
+           Object holding measurement data and attributes.
         ref_data :  numpy.ndarray, default=None
            Numpy array holding reference data, for example pixel quality
            reference map taken from the CKD. Shown are the changes with
            respect to the reference data.
         fig_info :  FIGinfo, default=None
-           OrderedDict holding meta-data to be displayed in the figure
+           OrderedDict holding meta-data to be displayed in the figure.
         side_panels :  str, default='quality'
            Show image row and column statistics in two side panels.
            Use 'none' when you do not want the side panels.
         title :  str, default=None
-           Title of this figure (matplotlib: Axis.set_title)
+           Title of this figure using `Axis.set_title`.
         **kwargs :   other keywords
            Pass keyword arguments: `data_sel`, `thres_worst`, `thres_bad`
-           or `qlabels` to moniplot.lib.fig_draw_image.fig_qdata_to_xarr()
+           or `qlabels` to `moniplot.lib.fig_draw_image.fig_qdata_to_xarr`.
+
+        See Also
+        --------
+        qdata_to_xarr : Prepare pixel-quality data for plotting.
 
         Notes
         -----
@@ -584,16 +592,20 @@ class MONplot:
         Parameters
         ----------
         xds :  xarray.Dataset, optional
-           Object holding measurement data and attributes
+           Object holding measurement data and attributes.
         hk_xds :  xarray.Dataset, optional
-           Object holding housekeeping data and attributes
+           Object holding housekeeping data and attributes.
         fig_info :  FIGinfo, optional
-           OrderedDict holding meta-data to be displayed in the figure
+           OrderedDict holding meta-data to be displayed in the figure.
         title :  str, optional
-           Title of this figure (matplotlib: Axis.set_title)
+           Title of this figure using `Axis.set_title`.
         **kwargs :   other keywords
            Pass keyword arguments: 'vperc' or 'vrange_last_orbits'
-           to moniplot.lib.fig_draw_trend.add_hk_subplot()
+           to 'moniplot.lib.fig_draw_trend.add_hk_subplot`.
+
+        See Also
+        --------
+        add_hk_subplot : Add a subplot for housekeeping data.
 
         Notes
         -----
@@ -606,7 +618,7 @@ class MONplot:
         Examples
         --------
         Create a PDF document 'test.pdf' and add figure of dataset 'xds'
-        (numpy.ndarray or xarray.DataArray) with a title. The dataset 'xds'
+        (`numpy.ndarray` or `xarray.DataArray`) with a title. The dataset 'xds'
         may contain multiple DataArrays with a common X-coordinate. Each
         DataArray will be displayed in a seperate sub-panel.
 
@@ -678,30 +690,33 @@ class MONplot:
     # --------------------------------------------------
     def draw_hist(self, data, data_sel=None, vrange=None,
                   fig_info=None, title=None, **kwargs) -> None:
-        """
-        Display data as histograms.
+        r"""Display data as histograms.
 
         Parameters
         ----------
         data :  numpy.ndarray or xarray.DataArray
-           Object holding measurement data and attributes
+           Object holding measurement data and attributes.
         data_sel :  mask or index tuples for arrays, optional
            Select a region on the detector by fancy indexing (using a
            boolean/interger arrays), or using index tuples for arrays
-           (generated with numpy.s\_).
+           (generated with `numpy.s\_`).
         vrange :  list, default=[data.min(), data.max()]
            The lower and upper range of the bins.
            Note data will also be clipped according to this range.
         fig_info :  FIGinfo, optional
-           OrderedDict holding meta-data to be displayed in the figure
+           OrderedDict holding meta-data to be displayed in the figure.
         title :  str, optional
-           Title of this figure (matplotlib: Axis.set_title).
+           Title of this figure using `Axis.set_title`.
            Default title is 'f'Histogram of {data.attrs["long_name"]}'.
         **kwargs :   other keywords
-           Pass the following keyword arguments to matplotlib.pyplot.hist:
+           Pass the following keyword arguments to `matplotlib.pyplot.hist`:
            'bins', 'density' or 'log'.
            Note that keywords: 'histtype', 'color', 'linewidth' and 'fill'
            are predefined.
+
+        See Also
+        --------
+        matplotlib.pyplot.hist : Compute and plot a histogram.
 
         Notes
         -----
@@ -800,25 +815,28 @@ class MONplot:
     # --------------------------------------------------
     def draw_qhist(self, xds, data_sel=None, density=True,
                    fig_info=None, title=None) -> None:
-        """
-        Display pixel-quality data as histograms.
+        r"""Display pixel-quality data as histograms.
 
         Parameters
         ----------
         xds :  xarray.Dataset
-           Object holding measurement data and attributes
+           Object holding measurement data and attributes.
         data_sel :  mask or index tuples for arrays, optional
            Select a region on the detector by fancy indexing (using a
            boolean/interger arrays), or using index tuples for arrays
-           (generated with numpy.s\_).
+           (generated with `numpy.s\_`).
         density : bool, default=True
            If True, draw and return a probability density: each bin will
            display the bin's raw count divided by the total number of counts
-           and the bin width (see matplotlib.pyplot.hist).
+           and the bin width (see `matplotlib.pyplot.hist`).
         fig_info :  FIGinfo, optional
-           OrderedDict holding meta-data to be displayed in the figure
+           OrderedDict holding meta-data to be displayed in the figure.
         title :  str, optional
-           Title of this figure (matplotlib: Axis.set_title)
+           Title of this figure using `Axis.set_title`.
+
+        See Also
+        --------
+        matplotlib.pyplot.hist : Compute and plot a histogram.
 
         Notes
         -----
@@ -831,7 +849,7 @@ class MONplot:
         Examples
         --------
         Create a PDF document 'test.pdf' and add figure of dataset 'xds'
-        (numpy.ndarray or xarray.DataArray) with a title. The dataset 'xds'
+        (`numpy.ndarray` or `xarray.DataArray`) with a title. The dataset 'xds'
         may contain multiple DataArrays with a common X-coordinate. Each
         DataArray will be displayed in a seperate sub-panel.
 
@@ -885,30 +903,31 @@ class MONplot:
     # --------------------------------------------------
     def draw_lplot(self, xdata, ydata, color=0, *, square=False,
                    fig_info=None, title=None, **kwargs) -> None:
-        """
-        Plot y versus x lines, maybe called multiple times to add lines.
+        """Plot y versus x lines, maybe called multiple times to add lines.
         Figure is closed when called with xdata equals None.
 
         Parameters
         ----------
         xdata :  ndarray
-           [add line] X data, [close figure] when xdata is None
+           ``[add line]`` X data;
+           ``[close figure]`` when xdata is None.
         ydata :  ndarray
-           [add line] Y data
+           ``[add line]`` Y data
         square :  bool
-           [add line] create a square figure,\
+           ``[add line]`` create a square figure, \
            independent of number of data-points (*first call, only*).
         color :  integer, default=0
-           [add line] Index to color in tol_colors.tol_cset('bright')
+           ``[add line]`` Index to color in tol_colors.tol_cset('bright')
         fig_info  :  FIGinfo, optional
-           [close figure] Meta-data to be displayed in the figure
+           ``[close figure]`` Meta-data to be displayed in the figure
         title :  str, default=None
-           [close figure] Title of this figure (matplotlib: Axis.set_title)
+           ``[close figure]`` Title of this figure using `Axis.set_title`.
         **kwargs :   other keywords
-           [add line] Keywords are passed to mpl.pyplot.plot()
-           [close figure] Kewords are passed to appropriate mpl.Axes method
-           [close figure] keyword 'text' can be used to add addition text \
-           in the upper left corner.
+           ``[add line]`` Keywords are passed to `matplotlib.pyplot.plot`.
+           ``[close figure]`` Keywords are passed to appropriate \
+           `matplotlib.Axes` method
+           ``[close figure]`` keyword 'text' can be used to add addition \
+           text in the upper left corner.
 
         Examples
         --------
@@ -983,24 +1002,28 @@ class MONplot:
     # --------------------------------------------------
     def draw_multiplot(self, data_tuple: tuple, gridspec=None, *,
                        fig_info=None, title=None, **kwargs) -> None:
-        """
-        Display multiple subplots on one page using matplotlib.gridspec.GridSpec
+        """Display multiple subplots on one page using
+        `matplotlib.gridspec.GridSpec`.
 
         Parameters
         ----------
-        data_tuple :  tuple with np.ndarray, xarray.DataArray or xarray.Dataset
-           One dataset per subplot
+        data_tuple :  tuple of np.ndarray, xarray.DataArray or xarray.Dataset
+           One dataset per subplot.
         gridspec :  matplotlib.gridspec.GridSpec, optional
-           Instance of matplotlib.gridspec.GridSpec
+           Instance of `matplotlib.gridspec.GridSpec`.
         fig_info  :  FIGinfo, optional
-           Meta-data to be displayed in the figure
+           Meta-data to be displayed in the figure.
         title :  str, default=None
-           Title of this figure (matplotlib: Axis.set_title)
-           Ignored when data is a xarray data structure
+           Title of this figure using `Axis.set_title`.
+           Ignored when data is a `xarray` data-structure.
         **kwargs :   other keywords
-           Keywords are passed to mpl.pyplot.plot().
-           Ignored when data is a xarray data structure
+           Keywords are passed to `matplotlib.pyplot.plot`.
+           Ignored when data is a `xarray` data-structure.
 
+        See Also
+        --------
+        matplotlib.pyplot.plot : Plot y versus x as lines and/or markers.
+        
         Notes
         -----
         When data is an xarray.DataArray then the following attributes are used:
@@ -1028,8 +1051,8 @@ class MONplot:
         >>> plot.close()
 
         Show four DataArrays, each in a different panel. The subplots
-        are above each other in 2 columns (row=2, col=2). The X-coordinates are
-        generated from the first dimension of the DataArrays:
+        are above each other in 2 columns (row=2, col=2). The X-coordinates
+        are generated from the first dimension of the DataArrays:
 
         >>> data_tuple = (xarr1, xarr2, xarr3, xarr4)
         >>> plot = MONplot(fig_name)
@@ -1095,22 +1118,22 @@ class MONplot:
     # --------------------------------------------------
     def draw_tracks(self, lons, lats, icids, *, saa_region=None,
                     fig_info=None, title=None) -> None:
-        """
-        Display tracks of satellite on a world map using a Robinson projection
+        """Display tracks of satellite on a world map
+        using a Robinson projection.
 
         Parameters
         ----------
         lons :  (N, 2) array-like
-           Longitude coordinates at start and end of measurement
+           Longitude coordinates at start and end of measurement.
         lats :  (N, 2) array-like
-           Latitude coordinates at start and end of measurement
+           Latitude coordinates at start and end of measurement.
         icids :  (N) array-like
-           ICID of measurements per (lon, lat)
+           ICID of measurements per (lon, lat).
         saa_region :  (N, 2) array-like, optional
            The coordinates of the vertices. When defined, then show SAA region
            as a matplotlib polygon patch.
         fig_info :  FIGinfo, optional
-           OrderedDict holding meta-data to be displayed in the figure
+           OrderedDict holding meta-data to be displayed in the figure.
 
         The information provided in the parameter 'fig_info' will be displayed
         in a small box.

@@ -21,7 +21,11 @@
 This module contains the definitions of color schemes and color set provided
 by `Paul Tol <https://personal.sron.nl/~pault/>`_.
 
-Contains the functions: `tol_cmap` and `tol_cset`
+Routines in this module::
+
+   tol_cmap(colormap=None, lut=0)
+   tol_cset(colorset=None)
+
 """
 
 from typing import NamedTuple
@@ -233,7 +237,7 @@ def tol_cmap(colormap=None, lut=0):
     """Continuous and discrete color sets for ordered data.
 
     Definition of colour schemes for lines which also work for colour-blind
-    people. See `https://personal.sron.nl/~pault/`_ for background information
+    people. See `https://personal.sron.nl/~pault/` for background information
     and best usage of the schemes.
 
     Parameters
@@ -248,6 +252,11 @@ def tol_cmap(colormap=None, lut=0):
     Returns
     -------
     matplotlib.colormaps
+
+    Examples
+    --------
+    >>> cmap = tol_cmap(<scheme>)
+
     """
     if colormap is None:
         return _cmap_dict.keys()
@@ -271,7 +280,7 @@ def tol_cset(colorset=None):
     """Discrete color sets for qualitative data.
 
     Definition of colour schemes for lines which also work for colour-blind
-    people. See `https://personal.sron.nl/~pault/`_ for background information
+    people. See `https://personal.sron.nl/~pault/` for background information
     and best usage of the schemes.
 
     Parameters
@@ -294,7 +303,6 @@ def tol_cset(colorset=None):
 
     Examples
     --------
-
     >>> cset = tol_cset(<scheme>)
 
     """
