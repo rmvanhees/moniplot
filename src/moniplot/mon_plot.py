@@ -4,6 +4,7 @@
 # https://github.com/rmvanhees/moniplot.git
 #
 # Copyright (c) 2022 SRON - Netherlands Institute for Space Research
+# All rights reserved.
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -18,6 +19,11 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+This module contains the `MONplot` class with the plotting methods:
+`draw_hist`, `draw_lplot`, `draw_multiplot`, `draw_qhist`, `draw_quality`,
+`draw_signal`, `draw_tracks`, `draw_trend`.
+"""
 
 from datetime import datetime
 from pathlib import PurePath
@@ -68,16 +74,12 @@ class MONplot:
 
     Notes
     -----
-    The methods of the class MONplot will accept numpy arrays as input and
+    The methods of the class `MONplot` will accept `numpy` arrays as input and
     display your data without knowledge on the data units and coordinates.
     In most cases, this will be enough for a quick inspection of your data.
-    However, when you use xarray labeled arrays and datasets then the software
-    will use the name of the xarray arrays, coordinate names and data
-    attributes, such as `long_name` and `units`.
-
-    Currently, we have turned off the automatic offset notation of
-    Matplotlib. Maybe this should be the default, which the user may
-    override.
+    However, when you use the labeled arrays and datasets of `xarray`then
+    the software will use the name of the xarray class, coordinate names and
+    data attributes, such as `long_name` and `units`.
     """
     def __init__(self, figname, caption=None):
         """Initialize multi-page PDF document or a single-page PNG.
@@ -376,11 +378,11 @@ class MONplot:
            Object holding measurement data and attributes
         fig_info :  FIGinfo, default=None
            OrderedDict holding meta-data to be displayed in the figure
-        side_panels :  str, default=`nanmedian`
+        side_panels :  str, default='nanmedian'
            Show image row and column statistics in two side panels.
-           Use `none` when you do not want the side panels.
-           Other valid values are: `median`, `nanmedian`, `mean`, `nanmean`,
-           `quality`, `std` and `nanstd`.
+           Use 'none' when you do not want the side panels.
+           Other valid values are: 'median', 'nanmedian', 'mean', 'nanmean',
+           'quality', 'std' and 'nanstd'.
         title :  str, default=None
            Title of this figure (matplotlib: Axis.set_title)
         **kwargs :   other keywords
@@ -405,10 +407,14 @@ class MONplot:
         in a text box. In addition, we display the creation date and the data
         (biweight) median & spread.
 
+        Currently, we have turned off the automatic offset notation of
+        `matplotlib`. Maybe this should be the default, which the user may
+        override.
+
         Examples
         --------
-        Create a PDF document `test.pdf` and add figure of dataset `img`
-        (numpy.ndarray or xarray.DataArray) with side-panels and title
+        Create a PDF document 'test.pdf' and add figure of dataset img
+        (`numpy.ndarray` or `xarray.DataArray`) with side-panels and title
 
         >>> plot = MONplot('test.pdf', caption='my caption')
         >>> plot.set_institute('SRON')
@@ -472,9 +478,9 @@ class MONplot:
            respect to the reference data.
         fig_info :  FIGinfo, default=None
            OrderedDict holding meta-data to be displayed in the figure
-        side_panels :  str, default=`quality`
+        side_panels :  str, default='quality'
            Show image row and column statistics in two side panels.
-           Use `none` when you do not want the side panels.
+           Use 'none' when you do not want the side panels.
         title :  str, default=None
            Title of this figure (matplotlib: Axis.set_title)
         **kwargs :   other keywords
@@ -493,12 +499,12 @@ class MONplot:
         'thres_bad'     : threshold between good and bad
         'thres_worst'   : threshold between bad and worst
         '_cmap'         : contains the matplotlib colormap
-        '_zscale'       : should be `quality`
+        '_zscale'       : should be 'quality'
         '_znorm'        : matplotlib class to normalize the data between zero \
                           and one
 
-        The quality ranking labels are [`unusable`, `worst`, `bad`, `good`],
-        in case nor reference dataset is provided. Where::
+        The quality ranking labels are ['unusable', 'worst', 'bad', 'good'],
+        when no reference dataset is provided. Where::
 
         'unusable'  : pixels outside the illuminated region
         'worst'     : 0 <= value < thres_worst
@@ -520,8 +526,8 @@ class MONplot:
 
         Examples
         --------
-        Create a PDF document `test.pdf` and add figure of dataset `img`
-        (numpy.ndarray or xarray.DataArray) with side-panels and title
+        Create a PDF document 'test.pdf' and add figure of dataset img
+        (`numpy.ndarray` or `xarray.DataArray`) with side-panels and title
 
         >>> plot = MONplot('test.pdf', caption='my caption', institute='SRON')
         >>> plot.draw_quality(img, title='my title')
@@ -881,7 +887,7 @@ class MONplot:
                    fig_info=None, title=None, **kwargs) -> None:
         """
         Plot y versus x lines, maybe called multiple times to add lines.
-        Figure is closed when called with x is None.
+        Figure is closed when called with xdata equals None.
 
         Parameters
         ----------
@@ -890,8 +896,8 @@ class MONplot:
         ydata :  ndarray
            [add line] Y data
         square :  bool
-           [first call, only] create a square figure,\
-           independent of number of data-points.
+           [add line] create a square figure,\
+           independent of number of data-points (*first call, only*).
         color :  integer, default=0
            [add line] Index to color in tol_colors.tol_cset('bright')
         fig_info  :  FIGinfo, optional
@@ -901,7 +907,8 @@ class MONplot:
         **kwargs :   other keywords
            [add line] Keywords are passed to mpl.pyplot.plot()
            [close figure] Kewords are passed to appropriate mpl.Axes method
-           [close figure] keyword 'text' can be used to add addition text in the upper left corner.
+           [close figure] keyword 'text' can be used to add addition text \
+           in the upper left corner.
 
         Examples
         --------
@@ -959,7 +966,7 @@ class MONplot:
             if square:
                 figsize = (9, 9)
             else:
-                figsize = {0: (8, 7),
+                figsize = {0: (10, 7),
                            1: (10, 7),
                            2: (12, 7)}.get(len(xdata) // 256, (14, 8))
 
@@ -981,7 +988,7 @@ class MONplot:
 
         Parameters
         ----------
-        data_tuple :  tuple with nparray, xarray.DataArray or xarray.Dataset
+        data_tuple :  tuple with np.ndarray, xarray.DataArray or xarray.Dataset
            One dataset per subplot
         gridspec :  matplotlib.gridspec.GridSpec, optional
            Instance of matplotlib.gridspec.GridSpec
@@ -1010,12 +1017,33 @@ class MONplot:
 
         Examples
         --------
-        Show two numpy arrays:
+        Show two numpy arrays, each in a different panel. The subplots are
+        above each other (row=2, col=1). The X-coordinates are generated
+        using np.range(ndarray1) and  np.range(ndarray2):
 
         >>> data_tuple = (ndarray1, ndarray2)
         >>> plot = MONplot(fig_name)
-        >>> plot.draw_multiplot(data_tuple: tuple, title='my title',
+        >>> plot.draw_multiplot(data_tuple, title='my title',
         >>>                     marker='o', linestyle='', color='r')
+        >>> plot.close()
+
+        Show four DataArrays, each in a different panel. The subplots
+        are above each other in 2 columns (row=2, col=2). The X-coordinates are
+        generated from the first dimension of the DataArrays:
+
+        >>> data_tuple = (xarr1, xarr2, xarr3, xarr4)
+        >>> plot = MONplot(fig_name)
+        >>> plot.draw_multiplot(data_tuple, title='my title',
+        >>>                     marker='o', linestyle='')
+        >>> plot.close()
+
+        Show the DataArrays in a Dataset, each in a different panel. If there
+        are 3 DataArrays preset then the subplots are above each other (row=3,
+        col=1). The X-coordinates are generated from the (shared?) first
+        dimension of the DataArrays:
+
+        >>> plot = MONplot(fig_name)
+        >>> plot.draw_multiplot(xds, title='my title')
         >>> plot.close()
 
         """
