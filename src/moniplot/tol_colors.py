@@ -25,6 +25,7 @@ Routines in this module::
 
    tol_cmap(colormap=None, lut=0)
    tol_cset(colorset=None)
+   tol_rgba(cname, cnum=None)
 
 """
 
@@ -33,7 +34,9 @@ from typing import NamedTuple
 import numpy as np
 import matplotlib.pyplot as plt
 
-from matplotlib.colors import LinearSegmentedColormap, to_rgba_array
+from matplotlib.cm import ScalarMappable
+from matplotlib.colors import (LinearSegmentedColormap, Normalize,
+                               to_rgba_array)
 
 
 # Dictionary with all color maps as tuple of strings.
@@ -97,13 +100,6 @@ _cmap_dict = {
         '#A6BE54', '#BEBC48', '#D1B541', '#DDAA3C', '#E49C39',
         '#E78C35', '#E67932', '#E4632D', '#DF4828', '#DA2222',
         '#B8221E', '#95211B', '#721E17', '#521A13', '#666666'),
-    'rainbow_discrete': (
-        '#E8ECFB', '#D9CCE3', '#D1BBD7', '#CAACCB', '#BA8DB4',
-        '#AE76A3', '#AA6F9E', '#994F88', '#882E72', '#1965B0',
-        '#437DBF', '#5289C7', '#6195CF', '#7BAFDE', '#4EB265',
-        '#90C987', '#CAE0AB', '#F7F056', '#F7CB45', '#F6C141',
-        '#F4A736', '#F1932D', '#EE8026', '#E8601C', '#E65518',
-        '#DC050C', '#A5170E', '#72190E', '#42150A', '#777777')
 }
 
 
@@ -144,14 +140,21 @@ _cset_dict = {
 
 
 # This is a special case os a discrete colormap
-def _rainbow_discrete(cname: str, lut=0):
-    """Define colormap 'rainbow_discrete'.
+def _rainbow_discrete(lut=None):
+    """Define list of colors of 'rainbow_discrete'.
     """
+    hexclrs = ('#E8ECFB', '#D9CCE3', '#D1BBD7', '#CAACCB', '#BA8DB4',
+               '#AE76A3', '#AA6F9E', '#994F88', '#882E72', '#1965B0',
+               '#437DBF', '#5289C7', '#6195CF', '#7BAFDE', '#4EB265',
+               '#90C987', '#CAE0AB', '#F7F056', '#F7CB45', '#F6C141',
+               '#F4A736', '#F1932D', '#EE8026', '#E8601C', '#E65518',
+               '#DC050C', '#A5170E', '#72190E', '#42150A')
+
+    if lut is None:
+        return hexclrs + ['#777777']
+
     if lut < 1 or lut > 23:
         lut = 22
-
-    hexclrs = _cmap_dict[cname][:-1]
-    bad_hexclr = _cmap_dict[cname][-1]
 
     indexes = [[9], [9, 25], [9, 17, 25], [9, 14, 17, 25],
                [9, 13, 14, 17, 25], [9, 13, 14, 16, 17, 25],
@@ -178,32 +181,23 @@ def _rainbow_discrete(cname: str, lut=0):
                [0, 1, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 20,
                 22, 24, 25, 26, 27, 28]]
 
-    def discretemap(colormap, hexclrs):
-        """Produce a colormap from a list of discrete colors
-        without interpolation.
+    bad_hexclr = '#777777' if lut >= 23 else '#FFFFFF'
+    return [hexclrs[i] for i in indexes[lut-1]] + [bad_hexclr]
 
-        Parameters
-        ---------
-        colormap : matplotlib.colormaps
-           Original colormap
-        hexclrs : array_like
-           Matplotlib color or array of colors
 
-        Returns
-        -------
-        matplotlib.colors.LinearSegmentedColormap
-        """
-        clrs = to_rgba_array(hexclrs)
-        clrs = np.vstack([clrs[0], clrs, clrs[-1]])
-        cdict = {}
-        for ii, key in enumerate(('red', 'green', 'blue')):
-            cdict[key] = [(jj / (len(clrs)-2.), clrs[jj, ii], clrs[jj+1, ii])
-                          for jj in range(len(clrs)-1)]
-        return LinearSegmentedColormap(colormap, cdict)
+def _cmap_rainbow_discrete(lut=None):
+    """Produce a discrete colormap without interpolation.
+    """
+    clrs = to_rgba_array(_rainbow_discrete(lut)[:-1])
+    clrs = np.vstack([clrs[0], clrs, clrs[-1]])
+    cdict = {}
+    for ii, key in enumerate(('red', 'green', 'blue')):
+        cdict[key] = [(jj / (len(clrs)-2.), clrs[jj, ii], clrs[jj+1, ii])
+                      for jj in range(len(clrs)-1)]
 
-    cmap = discretemap('rainbow_discrete',
-                       [hexclrs[i] for i in indexes[lut-1]])
-    cmap.set_bad(bad_hexclr if lut == 23 else '#FFFFFF')
+    cmap = LinearSegmentedColormap('rainbow_discrete', cdict)
+    cmap.set_bad(_rainbow_discrete(lut)[-1])
+
     return cmap
 
 
@@ -233,6 +227,7 @@ def _get_cmap(cname: str, discrete=False):
     return cmap
 
 
+# --------------------------------------------------
 def tol_cmap(colormap=None, lut=0):
     """Continuous and discrete color sets for ordered data.
 
@@ -262,7 +257,7 @@ def tol_cmap(colormap=None, lut=0):
         return _cmap_dict.keys()
 
     if colormap == 'rainbow_discrete':
-        return _rainbow_discrete(colormap, lut)
+        return _cmap_rainbow_discrete(lut)
 
     # do we need to return a discrete color-map?
     indx = colormap.find('_discrete')
@@ -318,6 +313,67 @@ def tol_cset(colorset=None):
     return cset(*_cset_dict[colorset]['hexclrs'])
 
 
+def tol_rgba(cname: str, cnum=None):
+    """
+    Parameters
+    ----------
+    cname :  str
+       Name of a colormap or colorset.
+    cnum : int, optional
+       Number of discrete colors in colormap (*not colorset*).
+    """
+    if cname in _cset_dict:
+        return to_rgba_array(_cset_dict[cname]['hexclrs'])
+
+    if cname == 'rainbow_discrete':
+        return to_rgba_array(_rainbow_discrete(cnum))
+
+    if cname not in _cmap_dict:
+        return None
+
+    if cnum is None:
+        return to_rgba_array(_cmap_dict[cname])
+
+    cmap = tol_cmap(cname, cnum)
+    cnorm = Normalize(vmin=0, vmax=cnum-1)
+    scalar_map = ScalarMappable(norm=cnorm, cmap=cmap)
+    return [scalar_map.to_rgba(i) for i in range(cnum)]
+
+
+def __test():
+    """Unit test for `tol_rgba`.
+    """
+    cname = 'sunset'
+    print(cname, clrs := tol_rgba(cname, 16))
+
+    fig = plt.figure()
+    axx = fig.add_subplot(111)
+    axx.set_prop_cycle(color=clrs)
+    for ii in range(len(clrs)):
+        axx.plot(np.arange(10)*(ii+1))
+    plt.show()
+
+    cname = 'muted'
+    print(cname, clrs := tol_rgba(cname))
+
+    fig = plt.figure()
+    axx = fig.add_subplot(111)
+    axx.set_prop_cycle(color=clrs)
+    for ii in range(len(clrs)):
+        axx.plot(np.arange(10)*(ii+1))
+    plt.show()
+
+    cname = 'rainbow_discrete'
+    print(cname, clrs := tol_rgba(cname, 17))
+    if clrs is not None:
+        fig = plt.figure()
+        axx = fig.add_subplot(111)
+        axx.set_prop_cycle(color=clrs)
+        for ii in range(len(clrs)):
+            axx.plot(np.arange(10)*(ii+1))
+        plt.show()
+
+
 def __show():
     """Show all available colormaps and colorsets
     """
@@ -371,4 +427,5 @@ def __show():
 
 
 if __name__ == '__main__':
+    __test()
     __show()
