@@ -1,6 +1,7 @@
 # This file is part of moniplot
 #
 # https://github.com/rmvanhees/moniplot.git
+# All rights reserved.
 #
 # Copyright (c) 2022 SRON - Netherlands Institute for Space Research
 #
