@@ -23,8 +23,8 @@
 This module contains the `MONplot` class with the plotting methods:
 `draw_hist`, `draw_lplot`, `draw_multiplot`, `draw_qhist`, `draw_quality`,
 `draw_signal`, `draw_tracks`, `draw_trend`.
-"""
 
+"""
 from datetime import datetime
 from pathlib import PurePath
 
@@ -44,6 +44,7 @@ from matplotlib.gridspec import GridSpec
 
 from .biweight import biweight
 
+from .tol_colors import tol_rgba
 from .lib.fig_info import FIGinfo
 from .lib.fig_draw_image import (adjust_img_ticks,
                                  fig_data_to_xarr,
@@ -56,6 +57,7 @@ from .lib.fig_draw_multiplot import get_xylabels, draw_subplot
 if FOUND_CARTOPY:
     from .lib.fig_draw_tracks import fig_draw_tracks
 
+DEFAULT_CSET = 'bright'
 
 # - local functions --------------------------------
 
@@ -84,6 +86,7 @@ class MONplot:
     def __init__(self, figname, caption=None):
         """Initialize multi-page PDF document or a single-page PNG.
         """
+        self.__cset = tol_rgba(DEFAULT_CSET)
         self.__cmap = None
         self.__caption = '' if caption is None else caption
         self.__institute = ''
@@ -177,6 +180,30 @@ class MONplot:
         """Unset user supplied colormap, and use default colormap.
         """
         self.__cmap = None
+
+    # --------------------------------------------------
+    @property
+    def cset(self) -> str:
+        """Return name of current color-set.
+        """
+        return self.__cset
+
+    def set_cset(self, cname: str, cnum=None) -> None:
+        """Use alternative color-set through which `draw_lplot` will cycle.
+
+        Parameters
+        ----------
+        cname :  str
+           Name of color set. Use None to get the default matplotlib value.
+        cnum : int, optional
+           Number of discrete colors in colormap (*not colorset*).
+        """
+        self.__cset = tol_rgba(cname, cnum)
+
+    def unset_cset(self) -> None:
+        """Set color set to its default.
+        """
+        self.__cset = tol_rgba(DEFAULT_CSET)
 
     # --------------------------------------------------
     @property
@@ -901,7 +928,7 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_lplot(self, xdata, ydata, color=0, *, square=False,
+    def draw_lplot(self, xdata, ydata, *, square=False,
                    fig_info=None, title=None, **kwargs) -> None:
         """Plot y versus x lines, maybe called multiple times to add lines.
         Figure is closed when called with xdata equals None.
@@ -912,21 +939,19 @@ class MONplot:
            ``[add line]`` X data;
            ``[close figure]`` when xdata is None.
         ydata :  ndarray
-           ``[add line]`` Y data
+           ``[add line]`` Y data.
         square :  bool
-           ``[add line]`` create a square figure, \
+           ``[add line]`` create a square figure,
            independent of number of data-points (*first call, only*).
-        color :  integer, default=0
-           ``[add line]`` Index to color in tol_colors.tol_cset('bright')
         fig_info  :  FIGinfo, optional
-           ``[close figure]`` Meta-data to be displayed in the figure
+           ``[close figure]`` Meta-data to be displayed in the figure.
         title :  str, default=None
            ``[close figure]`` Title of this figure using `Axis.set_title`.
         **kwargs :   other keywords
-           ``[add line]`` Keywords are passed to `matplotlib.pyplot.plot`.
-           ``[close figure]`` Keywords are passed to appropriate \
-           `matplotlib.Axes` method
-           ``[close figure]`` keyword 'text' can be used to add addition \
+           ``[add line]`` Keywords are passed to `matplotlib.pyplot.plot`;
+           ``[close figure]`` Keywords are passed to appropriate
+           `matplotlib.Axes` method;
+           ``[close figure]`` Keyword 'text' can be used to add addition
            text in the upper left corner.
 
         Examples
@@ -935,7 +960,7 @@ class MONplot:
 
         >>> plot = MONplot(fig_name)
         >>> for ii, ix, iy in enumerate(data_of_each_line):
-        >>>    plot.draw_lplot(ix, iy, color=ii, label=mylabel[ii],
+        >>>    plot.draw_lplot(ix, iy, label=mylabel[ii],
         >>>                    marker='o', linestyle='None')
         >>> plot.draw_lplot(None, None, xlim=[0, 0.5], ylim=[-10, 10],
         >>>                 xlabel=my_xlabel, ylabel=my_ylabel)
@@ -948,11 +973,44 @@ class MONplot:
         >>>        + timedelta(seconds=sec_in_day))
         >>> tt = [tt0 + iy * t_step for iy in range(yy.size)]
         >>> plot = MONplot(fig_name)
-        >>> plot.draw_lplot(tt, yy, color=1, label=mylabel,
+        >>> plot.draw_lplot(tt, yy, label=mylabel,
         >>>                 marker='o', linestyle='None')
         >>> plot.draw_line(None, None, ylim=[-10, 10],
         >>>                xlabel=my_xlabel, ylabel=my_ylabel)
         >>> plot.close()
+
+        You can use different sets of colors and cycle through them.
+        First, we use default colors defined by matplotlib:
+
+        >>> plot = MONplot('test_lplot.pdf')
+        >>> plot.set_cset(None)
+        >>> for i in range(5):
+        >>>    plot.draw_lplot(np.arange(10), np.arange(10)*(i+1))
+        >>> plot.draw_lplot(None, None)
+
+        You can also assign colors to each line:
+
+        >>> clr = 'rgbym'
+        >>> for i in range(5):
+        >>>    plot.draw_lplot(np.arange(10), np.arange(10)*(i+1), color=clr[i])
+        >>> plot.draw_lplot(None, None)
+
+        You can use one of the color sets as defined in ``tol_colors``:
+
+        >>> plot.set_cset('mute')   # the default is 'bright'
+        >>> for i in range(5):
+        >>>    plot.draw_lplot(np.arange(10), np.arange(10)*(i+1))
+        >>> plot.draw_lplot(None, None)
+
+        Or you can use a color map as defined in ``tol_colors`` where
+        you can define the number of colors you need. If you need less than 24
+        colors, you can use 'rainbow_discrete' or you can choose an other
+        color map if you need more colors, for example:
+
+        >>> plot.set_cset('rainbow_PuBr', 25)
+        >>> for i in range(25):
+        >>>     plot.draw_lplot(np.arange(10), np.arange(10)*(i+1))
+        >>> plot.draw_lplot(None, None)
 
         """
         if xdata is None:
@@ -996,8 +1054,14 @@ class MONplot:
             # add a centered suptitle to the figure
             self.__add_caption(self.__mpl['fig'])
 
+            # set color cycle
+            if self.cset is None:
+                self.__mpl['axx'].set_prop_cycle(None)
+            else:
+                self.__mpl['axx'].set_prop_cycle(color=self.cset)
+
         # draw line in figure
-        fig_draw_lplot(self.__mpl['axx'], xdata, ydata, color, **kwargs)
+        fig_draw_lplot(self.__mpl['axx'], xdata, ydata, **kwargs)
 
     # --------------------------------------------------
     def draw_multiplot(self, data_tuple: tuple, gridspec=None, *,
@@ -1023,7 +1087,7 @@ class MONplot:
         See Also
         --------
         matplotlib.pyplot.plot : Plot y versus x as lines and/or markers.
-        
+
         Notes
         -----
         When data is an xarray.DataArray then the following attributes are used:

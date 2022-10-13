@@ -23,40 +23,33 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.dates import DateFormatter
 
-from ..tol_colors import tol_cset
 
-
-def fig_draw_lplot(axx, xdata, ydata, icol: str, use_steps=False, **kwargs):
+def fig_draw_lplot(axx, xdata, ydata, use_steps=False, **kwargs):
     """Add line plot to figure.
 
     Parameters
     ----------
     axx : matplotlib.Axes
-       Matplotlib Axes object of plot window
+       Matplotlib Axes object of plot window.
     xdata : array_like
-       X data
+       X data.
     ydata : array_like
-       Y data
-    icol : str
-       color index
+       Y data.
     use_steps : bool, default=False
-       use plt.stairs() instead of plt.plot() 
+       use plt.stairs() instead of plt.plot().
     **kwargs : keyword arguments
+       Keywords passed to matplotlib.pyplot.plot
 
     See Also
     --------
-    matplotlib.pyplot.plot, matplotlib.pyplot.stairs 
+    matplotlib.pyplot.plot, matplotlib.pyplot.stairs
     """
-    # define colors
-    cset = tol_cset('bright')
-    color = cset[icol % len(cset)]
-
     if use_steps:
         edges = np.append(xdata, xdata[-1])
         values = np.append(ydata, ydata[-1])
-        axx.stairs(values, edges, color=color, **kwargs)
+        axx.stairs(values, edges, **kwargs)
     else:
-        axx.plot(xdata, ydata, color=color, **kwargs)
+        axx.plot(xdata, ydata, **kwargs)
 
 
 def close_draw_lplot(axx, time_axis: bool, title: str, **kwargs):
@@ -93,6 +86,7 @@ def close_draw_lplot(axx, time_axis: bool, title: str, **kwargs):
         axx.set_xscale(kwargs['xscale'])
     if 'yscale' in kwargs:
         axx.set_ylabel(kwargs['yscale'])
+
     # format the X-axis when it is a time-axis
     if time_axis:
         plt.gcf().autofmt_xdate()
