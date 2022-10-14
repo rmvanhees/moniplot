@@ -183,19 +183,19 @@ def run_draw_lplot(plot):
     """
     print('Run unit tests on MONplot::draw_lplot')
     xval = np.arange(200) / 100
-    plot.draw_lplot(xval, np.sin(xval * np.pi), color=0,
-                    label='sinus', marker='o', linestyle='-')
-    plot.draw_lplot(xval, np.cos(xval * np.pi), color=1,
-                    label='cosinus', marker='o', linestyle='-')
+    plot.draw_lplot(xval, np.sin(xval * np.pi), label='sinus',
+                    marker='o', linestyle='-')
+    plot.draw_lplot(xval, np.cos(xval * np.pi), label='cosinus',
+                    marker='o', linestyle='-')
     plot.draw_lplot(None, None, ylim=[-1.05, 1.05],
                     xlabel='x-axis [Pi]', ylabel='y-axis',
                     title='draw_lplot [no time_axis]')
 
     xval = np.arange(500) / 100
-    plot.draw_lplot(xval, np.sin(xval * np.pi), color=0,
-                    label='sinus', marker='o', linestyle='-')
-    plot.draw_lplot(xval, np.cos(xval * np.pi), color=1,
-                    label='cosinus', marker='o', linestyle='-')
+    plot.draw_lplot(xval, np.sin(xval * np.pi), label='sinus',
+                    marker='o', linestyle='-')
+    plot.draw_lplot(xval, np.cos(xval * np.pi), label='cosinus',
+                    marker='o', linestyle='-')
     plot.draw_lplot(None, None, ylim=[-1.05, 1.05],
                     xlabel='x-axis [Pi]', ylabel='y-axis',
                     title='draw_lplot [no time_axis]')
@@ -204,8 +204,7 @@ def run_draw_lplot(plot):
     yval = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
     xval = [customdate + timedelta(hours=i, minutes=4*i)
             for i in range(len(yval))]
-    plot.draw_lplot(xval, yval, color=0, label='mydata',
-                    marker='o', linestyle='-')
+    plot.draw_lplot(xval, yval, label='mydata', marker='o', linestyle='-')
     plot.draw_lplot(None, None, title='draw_lplot [time_axis]',
                     xlabel='x-axis', ylabel='y-axis')
 

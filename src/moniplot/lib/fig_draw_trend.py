@@ -27,6 +27,9 @@ from ..tol_colors import tol_cset
 
 from .fig_legend import blank_legend_key
 
+# - global parameters ------------------------------
+CSET = tol_cset('bright')
+
 
 # - local functions --------------------------------
 def set_labels_colors(xarr) -> tuple:
@@ -41,8 +44,6 @@ def set_labels_colors(xarr) -> tuple:
     tuple
        plot parameters: hk_title, hk_label, lcolor, fcolor
     """
-    cset = tol_cset('bright')
-
     hk_unit = xarr.attrs['units']
     if isinstance(hk_unit, bytes):
         hk_unit = hk_unit.decode()
@@ -55,23 +56,23 @@ def set_labels_colors(xarr) -> tuple:
         if (ii := hk_title.find(' temperature')) > 0:
             hk_title = hk_title[:ii]
         hk_label = f'temperature [{hk_unit}]'
-        lcolor = cset.blue
+        lcolor = CSET.blue
         fcolor = '#BBCCEE'
     elif hk_unit in ('A', 'mA'):
         if (ii := hk_title.find(' current')) > 0:
             hk_title = hk_title[:ii]
         hk_label = f'current [{hk_unit}]'
-        lcolor = cset.green
+        lcolor = CSET.green
         fcolor = '#CCDDAA'
     elif hk_unit == '%':
         if (ii := hk_title.find(' duty')) > 0:
             hk_title = hk_title[:ii]
         hk_label = f'duty cycle [{hk_unit}]'
-        lcolor = cset.red
+        lcolor = CSET.red
         fcolor = '#FFCCCC'
     else:
         hk_label = f'value [{hk_unit}]'
-        lcolor = cset.purple
+        lcolor = CSET.purple
         fcolor = '#EEBBDD'
 
     # overwrite ylabel
@@ -203,7 +204,7 @@ def add_subplot(axx, xarr) -> None:
     ylabel = xarr.attrs['long_name']
     if 'units' in xarr.attrs and xarr.attrs['units'] != '1':
         ylabel += f' [{adjust_units(xarr.attrs["units"])}]'
-    lcolor = xarr.attrs['_color'] if '_color' in xarr.attrs else cset.blue
+    lcolor = xarr.attrs['_color'] if '_color' in xarr.attrs else CSET.blue
     fcolor = '#BBCCEE'
 
     # define xdata and determine gap_list (always atleast one element!)

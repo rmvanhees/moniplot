@@ -30,6 +30,9 @@ from matplotlib.ticker import AutoMinorLocator
 from ..image_to_xarray import data_to_xr
 from ..tol_colors import tol_cmap, tol_cset
 
+# - global parameters ------------------------------
+CSET = tol_cset('bright')
+
 
 # - local functions --------------------------------
 def adjust_zunit(zunit: str, vmin: float, vmax: float) -> tuple:
@@ -157,8 +160,6 @@ def fig_draw_panels(axx_p: dict, xarr, side_panels: str) -> None:
     side_panels :  str
        Show row and column statistics in side plots.
     """
-    cset = tol_cset('bright')
-
     # get numpy function to apply on image rows and columns for side panels
     func_panels = {
         'median': np.median,
@@ -175,18 +176,18 @@ def fig_draw_panels(axx_p: dict, xarr, side_panels: str) -> None:
     xdata = np.arange(xarr.shape[1])
     if side_panels == 'quality':
         ydata = np.sum(((xarr.values == 1) | (xarr.values == 2)), axis=0)
-        axx_p['X'].step(xdata, ydata, linewidth=0.75, color=cset.yellow)
+        axx_p['X'].step(xdata, ydata, linewidth=0.75, color=CSET.yellow)
         ydata = np.sum((xarr.values == 1), axis=0)          # worst
-        axx_p['X'].step(xdata, ydata, linewidth=0.75, color=cset.red)
+        axx_p['X'].step(xdata, ydata, linewidth=0.75, color=CSET.red)
         if len(xarr.attrs['flag_values']) == 6:
             ydata = np.sum((xarr.values == 4), axis=0)      # to_good
-            axx_p['X'].step(xdata, ydata, linewidth=0.75, color=cset.green)
+            axx_p['X'].step(xdata, ydata, linewidth=0.75, color=CSET.green)
     else:
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore',
                                     r'All-NaN (slice|axis) encountered')
             axx_p['X'].plot(xdata, func_panels(xarr.values, axis=0),
-                            linewidth=0.75, color=cset.blue)
+                            linewidth=0.75, color=CSET.blue)
     adjust_img_ticks(axx_p['X'], xarr, dims='X')
     axx_p['X'].grid()
 
@@ -194,18 +195,18 @@ def fig_draw_panels(axx_p: dict, xarr, side_panels: str) -> None:
     ydata = np.arange(xarr.shape[0])
     if side_panels == 'quality':
         xdata = np.sum(((xarr.values == 1) | (xarr.values == 2)), axis=1)
-        axx_p['Y'].step(xdata, ydata, linewidth=0.75, color=cset.yellow)
+        axx_p['Y'].step(xdata, ydata, linewidth=0.75, color=CSET.yellow)
         xdata = np.sum(xarr.values == 1, axis=1)            # worst
-        axx_p['Y'].step(xdata, ydata, linewidth=0.75, color=cset.red)
+        axx_p['Y'].step(xdata, ydata, linewidth=0.75, color=CSET.red)
         if len(xarr.attrs['flag_values']) == 6:
             xdata = np.sum(xarr.values == 4, axis=1)        # to_good
-            axx_p['Y'].step(xdata, ydata, linewidth=0.75, color=cset.green)
+            axx_p['Y'].step(xdata, ydata, linewidth=0.75, color=CSET.green)
     else:
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore',
                                     r'All-NaN (slice|axis) encountered')
             axx_p['Y'].plot(func_panels(xarr.values, axis=1), ydata,
-                            linewidth=0.75, color=cset.blue)
+                            linewidth=0.75, color=CSET.blue)
     # axx_p['Y'].xaxis.tick_top()
     axx_p['X'].tick_params(axis='y', labelrotation=45, labelsize='small')
     axx_p['Y'].tick_params(axis='x', bottom=False, top=True,
@@ -388,7 +389,6 @@ def fig_qdata_to_xarr(data, ref_data=None, data_sel=None,
     xarr.attrs['_zscale'] = 'quality'
 
     # define colors, data-range
-    cset = tol_cset('bright')
     if ref_data is None:
         if qlabels is None:
             xarr.attrs['flag_meanings'] = ("unusable", "worst", "bad", "good")
@@ -397,7 +397,7 @@ def fig_qdata_to_xarr(data, ref_data=None, data_sel=None,
         else:
             xarr.attrs['flag_meanings'] = qlabels
         # define colors for resp. unusable, worst, bad and good
-        ctuple = (cset.grey, cset.red, cset.yellow, '#FFFFFF')
+        ctuple = (CSET.grey, CSET.red, CSET.yellow, '#FFFFFF')
         xarr.attrs['valid_range'] = np.array([0, 8], dtype='i1')
         xarr.attrs['flag_values'] = np.array([0, 1, 2, 4, 8], dtype='i1')
     else:
@@ -410,7 +410,7 @@ def fig_qdata_to_xarr(data, ref_data=None, data_sel=None,
         else:
             xarr.attrs['flag_meanings'] = qlabels
         # define colors for resp. unusable, worst, bad, good and unchanged
-        ctuple = (cset.grey, cset.red, cset.yellow, cset.green, '#FFFFFF')
+        ctuple = (CSET.grey, CSET.red, CSET.yellow, CSET.green, '#FFFFFF')
         xarr.attrs['valid_range'] = np.array([0, 16], dtype='i1')
         xarr.attrs['flag_values'] = np.array([0, 1, 2, 4, 8, 16], dtype='i1')
 

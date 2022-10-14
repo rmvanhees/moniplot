@@ -50,24 +50,18 @@ if FOUND_CARTOPY:
         saa_region :
            Polygon of the SAA region
         """
-        # define colors
-        cset = tol_cset('bright')
-
         # draw coastlines and gridlines
         axx.set_global()
         axx.coastlines(resolution='110m')
         axx.gridlines()
 
         # draw satellite position(s)
-        icolor = 0
         for val in np.unique(icids):
             mask = icids == val
             # pylint: disable=abstract-class-instantiated
             plt.plot(lons[mask], lats[mask], linestyle='',
-                     marker='s', markersize=2,
-                     color=cset[icolor % 6], label=f'ICID: {val}',
+                     marker='s', markersize=2, label=f'ICID: {val}',
                      transform=ccrs.PlateCarree())
-            icolor += 1
         axx.legend(loc='lower left')
 
         # draw SAA region
