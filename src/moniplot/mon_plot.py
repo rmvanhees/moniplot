@@ -4,7 +4,6 @@
 # https://github.com/rmvanhees/moniplot.git
 #
 # Copyright (c) 2022 SRON - Netherlands Institute for Space Research
-# All rights reserved.
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -43,23 +42,24 @@ from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.gridspec import GridSpec
 
 from .biweight import biweight
-
-from .tol_colors import tol_rgba
 from .lib.fig_info import FIGinfo
 from .lib.fig_draw_image import (adjust_img_ticks,
                                  fig_data_to_xarr,
                                  fig_qdata_to_xarr,
                                  fig_draw_panels)
-from .lib.fig_draw_trend import add_subplot, add_hk_subplot
-from .lib.fig_draw_qhist import fig_draw_qhist
 from .lib.fig_draw_lplot import fig_draw_lplot, close_draw_lplot
 from .lib.fig_draw_multiplot import get_xylabels, draw_subplot
+from .lib.fig_draw_qhist import fig_draw_qhist
+from .lib.fig_draw_trend import add_subplot, add_hk_subplot
+from .tol_colors import tol_rgba
 if FOUND_CARTOPY:
     from .lib.fig_draw_tracks import fig_draw_tracks
 
+# - global variables -------------------------------
 DEFAULT_CSET = 'bright'
 
 # - local functions --------------------------------
+
 
 # - main function ----------------------------------
 class MONplot:
@@ -758,7 +758,7 @@ class MONplot:
         Create a PDF document 'test.pdf' with two pages.
         Both pages have the caption "My Caption", the title of the figure on
         the first page is "my title" and on the second page the title of the
-        figure is f'Histogram of {xarr.attrs['long_name']}" when xarr has
+        figure is `f"Histogram of {xarr.attrs['long_name']}"`, if xarr has
         attribute "long_name".
 
         >>> plot = MONplot('test.pdf', caption='My Caption')
@@ -928,55 +928,52 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_lplot(self, xdata, ydata, *, square=False,
+    def draw_lplot(self, xdata=None, ydata=None, *, square=False,
                    fig_info=None, title=None, **kwargs) -> None:
         """Plot y versus x lines, maybe called multiple times to add lines.
         Figure is closed when called with xdata equals None.
 
         Parameters
         ----------
-        xdata :  ndarray
-           ``[add line]`` X data;
-           ``[close figure]`` when xdata is None.
-        ydata :  ndarray
-           ``[add line]`` Y data.
-        square :  bool
+        xdata :  ndarray, optional
+           ``[add line]`` X-data.
+        ydata :  ndarray, optional
+           ``[add line]`` Y-data, or
+           ``[close figure]`` when ydata is None.
+        square :  bool, default=False
            ``[add line]`` create a square figure,
            independent of number of data-points (*first call, only*).
         fig_info  :  FIGinfo, optional
            ``[close figure]`` Meta-data to be displayed in the figure.
-        title :  str, default=None
-           ``[close figure]`` Title of this figure using `Axis.set_title`.
+        title :  str, optional
+           ``[close figure]`` Title of figure (using `Axis.set_title`).
         **kwargs :   other keywords
            ``[add line]`` Keywords are passed to `matplotlib.pyplot.plot`;
            ``[close figure]`` Keywords are passed to appropriate
-           `matplotlib.Axes` method;
-           ``[close figure]`` Keyword 'text' can be used to add addition
-           text in the upper left corner.
+           `matplotlib.Axes` method, and the keyword 'text' can be used to
+           add addition text in the upper left corner.
 
         Examples
         --------
         General example:
 
         >>> plot = MONplot(fig_name)
-        >>> for ii, ix, iy in enumerate(data_of_each_line):
-        >>>    plot.draw_lplot(ix, iy, label=mylabel[ii],
-        >>>                    marker='o', linestyle='None')
-        >>> plot.draw_lplot(None, None, xlim=[0, 0.5], ylim=[-10, 10],
-        >>>                 xlabel=my_xlabel, ylabel=my_ylabel)
+        >>> for ii, xarr, yarr in enumerate(data_of_each_line):
+        ...    plot.draw_lplot(xarr, yarr, label=mylabel[ii], marker='o')
+        ...
+        >>> plot.draw_lplot(xlim=[0, 0.5], ylim=[-10, 10],
+        ...    xlabel='x-axis, ylabel=y-axis')
         >>> plot.close()
 
         Using a time-axis:
 
         >>> from datetime import datetime, timedelta
         >>> tt0 = (datetime(year=2020, month=10, day=1)
-        >>>        + timedelta(seconds=sec_in_day))
+        ...        + timedelta(seconds=sec_in_day))
         >>> tt = [tt0 + iy * t_step for iy in range(yy.size)]
         >>> plot = MONplot(fig_name)
-        >>> plot.draw_lplot(tt, yy, label=mylabel,
-        >>>                 marker='o', linestyle='None')
-        >>> plot.draw_line(None, None, ylim=[-10, 10],
-        >>>                xlabel=my_xlabel, ylabel=my_ylabel)
+        >>> plot.draw_lplot(tt, yy, label='mylabel', marker='o')
+        >>> plot.draw_line(ylim=[-10, 10], xlabel='t-axis', ylabel='y-axis')
         >>> plot.close()
 
         You can use different sets of colors and cycle through them.
@@ -985,22 +982,27 @@ class MONplot:
         >>> plot = MONplot('test_lplot.pdf')
         >>> plot.set_cset(None)
         >>> for i in range(5):
-        >>>    plot.draw_lplot(np.arange(10), np.arange(10)*(i+1))
-        >>> plot.draw_lplot(None, None)
+        ...    plot.draw_lplot(np.arange(10), np.arange(10)*(i+1))
+        ...
+        >>> plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
+        ...    title='draw_lplot [cset is None]')
 
         You can also assign colors to each line:
 
-        >>> clr = 'rgbym'
-        >>> for i in range(5):
-        >>>    plot.draw_lplot(np.arange(10), np.arange(10)*(i+1), color=clr[i])
-        >>> plot.draw_lplot(None, None)
+        >>> for i, clr in enumerate('rgbym'):
+        ...    plot.draw_lplot(np.arange(10), np.arange(10)*(i+1), color=clr)
+        ...
+        >>> plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
+        ...    title='draw_lplot [cset="rgbym"]')
 
         You can use one of the color sets as defined in ``tol_colors``:
 
-        >>> plot.set_cset('mute')   # the default is 'bright'
+        >>> plot.set_cset('mute')   # Note the default is 'bright'
         >>> for i in range(5):
-        >>>    plot.draw_lplot(np.arange(10), np.arange(10)*(i+1))
-        >>> plot.draw_lplot(None, None)
+        ...    plot.draw_lplot(ydata=np.arange(10)*(i+1))
+        ...
+        >>> plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
+        ...    title='draw_lplot [cset="mute"]')
 
         Or you can use a color map as defined in ``tol_colors`` where
         you can define the number of colors you need. If you need less than 24
@@ -1009,11 +1011,14 @@ class MONplot:
 
         >>> plot.set_cset('rainbow_PuBr', 25)
         >>> for i in range(25):
-        >>>     plot.draw_lplot(np.arange(10), np.arange(10)*(i+1))
-        >>> plot.draw_lplot(None, None)
+        ...    plot.draw_lplot(ydata=np.arange(10)*(i+1))
+        ...
+        >>> plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
+        ...    title='draw_lplot [cset="rainbow_PyBr"]')
+        >>> plot.close()
 
         """
-        if xdata is None:
+        if ydata is None:
             if self.__mpl is None:
                 raise ValueError('No plot defined and no data provided')
             fig = self.__mpl['fig']
@@ -1039,13 +1044,15 @@ class MONplot:
             return
 
         # initialize figure
+        if xdata is None:
+            xdata = np.arange(ydata.size)
         if self.__mpl is None:
             if square:
                 figsize = (9, 9)
             else:
                 figsize = {0: (10, 7),
                            1: (10, 7),
-                           2: (12, 7)}.get(len(xdata) // 256, (14, 8))
+                           2: (12, 7)}.get(len(ydata) // 256, (14, 8))
 
             self.__mpl = dict(zip(('fig', 'axx'),
                                   plt.subplots(1, figsize=figsize)))
@@ -1111,7 +1118,7 @@ class MONplot:
         >>> data_tuple = (ndarray1, ndarray2)
         >>> plot = MONplot(fig_name)
         >>> plot.draw_multiplot(data_tuple, title='my title',
-        >>>                     marker='o', linestyle='', color='r')
+        ...                     marker='o', linestyle='', color='r')
         >>> plot.close()
 
         Show four DataArrays, each in a different panel. The subplots
@@ -1121,7 +1128,7 @@ class MONplot:
         >>> data_tuple = (xarr1, xarr2, xarr3, xarr4)
         >>> plot = MONplot(fig_name)
         >>> plot.draw_multiplot(data_tuple, title='my title',
-        >>>                     marker='o', linestyle='')
+        ...                     marker='o', linestyle='')
         >>> plot.close()
 
         Show the DataArrays in a Dataset, each in a different panel. If there

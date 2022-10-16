@@ -57,8 +57,9 @@ a panel on the left with the row-medians, a panel below the central image with
 the column-medians and a colorbar on the right of the central image.
 The axis will have the labels of the coordinates and the units of the data are
 shown in the label of the colorbar. The info-box contains the median and
-standard deviation of the image data and the creation time the figure. The
-method `draw_signal` has many options to improve the data to your needs.
+standard deviation of the image data and the creation time the figure.
+
+.. image:: figures/mon_plot_draw_signal-02.png
 
 For some measurements it might be interessting to show an histogram of your
 image data (dark or noise measurements)::
@@ -72,7 +73,9 @@ xdr - xdr2.values. Let's add another figure to the report::
 
    >>> plot.draw_signal(xds - xds2, title='Raw detector signal', zscale='diff')
 
-A diverging colormap is used when zscale equals 'diff' or 'ratio'. 
+A diverging colormap is used when zscale equals 'diff' or 'ratio'.
+
+.. image:: figures/mon_plot_draw_signal-03.png
 
 Now we can finalize the report, which will generate the file
 'my_first_report.pdf'::

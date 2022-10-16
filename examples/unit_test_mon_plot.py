@@ -2,7 +2,6 @@
 # https://github.com/rmvanhees/moniplot.git
 #
 # Copyright (c) 2022 SRON - Netherlands Institute for Space Research
-# All rights reserved.
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -17,7 +16,10 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+Perform a small unit test on the methods of the class `MONplot`.
 
+"""
 from datetime import datetime, timedelta
 
 import numpy as np
@@ -45,62 +47,94 @@ def get_test_data(data_sel=None, xy_min=-5, xy_max=5, delta=0.01, error=0):
     return data_to_xr(data, long_name='bogus data', units='Volt')
 
 
-def run_draw_signal(plot):
+def run_draw_lplot():
     """
-    Run unit tests on MONplot::draw_signal
+    Run unit tests on MONplot::draw_lplot
     """
-    print('Run unit tests on MONplot::draw_signal')
-    msm = get_test_data(error=.1)
-    # msm_ref = get_test_data(error=0.025)
+    print('Run unit tests on MONplot::draw_lplot')
+    plot = MONplot('mon_plot_draw_lplot-1.png')
+    plot.set_institute('SRON')
+    plot.set_cset(None)
+    for ii in range(5):
+        plot.draw_lplot(np.arange(10), np.arange(10)*(ii+1))
+    plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
+                    title='draw_lplot [cset is None]')
+    plot.close()
 
-    # image aspect=4
-    plot.draw_signal(msm, zscale='linear', side_panels='none',
-                     title='method=linear; aspect=1; fig_pos=above')
-    plot.draw_signal(msm, zscale='linear',
-                     title='method=linear; aspect=1; fig_pos=above')
-    plot.draw_signal(msm, zscale='diff',
-                     title='method=diff; aspect=1; fig_pos=above')
-    msm1 = msm.copy()
-    msm1.values = (msm1.values + 3) / 3
-    msm1.attrs['units'] = '1'
-    plot.draw_signal(msm1, zscale='ratio',
-                     title='method=ratio; aspect=1; fig_pos=above')
-    plot.draw_signal(np.abs(msm), zscale='log', side_panels='none',
-                     title='method=error; aspect=1; fig_pos=above')
-    # plot.draw_signal(msm, fig_info=fig_info_in.copy(),
-    #                 title='method=linear; aspect=1; fig_pos=right')
+    plot = MONplot('mon_plot_draw_lplot-2.png')
+    plot.set_institute('SRON')
+    for ii, clr in enumerate('rgbym'):
+        plot.draw_lplot(np.arange(10), np.arange(10)*(ii+1), color=clr)
+    plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
+                    title='draw_lplot [cset="rgbym"]')
+    plot.close()
 
-    # image aspect=2
-    msm = get_test_data(data_sel=np.s_[500-250:500+250, :], error=.1)
-    plot.draw_signal(msm, side_panels='none',
-                     title='method=linear; aspect=2; fig_pos=above')
-    plot.draw_signal(msm,
-                     title='method=linear; aspect=2; fig_pos=above')
-    # plot.draw_signal(msm, fig_info=fig_info_in.copy(),
-    #                 title='method=linear; aspect=2; fig_pos=right')
+    plot = MONplot('mon_plot_draw_lplot-3.png')
+    plot.set_institute('SRON')
+    plot.set_cset('mute')
+    for ii in range(5):
+        plot.draw_lplot(ydata=np.arange(10)*(ii+1))
+    plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
+                    title='draw_lplot [cset="mute"]')
+    plot.close()
 
-    # image aspect=3
-    msm = get_test_data(data_sel=np.s_[500-125:500+125, 500-375:500+375],
-                        error=.1)
-    plot.draw_signal(msm, side_panels='none',
-                     title='method=linear; aspect=3; fig_pos=above')
-    plot.draw_signal(msm,
-                     title='method=linear; aspect=3; fig_pos=above')
-    # plot.draw_signal(msm,
-    #                 fig_info=fig_info_in.copy(),
-    #                 title='method=linear; aspect=3; fig_pos=right')
+    plot = MONplot('mon_plot_draw_lplot-4.png')
+    plot.set_institute('SRON')
+    plot.set_cset('rainbow_PuBr', 25)
+    for ii in range(25):
+        plot.draw_lplot(ydata=np.arange(10)*(ii+1))
+    plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
+                    title='draw_lplot [cset="rainbow_PyBr"]')
+    plot.close()
 
-    # image aspect=4
-    msm = get_test_data(data_sel=np.s_[500-128:500+128, :], error=.1)
-    plot.draw_signal(msm, side_panels='none',
-                     title='method=linear; aspect=4; fig_pos=above')
-    plot.draw_signal(msm,
-                     title='method=linear; aspect=4; fig_pos=above')
-    # plot.draw_signal(msm, fig_info=fig_info_in.copy(),
-    #                 title='method=linear; aspect=4; fig_pos=right')
+    # time axis
+    plot = MONplot('mon_plot_draw_lplot-5.png')
+    plot.set_institute('SRON')
+    customdate = datetime(2016, 1, 1, 13, 0, 0)
+    yval = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+    xval = [customdate + timedelta(hours=i, minutes=4*i)
+            for i in range(len(yval))]
+    plot.draw_lplot(xval, yval, label='mydata', marker='o', linestyle='-')
+    plot.draw_lplot(title='draw_lplot [time_axis]',
+                    xlabel='t-axis', ylabel='y-axis')
+    plot.close()
 
 
-def run_draw_quality(plot):
+def run_draw_qhist():
+    """
+    Run unit tests on MONplot::draw_qhist
+    """
+    print('Run unit tests on MONplot::draw_qhist')
+    plot = MONplot('mon_plot_draw_qhist-1.png')
+    plot.set_institute('SRON')
+    buff0 = np.repeat(0.9 + np.random.rand(1000) / 10, 56)
+    buff1 = np.repeat(np.random.rand(1000) / 10, 10)
+    buff2 = 0.1 + np.random.rand(1000) / 10
+    buff3 = np.repeat(0.2 + np.random.rand(1000) / 10, 2)
+    buff4 = np.repeat(0.3 + np.random.rand(1000) / 10, 3)
+    buff5 = np.repeat(0.4 + np.random.rand(1000) / 10, 4)
+    buff6 = np.repeat(0.5 + np.random.rand(1000) / 10, 8)
+    buff7 = np.repeat(0.6 + np.random.rand(1000) / 10, 12)
+    buff8 = np.repeat(0.7 + np.random.rand(1000) / 10, 20)
+    buff9 = np.repeat(0.8 + np.random.rand(1000) / 10, 40)
+    buffa = np.repeat(0.9 + np.random.rand(1000) / 10, 100)
+    frame = np.concatenate((buff0, buff1, buff2, buff3, buff4,
+                            buff5, buff6, buff7, buff8, buff9,
+                            buffa)).reshape(256, 1000)
+    msm = xr.merge([data_to_xr(frame, name='dpqm',
+                               long_name='pixel-quality map'),
+                    data_to_xr(frame, name='dpqm_dark',
+                               long_name='pixel-quality map (dark)'),
+                    data_to_xr(frame, name='dpqm_noise',
+                               long_name='pixel-quality map (noise average)'),
+                    data_to_xr(frame, name='dpqm_noise_var',
+                               long_name='pixel-quality map (noise variance)')])
+
+    plot.draw_qhist(msm, data_sel=np.s_[11:228, 16:991], title='my histogram')
+    plot.close()
+
+
+def run_draw_quality():
     """
     Run unit tests on MONplot::draw_quality
     """
@@ -120,16 +154,115 @@ def run_draw_quality(plot):
     figinfo_in.add('orbits', (17, [23662, 23707]), fmt='{} in {}')
     figinfo_in.add('coverage', ('2022-05-08', '2022-05-10'), fmt='{} / {}')
 
+    plot = MONplot('mon_plot_draw_quality-1.png')
+    plot.set_institute('SRON')
     plot.draw_quality(data, data_sel=np.s_[11:228, 16:991],
                       title='no reference', fig_info=figinfo_in.copy())
+    plot.close()
+    plot = MONplot('mon_plot_draw_quality-2.png')
+    plot.set_institute('SRON')
     plot.draw_quality(data, ref_data=ref_data, data_sel=np.s_[11:228, 16:991],
                       title='with reference', fig_info=figinfo_in.copy())
+    plot.close()
+    plot = MONplot('mon_plot_draw_quality-3.png')
+    plot.set_institute('SRON')
     plot.draw_quality(data, data_sel=np.s_[11:228, 16:991],
                       side_panels='none', title='no reference',
                       fig_info=figinfo_in.copy())
+    plot.close()
 
 
-def run_draw_trend(plot):
+def run_draw_signal():
+    """
+    Run unit tests on MONplot::draw_signal
+    """
+    print('Run unit tests on MONplot::draw_signal')
+    msm = get_test_data(error=.1)
+    # msm_ref = get_test_data(error=0.025)
+
+    # image aspect=4
+    plot = MONplot('mon_plot_draw_signal-01.png',
+                   caption='Unit test of MONplot [draw_signal]')
+    plot.set_institute('SRON')
+    plot.draw_signal(msm, zscale='linear', side_panels='none',
+                     title='method=linear; aspect=1; fig_pos=above')
+    plot.close()
+    plot = MONplot('mon_plot_draw_signal-02.png',
+                   caption='Unit test of MONplot [draw_signal]')
+    plot.set_institute('SRON')
+    plot.draw_signal(msm, zscale='linear',
+                     title='method=linear; aspect=1; fig_pos=above')
+    plot.close()
+    plot = MONplot('mon_plot_draw_signal-03.png',
+                   caption='Unit test of MONplot [draw_signal]')
+    plot.set_institute('SRON')
+    plot.draw_signal(msm, zscale='diff',
+                     title='method=diff; aspect=1; fig_pos=above')
+    plot.close()
+    msm1 = msm.copy()
+    msm1.values = (msm1.values + 3) / 3
+    msm1.attrs['units'] = '1'
+    plot = MONplot('mon_plot_draw_signal-04.png',
+                   caption='Unit test of MONplot [draw_signal]')
+    plot.set_institute('SRON')
+    plot.draw_signal(msm1, zscale='ratio',
+                     title='method=ratio; aspect=1; fig_pos=above')
+    plot.close()
+    plot = MONplot('mon_plot_draw_signal-05.png',
+                   caption='Unit test of MONplot [draw_signal]')
+    plot.set_institute('SRON')
+    plot.draw_signal(np.abs(msm), zscale='log', side_panels='none',
+                     title='method=error; aspect=1; fig_pos=above')
+    plot.close()
+
+    # image aspect=2
+    msm = get_test_data(data_sel=np.s_[500-250:500+250, :], error=.1)
+    plot = MONplot('mon_plot_draw_signal-06.png',
+                   caption='Unit test of MONplot [draw_signal]')
+    plot.set_institute('SRON')
+    plot.draw_signal(msm, side_panels='none',
+                     title='method=linear; aspect=2; fig_pos=above')
+    plot.close()
+    plot = MONplot('mon_plot_draw_signal-07.png',
+                   caption='Unit test of MONplot [draw_signal]')
+    plot.set_institute('SRON')
+    plot.draw_signal(msm,
+                     title='method=linear; aspect=2; fig_pos=above')
+    plot.close()
+
+    # image aspect=3
+    msm = get_test_data(data_sel=np.s_[500-125:500+125, 500-375:500+375],
+                        error=.1)
+    plot = MONplot('mon_plot_draw_signal-08.png',
+                   caption='Unit test of MONplot [draw_signal]')
+    plot.set_institute('SRON')
+    plot.draw_signal(msm, side_panels='none',
+                     title='method=linear; aspect=3; fig_pos=above')
+    plot.close()
+    plot = MONplot('mon_plot_draw_signal-09.png',
+                   caption='Unit test of MONplot [draw_signal]')
+    plot.set_institute('SRON')
+    plot.draw_signal(msm,
+                     title='method=linear; aspect=3; fig_pos=above')
+    plot.close()
+
+    # image aspect=4
+    msm = get_test_data(data_sel=np.s_[500-128:500+128, :], error=.1)
+    plot = MONplot('mon_plot_draw_signal-10.png',
+                   caption='Unit test of MONplot [draw_signal]')
+    plot.set_institute('SRON')
+    plot.draw_signal(msm, side_panels='none',
+                     title='method=linear; aspect=4; fig_pos=above')
+    plot.close()
+    plot = MONplot('mon_plot_draw_signal-11.png',
+                   caption='Unit test of MONplot [draw_signal]')
+    plot.set_institute('SRON')
+    plot.draw_signal(msm,
+                     title='method=linear; aspect=4; fig_pos=above')
+    plot.close()
+
+
+def run_draw_trend():
     """
     Run unit tests on MONplot::draw_trend
     """
@@ -172,126 +305,54 @@ def run_draw_trend(plot):
     msm_ds = xr.merge((msm1, msm2), combine_attrs="drop_conflicts")
 
     # plot.draw_trend(msm_ds, title='one dataset, no house-keeping')
+    plot = MONplot('mon_plot_draw_trend-1.png',
+                   caption='Unit test of MONplot [draw_trend]')
+    plot.set_institute('SRON')
     plot.draw_trend(xds=msm_ds, title='two datasets, no house-keeping')
+    plot.close()
+    plot = MONplot('mon_plot_draw_trend-1.png',
+                   caption='Unit test of MONplot [draw_trend]')
+    plot.set_institute('SRON')
     plot.draw_trend(hk_xds=hk_ds, title='no datasets, only house-keeping')
+    plot.close()
+    plot = MONplot('mon_plot_draw_trend-1.png',
+                   caption='Unit test of MONplot [draw_trend]')
+    plot.set_institute('SRON')
     plot.draw_trend(msm_ds, hk_ds, title='two datasets and house-keeping')
-
-
-def run_draw_lplot(plot):
-    """
-    Run unit tests on MONplot::draw_lplot
-    """
-    print('Run unit tests on MONplot::draw_lplot')
-    xval = np.arange(200) / 100
-    plot.draw_lplot(xval, np.sin(xval * np.pi), label='sinus',
-                    marker='o', linestyle='-')
-    plot.draw_lplot(xval, np.cos(xval * np.pi), label='cosinus',
-                    marker='o', linestyle='-')
-    plot.draw_lplot(None, None, ylim=[-1.05, 1.05],
-                    xlabel='x-axis [Pi]', ylabel='y-axis',
-                    title='draw_lplot [no time_axis]')
-
-    xval = np.arange(500) / 100
-    plot.draw_lplot(xval, np.sin(xval * np.pi), label='sinus',
-                    marker='o', linestyle='-')
-    plot.draw_lplot(xval, np.cos(xval * np.pi), label='cosinus',
-                    marker='o', linestyle='-')
-    plot.draw_lplot(None, None, ylim=[-1.05, 1.05],
-                    xlabel='x-axis [Pi]', ylabel='y-axis',
-                    title='draw_lplot [no time_axis]')
-
-    customdate = datetime(2016, 1, 1, 13, 0, 0)
-    yval = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
-    xval = [customdate + timedelta(hours=i, minutes=4*i)
-            for i in range(len(yval))]
-    plot.draw_lplot(xval, yval, label='mydata', marker='o', linestyle='-')
-    plot.draw_lplot(None, None, title='draw_lplot [time_axis]',
-                    xlabel='x-axis', ylabel='y-axis')
-
-
-def run_draw_qhist(plot):
-    """
-    Run unit tests on MONplot::draw_qhist
-    """
-    print('Run unit tests on MONplot::draw_qhist')
-    buff0 = np.repeat(0.9 + np.random.rand(1000) / 10, 56)
-    buff1 = np.repeat(np.random.rand(1000) / 10, 10)
-    buff2 = 0.1 + np.random.rand(1000) / 10
-    buff3 = np.repeat(0.2 + np.random.rand(1000) / 10, 2)
-    buff4 = np.repeat(0.3 + np.random.rand(1000) / 10, 3)
-    buff5 = np.repeat(0.4 + np.random.rand(1000) / 10, 4)
-    buff6 = np.repeat(0.5 + np.random.rand(1000) / 10, 8)
-    buff7 = np.repeat(0.6 + np.random.rand(1000) / 10, 12)
-    buff8 = np.repeat(0.7 + np.random.rand(1000) / 10, 20)
-    buff9 = np.repeat(0.8 + np.random.rand(1000) / 10, 40)
-    buffa = np.repeat(0.9 + np.random.rand(1000) / 10, 100)
-    frame = np.concatenate((buff0, buff1, buff2, buff3, buff4,
-                            buff5, buff6, buff7, buff8, buff9,
-                            buffa)).reshape(256, 1000)
-    msm = xr.merge([data_to_xr(frame, name='dpqm',
-                               long_name='pixel-quality map'),
-                    data_to_xr(frame, name='dpqm_dark',
-                               long_name='pixel-quality map (dark)'),
-                    data_to_xr(frame, name='dpqm_noise',
-                               long_name='pixel-quality map (noise average)'),
-                    data_to_xr(frame, name='dpqm_noise_var',
-                               long_name='pixel-quality map (noise variance)')])
-
-    plot.draw_qhist(msm, data_sel=np.s_[11:228, 16:991], title='my histogram')
+    plot.close()
 
 
 # --------------------------------------------------
-def main():
+def unit_tests():
+    """Perform unit tests.
     """
-    main function
-    """
-    check_draw_signal = True
-    check_draw_quality = True
-    check_draw_qhist = True
-    check_draw_trend = True
     check_draw_lplot = True
-
-    # ---------- UNIT TEST: draw_signal ----------
-    if check_draw_signal:
-        plot = MONplot('mon_plot_draw_signal.pdf',
-                       caption='Unit test of MONplot [draw_signal]')
-        plot.set_institute('SRON')
-        run_draw_signal(plot)
-        plot.close()
-
-    # ---------- UNIT TEST: draw_quality ----------
-    if check_draw_quality:
-        plot = MONplot('mon_plot_draw_quality.pdf',
-                       caption='Unit test of MONplot [draw_quality]')
-        plot.set_institute('SRON')
-        run_draw_quality(plot)
-        plot.close()
-
-    # ---------- UNIT TEST: draw_qhist ----------
-    if check_draw_qhist:
-        plot = MONplot('mon_plot_draw_qhist.pdf',
-                       caption='Unit test of MONplot [draw_qhist]')
-        plot.set_institute('SRON')
-        run_draw_qhist(plot)
-        plot.close()
-
-    # ---------- UNIT TEST: draw_trend ----------
-    if check_draw_trend:
-        plot = MONplot('mon_plot_draw_trend.pdf',
-                       caption='Unit test of MONplot [draw_trend]')
-        plot.set_institute('SRON')
-        run_draw_trend(plot)
-        plot.close()
+    check_draw_qhist = True
+    check_draw_quality = True
+    check_draw_signal = True
+    check_draw_trend = True
 
     # ---------- UNIT TEST: draw_lplot ----------
     if check_draw_lplot:
-        plot = MONplot('mon_plot_draw_lplot.pdf',
-                       caption='Unit test of MONplot [draw_lplot]')
-        plot.set_institute('SRON')
-        run_draw_lplot(plot)
-        plot.close()
+        run_draw_lplot()
+
+    # ---------- UNIT TEST: draw_qhist ----------
+    if check_draw_qhist:
+        run_draw_qhist()
+
+    # ---------- UNIT TEST: draw_quality ----------
+    if check_draw_quality:
+        run_draw_quality()
+
+    # ---------- UNIT TEST: draw_signal ----------
+    if check_draw_signal:
+        run_draw_signal()
+
+    # ---------- UNIT TEST: draw_trend ----------
+    if check_draw_trend:
+        run_draw_trend()
 
 
 # - main code --------------------------------------
 if __name__ == '__main__':
-    main()
+    unit_tests()
