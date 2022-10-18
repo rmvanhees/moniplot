@@ -2,7 +2,6 @@
 # https://github.com/rmvanhees/moniplot.git
 #
 # Copyright (c) 2022 SRON - Netherlands Institute for Space Research
-# All rights reserved.
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -17,6 +16,10 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+This module contains the class `FIGinfo`.
+"""
+__all__ = ['FIGinfo']
 
 from copy import deepcopy
 from datetime import datetime
@@ -72,7 +75,7 @@ class FIGinfo:
         self.location = loc
 
     def add(self, key: str, value, fmt='{}') -> None:
-        """Extent fig_info by adding a new line.
+        r"""Extent fig_info by adding a new line.
 
         Parameters
         ----------

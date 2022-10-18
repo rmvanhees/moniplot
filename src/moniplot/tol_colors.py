@@ -2,7 +2,6 @@
 # https://github.com/rmvanhees/moniplot.git
 #
 # Copyright (c) 2019-2022, Paul Tol
-# All rights reserved
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -26,8 +25,8 @@ Routines in this module::
    tol_cmap(colormap=None, lut=0)
    tol_cset(colorset=None)
    tol_rgba(cname, cnum=None)
-
 """
+__all__ = ['tol_cmap', 'tol_cset', 'tol_rgba']
 
 from typing import NamedTuple
 

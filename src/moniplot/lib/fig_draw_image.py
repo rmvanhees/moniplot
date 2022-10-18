@@ -2,7 +2,6 @@
 # https://github.com/rmvanhees/moniplot.git
 #
 # Copyright (c) 2022 SRON - Netherlands Institute for Space Research
-# All rights reserved.
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -17,6 +16,11 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+This module holds `fig_data_to_xarr` and `fig_qdata_to_xarr`
+which are used by resp. `draw_signal` and `draw_quality`.
+"""
+__all__ = ['fig_data_to_xarr', 'fig_qdata_to_xarr']
 
 from math import log10
 import warnings
@@ -80,7 +84,7 @@ def set_norm(zscale: str, vmin: float, vmax: float):
     ----------
     zscale : str
         Scaling of the data values. Recognized values are: 'linear', 'log',
-        'diff' or 'ratio'.  
+        'diff' or 'ratio'.
     vmin : float
         Mininum of the data range
     vmax : float
@@ -131,7 +135,7 @@ def adjust_img_ticks(axx, xarr, dims=None) -> None:
     xarr : xarray.DataArray
        Object holding measurement data and attributes.
     dims : str, optional
-       Name of the plot dimension (`X` or `Y`). 
+       Name of the plot dimension (`X` or `Y`).
     """
     if dims is None or dims == 'X':
         if (xarr.shape[1] % 10) == 0:
@@ -303,7 +307,7 @@ def fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None):
 # pylint: disable=too-many-arguments
 def fig_qdata_to_xarr(data, ref_data=None, data_sel=None,
                       thres_worst=0.1, thres_bad=0.8, qlabels=None):
-    """Prepare pixel-quality data for plotting.
+    r"""Prepare pixel-quality data for plotting.
 
     Parameters
     ----------
@@ -313,10 +317,10 @@ def fig_qdata_to_xarr(data, ref_data=None, data_sel=None,
         Numpy array holding reference data, for example pixel quality
         reference map taken from the CKD. Shown are the changes with
         respect to the reference data.
-    data_sel :  mask or index tuples for arrays, optional
+    data_sel :  slice, optional
         Select a region on the detector by fancy indexing (using a
         boolean/interger arrays), or using index tuples for arrays
-        (generated with 'numpy.s\_').
+        (generated with `numpy.s\_`).
         Outside this region the pixels will be labeled: 'unusable'.
     thres_worst :  float, default=0.1
         Threshold to reject only the worst of the bad pixels, intended

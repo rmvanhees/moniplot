@@ -19,11 +19,12 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-This module contains the `MONplot` class with the plotting methods:
+This module contains the class `MONplot` with the methods:
 `draw_hist`, `draw_lplot`, `draw_multiplot`, `draw_qhist`, `draw_quality`,
 `draw_signal`, `draw_tracks`, `draw_trend`.
-
 """
+__all__ = ['MONplot']
+
 from datetime import datetime
 from pathlib import PurePath
 

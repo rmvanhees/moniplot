@@ -2,7 +2,6 @@
 # https://github.com/rmvanhees/moniplot.git
 #
 # Copyright (c) 2022 SRON - Netherlands Institute for Space Research
-# All rights reserved.
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -17,13 +16,18 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+This module holds `fig_draw_qhist` which are used by `draw_qhist`.
+"""
+__all__ = ['fig_draw_qhist']
 
 from matplotlib.ticker import AutoMinorLocator
 import numpy as np
 
-from .fig_legend import blank_legend_key
+from .fig_legend import blank_legend_handle
 
 
+# - main functions ---------------------------------
 def fig_draw_qhist(axx, qdata, label: str, density: bool) -> None:
     """Add a subplot showing pixel-quality data as a histogram.
 
@@ -44,7 +48,7 @@ def fig_draw_qhist(axx, qdata, label: str, density: bool) -> None:
              histtype='bar', align='mid', log=True, fill=True,
              edgecolor='#4477AA', facecolor='#77AADD', linewidth=1.5)
     # add label
-    legenda = axx.legend([blank_legend_key()],
+    legenda = axx.legend([blank_legend_handle()],
                          [label], loc='upper left')
     legenda.draw_frame(False)
     # add decoration

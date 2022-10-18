@@ -2,7 +2,6 @@
 # https://github.com/rmvanhees/moniplot.git
 #
 # Copyright (c) 2022 SRON - Netherlands Institute for Space Research
-# All rights reserved.
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -17,10 +16,15 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+This module holds `draw_subplot` which is used by `draw_multiplot`.
+"""
+__all__ = ['draw_subplot']
 
 import numpy as np
 
 
+# - local functions --------------------------------
 def get_xylabels(gridspec, data_tuple):
     """Define xlabel and ylabel for each subplot panel.
 
@@ -61,6 +65,7 @@ def get_xylabels(gridspec, data_tuple):
     return res
 
 
+# - main functions ---------------------------------
 def draw_subplot(axx, xarr, xylabels) -> None:
     """Draw a subplot figure.
 

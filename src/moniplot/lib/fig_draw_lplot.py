@@ -2,7 +2,6 @@
 # https://github.com/rmvanhees/moniplot.git
 #
 # Copyright (c) 2022 SRON - Netherlands Institute for Space Research
-# All rights reserved.
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -17,6 +16,11 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+This module holds `fig_draw_lplot` and `close_draw_lplot`
+which are used by `draw_lplot`.
+"""
+__all__ = ['fig_draw_lplot', 'close_draw_lplot']
 
 import numpy as np
 

@@ -2,7 +2,6 @@
 # https://github.com/rmvanhees/moniplot.git
 #
 # Copyright (c) 2022 SRON - Netherlands Institute for Space Research
-# All rights reserved.
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -17,6 +16,12 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+This module contains the routines `h5_to_xr` and `data_to_xr`.
+These functions store a HDF5 dataset or numpy array in a labeled array
+(class `xarray.DataArray`).
+"""
+__all__ = ['h5_to_xr', 'data_to_xr']
 
 from pathlib import PurePath
 
@@ -74,15 +79,15 @@ def __get_attrs(dset, field: str) -> dict:
     return attrs
 
 
-def __get_coords(dset, data_sel: tuple) -> list:
-    """Return coordinates of the HDF5 dataset with dimension scales.
+def __get_coords(dset, data_sel: slice) -> list:
+    r"""Return coordinates of the HDF5 dataset with dimension scales.
 
     Parameters
     ----------
     dset :  h5py.Dataset
        h5py dataset from which the data is read
-    data_sel :  tuple of slice(s)
-       A numpy slice generated for example 'numpy.s\_'
+    data_sel :  slice
+       A numpy slice generated for example `numpy.s\_`
 
     Returns
     -------
@@ -102,8 +107,8 @@ def __get_coords(dset, data_sel: tuple) -> list:
                 if dim[0].size > 0 and not np.all(dim[0][()] == 0):
                     buff = dim[0][()]
                 elif name in ('row', 'column'):
-                    co_dtype = 'u2' if ((dset.shape[ii]-1) >> 16) == 0 else 'u4'
-                    buff = np.arange(dset.shape[ii], dtype=co_dtype)
+                    d_type = 'u2' if ((dset.shape[ii]-1) >> 16) == 0 else 'u4'
+                    buff = np.arange(dset.shape[ii], dtype=d_type)
 
                 if not (buff is None or data_sel is None):
                     buff = buff[data_sel[ii]]
@@ -115,15 +120,15 @@ def __get_coords(dset, data_sel: tuple) -> list:
     return coords
 
 
-def __set_coords(dset, data_sel: tuple, dims: list) -> list:
-    """Set coordinates of the HDF5 dataset.
+def __set_coords(dset, data_sel: slice, dims: list) -> list:
+    r"""Set coordinates of the HDF5 dataset.
 
     Parameters
     ----------
     dset :  h5py.Dataset or numpy.array
        h5py dataset from which the data is read
-    data_sel :  tuple of slice(s)
-       A numpy slice generated for example 'numpy.s\_'
+    data_sel :  slice
+       A numpy slice generated for example `numpy.s\_`
     dims : list of strings
        Alternative names for the dataset dimensions if not attached to dataset
        Default coordinate names are ['time', ['row', ['column']]]
@@ -150,14 +155,14 @@ def __set_coords(dset, data_sel: tuple, dims: list) -> list:
 
 
 def __get_data(dset, data_sel: tuple, field: str):
-    """Return data of the HDF5 dataset.
+    r"""Return data of the HDF5 dataset.
 
     Parameters
     ----------
     dset :  h5py.Dataset
        h5py dataset from which the data is read
-    data_sel :  numpy slice
-       A numpy slice generated for example 'numpy.s\_'
+    data_sel :  slice
+       A numpy slice generated for example `numpy.s\_`
     field : str
        Name of field in compound dataset or None
 
@@ -188,7 +193,7 @@ def __get_data(dset, data_sel: tuple, field: str):
 
 
 def __check_selection(data_sel: tuple, ndim: int) -> tuple:
-    """Check and correct user provided data selection.
+    r"""Check and correct user provided data selection.
 
     Notes
     -----
@@ -223,7 +228,7 @@ def __check_selection(data_sel: tuple, ndim: int) -> tuple:
 
 # - main function ----------------------------------
 def h5_to_xr(h5_dset, data_sel=None, *, dims=None, field=None):
-    """Create xarray::DataArray from a HDF5 dataset (with dimension scales).
+    r"""Create xarray::DataArray from a HDF5 dataset (with dimension scales).
 
     Implements a lite interface with the xarray::DataArray, should work for all
     2-D detector images, sequences of detector measurements and trend data.
@@ -233,7 +238,7 @@ def h5_to_xr(h5_dset, data_sel=None, *, dims=None, field=None):
     h5_dset :  h5py.Dataset
        Data, dimensions, coordinates and attributes are read for this dataset
     data_sel :  slice, optional
-       A numpy slice generated for example 'numpy.s\_'
+       A numpy slice generated for example `numpy.s\_`
     dims :  list of strings, optional
        Alternative names for the dataset dimensions if not attached to dataset
     field : str, optional

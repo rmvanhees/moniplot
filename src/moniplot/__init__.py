@@ -1,7 +1,6 @@
 # This file is part of moniplot
 #
 # https://github.com/rmvanhees/moniplot.git
-# All rights reserved.
 #
 # Copyright (c) 2022 SRON - Netherlands Institute for Space Research
 #
@@ -18,8 +17,8 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-""" Moniplot is a Python data visualization library for (satellite)
+"""
+Moniplot is a Python data visualization library for (satellite)
 instrument monitoring.
 """
 

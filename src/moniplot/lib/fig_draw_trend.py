@@ -2,7 +2,6 @@
 # https://github.com/rmvanhees/moniplot.git
 #
 # Copyright (c) 2022 SRON - Netherlands Institute for Space Research
-# All rights reserved.
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -17,6 +16,11 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+This module contains `add_subplot` and `add_hk_subplot`
+which are used by `draw_trend`.
+"""
+__all__ = ['add_subplot', 'add_hk_subplot']
 
 from numbers import Integral
 import numpy as np
@@ -25,7 +29,7 @@ from matplotlib.ticker import AutoMinorLocator, MultipleLocator
 
 from ..tol_colors import tol_cset
 
-from .fig_legend import blank_legend_key
+from .fig_legend import blank_legend_handle
 
 # - global parameters ------------------------------
 CSET = tol_cset('bright')
@@ -200,7 +204,6 @@ def add_subplot(axx, xarr) -> None:
     xarr :  xarray.DataArray
        Object holding measurement data and attributes
     """
-    cset = tol_cset('bright')
     ylabel = xarr.attrs['long_name']
     if 'units' in xarr.attrs and xarr.attrs['units'] != '1':
         ylabel += f' [{adjust_units(xarr.attrs["units"])}]'
@@ -242,7 +245,7 @@ def add_subplot(axx, xarr) -> None:
         else:
             axx.plot(xdata[isel], avg[isel], linewidth=1.5, color=lcolor)
         if 'legend' in xarr.attrs:
-            legenda = axx.legend([blank_legend_key()],
+            legenda = axx.legend([blank_legend_handle()],
                                  [xarr.attrs['legend']], loc='upper left')
             legenda.draw_frame(False)
         ii = jj + 1
@@ -327,6 +330,6 @@ def add_hk_subplot(axx, xarr, vperc=None, vrange_last_orbits=-1) -> None:
     axx.grid(True)
 
     # add hk_title inside current subplots
-    legenda = axx.legend([blank_legend_key()],
+    legenda = axx.legend([blank_legend_handle()],
                          [hk_title], loc='upper left')
     legenda.draw_frame(False)
