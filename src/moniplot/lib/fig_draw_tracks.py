@@ -68,6 +68,6 @@ if FOUND_CARTOPY:
         if saa_region is not None:
             # pylint: disable=abstract-class-instantiated
             saa_poly = Polygon(xy=saa_region, closed=True, alpha=1.0,
-                               facecolor=cset.grey,
+                               facecolor=tol_cset('bright').grey,
                                transform=ccrs.PlateCarree())
             axx.add_patch(saa_poly)
