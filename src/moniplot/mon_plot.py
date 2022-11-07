@@ -42,7 +42,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.gridspec import GridSpec
 
-from .biweight import biweight
+from .biweight import Biweight
 from .lib.fig_info import FIGinfo
 from .lib.fig_draw_image import (adjust_img_ticks,
                                  fig_data_to_xarr,
@@ -484,13 +484,15 @@ class MONplot:
         if fig_info is None:
             fig_info = FIGinfo()
 
-        median, spread = biweight(xarr.values, spread=True)
+        biwght = Biweight(xarr.values)
         if xarr.attrs['_zunits'] is None or xarr.attrs['_zunits'] == '1':
-            fig_info.add('median', median, '{:.5g}')
-            fig_info.add('spread', spread, '{:.5g}')
+            fig_info.add('median', biwght.median, '{:.5g}')
+            fig_info.add('spread', biwght.spread, '{:.5g}')
         else:
-            fig_info.add('median', (median, xarr.attrs['_zunits']), '{:.5g} {}')
-            fig_info.add('spread', (spread, xarr.attrs['_zunits']), '{:.5g} {}')
+            fig_info.add('median', (biwght.median, xarr.attrs['_zunits']),
+                         '{:.5g} {}')
+            fig_info.add('spread', (biwght.spread, xarr.attrs['_zunits']),
+                         '{:.5g} {}')
 
         # draw actual image
         self.__draw_image__(xarr, side_panels, fig_info, title)
@@ -790,13 +792,13 @@ class MONplot:
         if fig_info is None:
             fig_info = FIGinfo()
 
-        median, spread = biweight(values, spread=True)
+        biwght = Biweight(values)
         if zunits == '1':
-            fig_info.add('median', median, '{:.5g}')
-            fig_info.add('spread', spread, '{:.5g}')
+            fig_info.add('median', biwght.median, '{:.5g}')
+            fig_info.add('spread', biwght.spread, '{:.5g}')
         else:
-            fig_info.add('median', (median, zunits), '{:.5g} {}')
-            fig_info.add('spread', (spread, zunits), '{:.5g} {}')
+            fig_info.add('median', (biwght.median, zunits), '{:.5g} {}')
+            fig_info.add('spread', (biwght.spread, zunits), '{:.5g} {}')
 
         # create figure
         fig, axx = plt.subplots(1, figsize=(9, 8))
