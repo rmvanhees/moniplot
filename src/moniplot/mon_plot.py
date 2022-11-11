@@ -21,7 +21,7 @@
 """
 This module contains the class `MONplot` with the methods:
 `draw_hist`, `draw_lplot`, `draw_multiplot`, `draw_qhist`, `draw_quality`,
-`draw_signal`, `draw_tracks`, `draw_trend`.
+`draw_signal`, `draw_tracks`, `draw_trend`, draw_spx_fov_ckd.
 """
 __all__ = ['MONplot']
 
@@ -1235,5 +1235,94 @@ class MONplot:
 
         # finalize figure
         self.__add_copyright(axx)
+        self.__add_fig_box(fig, fig_info)
+        self.__close_this_page(fig)
+
+    # --------------------------------------------------
+    def draw_spx1_fov_ckd(self, ckd: xr.DataArray, vp_blocks: tuple, *,
+                          vp_labels=None, fig_info=None, title=None) -> None:
+        """Display a 2D SPEXone CKD parameter which consists of data from 
+        several viewports.
+
+        Parameters
+        ----------
+        ckd :  xarray.DataArray
+           Object holding measurement data and attributes.
+        vp_blocks : tuple
+           Ranges of rows beloning to the data of one viewport. Each block
+           is show in a seperate subplot.
+        vp_labels :  tuple of str
+           Label for each viewport, default=('+50', '+20', '0', '-20', '-50').
+        fig_info :  FIGinfo, default=None
+           OrderedDict holding meta-data to be displayed in the figure.
+        title :  str, default=None
+           Title of this figure using `Axis.set_title`.
+        **kwargs :   other keywords
+           Keyword arguments: `zscale`, `vperc` or `vrange`
+
+        Examples
+        --------
+        ...
+        """
+
+        if vp_labels is None:
+            vp_labels = ('+50', '+20', '0', '-20', '-50')
+        if fig_info is None:
+            fig_info = FIGinfo()
+
+        nview = len(vp_labels)
+        dims = dict(zip(ckd.dims, ckd.shape))
+        ncol = dims['spectral_detector_pixels']
+
+        # write units as a LaTeX string
+        zunits = '1'
+        if 'units' in ckd.attrs and ckd.attrs['units'] != zunits:
+            zunits = ckd.attrs['units'].replace(' ', r'$\,$')
+            zunits = zunits.replace('-1', '$^{-1}$')
+            zunits = zunits.replace('-2', '$^{-2}$')
+            zunits = zunits.replace('um', r'$\mu$m')
+
+        # define plot layout
+        figsize = (1.75 * (dims['spectral_detector_pixels']
+                           // dims['spatial_samples_per_image']), 4.5)
+        fig, axs = plt.subplots(nview, 1, figsize=figsize, sharex=True)
+        fig.subplots_adjust(hspace=0, wspace=0,
+                            left=0.075, right=1.05,
+                            top=0.8)
+
+        # add a centered suptitle of the Figure
+        self.__add_caption(fig)
+
+        # add title to image panel
+        if title is None:
+            title = ckd.attrs['long_name']
+        axs[0].set_title(title)
+
+        vmin, vmax = np.nanpercentile(ckd, (1, 99))
+        for ii in range(nview):
+            axs[ii].set_anchor((.5, (nview - ii - 1) * 0.25))
+            ibgn, iend = vp_blocks[ii]
+            extent = (0, ncol, ibgn, iend)
+            ax_img = axs[ii].imshow(ckd[ibgn:iend, :],
+                                    vmin=vmin, vmax=vmax, extent=extent,
+                                    aspect=2, origin='lower')
+            axs[ii].set_xticks([x * ncol // 8 for x in range(9)])
+            axs[ii].set_yticks([ibgn, (iend + ibgn) // 2])
+            yax2 = axs[ii].secondary_yaxis(-.05)
+            yax2.tick_params(left=False, labelleft=False)
+            yax2.set_ylabel(vp_labels[ii])
+            if ii == nview // 2:
+                axs[ii].set_ylabel(ckd.dims[0])
+            if ii == nview - 1:
+                axs[ii].set_xlabel(ckd.dims[1])
+            else:
+                axs[ii].tick_params(labelbottom=False)
+
+        # defaults: pad=0.05, aspect=20
+        fig.colorbar(ax_img, ax=axs, pad=0.01, aspect=10,
+                     label='value' if zunits == '1' else rf'value [{zunits}]')
+        
+        # finalize figure
+        self.__add_copyright(axs[-1])
         self.__add_fig_box(fig, fig_info)
         self.__close_this_page(fig)
