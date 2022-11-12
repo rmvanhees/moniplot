@@ -21,7 +21,7 @@
 """
 This module contains the class `MONplot` with the methods:
 `draw_hist`, `draw_lplot`, `draw_multiplot`, `draw_qhist`, `draw_quality`,
-`draw_signal`, `draw_tracks`, `draw_trend`, draw_spx_fov_ckd.
+`draw_signal`, `draw_tracks`, `draw_trend`, draw_fov_ckd.
 """
 __all__ = ['MONplot']
 
@@ -1239,14 +1239,14 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_spx1_fov_ckd(self, ckd: xr.DataArray, vp_blocks: tuple, *,
-                          vp_labels=None, fig_info=None, title=None) -> None:
-        """Display a 2D SPEXone CKD parameter which consists of data from 
-        several viewports.
+    def draw_fov_ckd(self, data, *, vp_blocks: tuple, vp_labels=None,
+                     fig_info=None, title=None, **kwargs) -> None:
+        """Display a 2D CKD parameter which consists of data from several
+        viewports.
 
         Parameters
         ----------
-        ckd :  xarray.DataArray
+        data :  numpy.ndarray or xarray.DataArray
            Object holding measurement data and attributes.
         vp_blocks : tuple
            Ranges of rows beloning to the data of one viewport. Each block
@@ -1264,27 +1264,24 @@ class MONplot:
         --------
         ...
         """
-
         if vp_labels is None:
             vp_labels = ('+50', '+20', '0', '-20', '-50')
         if fig_info is None:
             fig_info = FIGinfo()
 
-        nview = len(vp_labels)
-        dims = dict(zip(ckd.dims, ckd.shape))
-        ncol = dims['spectral_detector_pixels']
+        # convert, if necessary, input data to xarray.DataArray
+        if isinstance(data, xr.DataArray) and '_zscale' in data.attrs:
+            xarr = data.copy()
+        else:
+            xarr = fig_data_to_xarr(data, **kwargs)
 
-        # write units as a LaTeX string
-        zunits = '1'
-        if 'units' in ckd.attrs and ckd.attrs['units'] != zunits:
-            zunits = ckd.attrs['units'].replace(' ', r'$\,$')
-            zunits = zunits.replace('-1', '$^{-1}$')
-            zunits = zunits.replace('-2', '$^{-2}$')
-            zunits = zunits.replace('um', r'$\mu$m')
+        # get dimensions needed to draw the data of the viewports
+        nview = len(vp_labels)
+        ncol = xarr.sizes['spectral_detector_pixels']
 
         # define plot layout
-        figsize = (1.75 * (dims['spectral_detector_pixels']
-                           // dims['spatial_samples_per_image']), 4.5)
+        figsize = (1.75 * (xarr.sizes['spectral_detector_pixels']
+                           // xarr.sizes['spatial_samples_per_image']), 4.5)
         fig, axs = plt.subplots(nview, 1, figsize=figsize, sharex=True)
         fig.subplots_adjust(hspace=0, wspace=0,
                             left=0.075, right=1.05,
@@ -1294,34 +1291,36 @@ class MONplot:
         self.__add_caption(fig)
 
         # add title to image panel
-        if title is None:
-            title = ckd.attrs['long_name']
-        axs[0].set_title(title)
+        if title is not None:
+            axs[0].set_title(title)
+        elif 'long_name' in xarr.attrs:
+            axs[0].set_title(xarr.attrs['long_name'])
 
-        vmin, vmax = np.nanpercentile(ckd, (1, 99))
+        cmap = self.cmap if self.cmap else xarr.attrs['_cmap']
         for ii in range(nview):
             axs[ii].set_anchor((.5, (nview - ii - 1) * 0.25))
             ibgn, iend = vp_blocks[ii]
             extent = (0, ncol, ibgn, iend)
-            ax_img = axs[ii].imshow(ckd[ibgn:iend, :],
-                                    vmin=vmin, vmax=vmax, extent=extent,
-                                    aspect=2, origin='lower')
+            ax_img = axs[ii].imshow(xarr.values[ibgn:iend, :],
+                                    norm=xarr.attrs['_znorm'], cmap=cmap,
+                                    extent=extent, aspect=2,
+                                    interpolation='none', origin='lower')
             axs[ii].set_xticks([x * ncol // 8 for x in range(9)])
             axs[ii].set_yticks([ibgn, (iend + ibgn) // 2])
             yax2 = axs[ii].secondary_yaxis(-.05)
             yax2.tick_params(left=False, labelleft=False)
             yax2.set_ylabel(vp_labels[ii])
             if ii == nview // 2:
-                axs[ii].set_ylabel(ckd.dims[0])
+                axs[ii].set_ylabel(xarr.dims[0])
             if ii == nview - 1:
-                axs[ii].set_xlabel(ckd.dims[1])
+                axs[ii].set_xlabel(xarr.dims[1])
             else:
                 axs[ii].tick_params(labelbottom=False)
 
         # defaults: pad=0.05, aspect=20
         fig.colorbar(ax_img, ax=axs, pad=0.01, aspect=10,
-                     label='value' if zunits == '1' else rf'value [{zunits}]')
-        
+                     label=xarr.attrs['_zlabel'])
+
         # finalize figure
         self.__add_copyright(axs[-1])
         self.__add_fig_box(fig, fig_info)

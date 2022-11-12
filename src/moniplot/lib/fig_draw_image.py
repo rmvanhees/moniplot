@@ -39,14 +39,14 @@ CSET = tol_cset('bright')
 
 
 # - local functions --------------------------------
-def adjust_zunit(zunit: str, vmin: float, vmax: float) -> tuple:
+def adjust_zunit(zunits: str, vmin: float, vmax: float) -> tuple:
     """
     Adjust units: electron to `e` and Volt to `V`
     and scale data range to <-1000, 1000>.
 
     Parameters
     ----------
-    zunit :  str
+    zunits :  str
        Units of the image data
     vmin, vmax : float
         image-data range
@@ -54,27 +54,31 @@ def adjust_zunit(zunit: str, vmin: float, vmax: float) -> tuple:
     Returns
     -------
     tuple
-        dscale, zunit
+        dscale, zunits
     """
-    if zunit is None or zunit == '1':
-        return 1, zunit
+    if zunits is None or zunits == '1':
+        return 1, zunits
 
-    if zunit.find('electron') >= 0:
-        zunit = zunit.replace('electron', 'e')
-    if zunit.find('Volt') >= 0:
-        zunit = zunit.replace('Volt', 'V')
-    if zunit.find('.s-1') >= 0:
-        zunit = zunit.replace('.s-1', ' s$^{-1}$')
+    zunits = zunits.replace('electron', 'e')
+    zunits = zunits.replace('Volt', 'V')
+    if zunits.find('.s-1') >= 0:
+        zunits = zunits.replace('.s-1', ' s$^{-1}$')
+    else:
+        zunits = zunits.replace('-1', '$^{-1}$')
+    zunits = zunits.replace('-2', '$^{-2}$')
+    zunits = zunits.replace('-3', '$^{-3}$')
+    zunits = zunits.replace('um', r'$\xb5$m')
+    zunits = zunits.replace(' ', r'$\,$')
 
-    if zunit[0] in ('e', 'V', 'A'):
-        key_to_zunit = {-4: 'p', -3: 'n', -2: '\xb5', -1: 'm',
+    if zunits[0] in ('e', 'V', 'A'):
+        key_to_zunit = {-4: 'p', -3: 'n', -2: r'\xb5', -1: 'm',
                         0: '', 1: 'k', 2: 'M', 3: 'G', 4: 'T'}
         max_value = max(abs(vmin), abs(vmax))
         key = min(4, max(-4, log10(max_value) // 3))
 
-        return 1000 ** key, key_to_zunit[key] + zunit
+        return 1000 ** key, key_to_zunit[key] + zunits
 
-    return 1, zunit
+    return 1, zunits
 
 
 def set_norm(zscale: str, vmin: float, vmax: float):
