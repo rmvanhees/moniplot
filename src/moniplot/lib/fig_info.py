@@ -34,7 +34,7 @@ class FIGinfo:
     Parameters
     ----------
     loc :  str, default='above'
-        Location to draw the fig_info box: 'above' (default), 'none'
+        Location to draw the fig_info box: 'above' (default), 'below', 'none'
     info_dict :  dict, optional
         Dictionary holding information to be displayed in the fig_info box
 
@@ -42,7 +42,7 @@ class FIGinfo:
     -----
     The figure-box can only hold a limited number of entries, because it will
     grow with the number of lines and overlap with the main image or its
-    colorbar. We have not implemented a good solution for this, yet.
+    colorbar. You may try loc='below', which is only available for image plots.
     """
     def __init__(self, loc='above', info_dict=None) -> None:
         """Create FIGinfo instance to hold information on the current plot.
