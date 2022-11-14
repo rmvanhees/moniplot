@@ -276,13 +276,13 @@ class MONplot:
 
             if fig_info.location == 'above':
                 if aspect <= 2:
-                    halign = 'center'
+                    halign = 'left' if aspect == 1 else 'center'
                     fontsize = 'x-small'
                 else:
                     halign = 'right'
                     fontsize = 'xx-small' if len(fig_info) > 6 else 'x-small'
 
-                axx_c.text(0 if aspect == 2 else 1,
+                axx_c.text(0 if aspect <= 2 else 1,
                            1.04 + (aspect-1) * 0.0075,
                            fig_info.as_str(), fontsize=fontsize,
                            transform=axx_c.transAxes,
@@ -1244,6 +1244,9 @@ class MONplot:
         """Display a 2D CKD parameter which consists of data from several
         viewports.
 
+        The current implementation only works for SPEXone CKD: FIELD_OF_VIEW,
+        POLARIMETRIC, RADIOMETRIC and WAVELENGTH
+
         Parameters
         ----------
         data :  numpy.ndarray or xarray.DataArray
@@ -1260,9 +1263,36 @@ class MONplot:
         **kwargs :   other keywords
            Keyword arguments: `zscale`, `vperc` or `vrange`
 
+        See also
+        --------
+        fig_data_to_xarr : Prepare image data for plotting.
+
         Examples
         --------
-        ...
+        Read SPEXone CKD:
+        >>> from pyspex.ckd_io import CKDio
+        >>> with CKDio(ckd_file) as ckd:
+        >>>     fov_ckd = ckd.fov()
+        >>>     rad_ckd = ckd.radiometric()
+
+        Set row-ranges belonging to one viewport
+        >>> nview = fov_ckd.dims['viewports']
+        >>> vp_blocks = ()
+        >>> for ii in range(nview):
+        >>>    ibgn = int(fov_ckd['fov_ifov_start_vp'][nview - ii - 1])
+        >>>    iend = int(ibgn + fov_ckd['fov_nfov_vp'][nview - ii - 1] + 1)
+        >>>    vp_blocks += ([ibgn, iend],)
+
+        Create figures:
+        >>> from moniplot.mon_plot import MONplot
+        >>> plot = MONplot('test_spx1_fov_ckd.pdf', caption='SPEXone CKD')
+        >>> plot.draw_fov_ckd(rad_ckd.isel(polarization_directions=0),
+        >>>                   vp_blocks=vp_blocks,
+        >>>                   title=rad_ckd.attrs['long_name'] + ' (S+)')
+        >>> plot.draw_fov_ckd(rad_ckd.isel(polarization_directions=1),
+        >>>                   vp_blocks=vp_blocks, zscale='log',
+        >>>                   title=rad_ckd.attrs['long_name'] + ' (S-)')
+        >>> plot.close()
         """
         if vp_labels is None:
             vp_labels = ('+50', '+20', '0', '-20', '-50')
