@@ -42,13 +42,13 @@ def add_fig_box(axx_c, aspect: int, fig_info: FIGinfo) -> None:
     # put text above colorbar
     if fig_info.location == 'above':
         if aspect <= 2:
-            halign = 'center'
+            halign = 'left' if aspect == 1 else 'center'
             fontsize = 'x-small'
         else:
             halign = 'right'
             fontsize = 'xx-small' if len(fig_info) > 6 else 'x-small'
 
-        axx_c.text(0 if aspect == 2 else 1,
+        axx_c.text(0 if aspect <= 2 else 1,
                    1.04 + (aspect-1) * 0.0075,
                    fig_info.as_str(), fontsize=fontsize,
                    transform=axx_c.transAxes,
@@ -71,7 +71,7 @@ def add_fig_box(axx_c, aspect: int, fig_info: FIGinfo) -> None:
 
 
 # -------------------------
-def draw_figure(aspect: int, side_panels='one') -> None:
+def draw_figure(aspect: int) -> None:
     """
     Show figure with given aspect ratio
     """
@@ -143,20 +143,16 @@ def draw_figure(aspect: int, side_panels='one') -> None:
     axx.grid(True)
 
     # side_panels
-    if side_panels != 'none':
-        for xtl in axx.get_xticklabels():
-            xtl.set_visible(False)
-        for ytl in axx.get_yticklabels():
-            ytl.set_visible(False)
-        axx_px = fig.add_subplot(gspec[1, 1], sharex=axx)
-        axx_px.set_xlabel('column')
-        axx_px.grid(True)
-        axx_py = fig.add_subplot(gspec[0, 0], sharey=axx)
-        axx_py.set_ylabel('row')
-        axx_py.grid(True)
-    else:
-        axx.set_xlabel('column')
-        axx.set_ylabel('row')
+    for xtl in axx.get_xticklabels():
+        xtl.set_visible(False)
+    for ytl in axx.get_yticklabels():
+        ytl.set_visible(False)
+    axx_px = fig.add_subplot(gspec[1, 1], sharex=axx)
+    axx_px.set_xlabel('column')
+    axx_px.grid(True)
+    axx_py = fig.add_subplot(gspec[0, 0], sharey=axx)
+    axx_py.set_ylabel('row')
+    axx_py.grid(True)
 
     # add colorbar
     axx_c = fig.add_subplot(gspec[0, 2])
