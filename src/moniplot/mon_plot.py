@@ -976,7 +976,7 @@ class MONplot:
         >>> tt = [tt0 + iy * t_step for iy in range(yy.size)]
         >>> plot = MONplot(fig_name)
         >>> plot.draw_lplot(tt, yy, label='mylabel', marker='o')
-        >>> plot.draw_line(ylim=[-10, 10], xlabel='t-axis', ylabel='y-axis')
+        >>> plot.draw_lplot(ylim=[-10, 10], xlabel='t-axis', ylabel='y-axis')
         >>> plot.close()
 
         You can use different sets of colors and cycle through them.
