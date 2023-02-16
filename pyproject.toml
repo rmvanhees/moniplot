@@ -1,13 +1,13 @@
 # pyproject.toml
 [build-system]
-requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2", "wheel"]
+requires = ["setuptools>=58", "setuptools_scm[toml]>=6.2", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "moniplot"
+dynamic = ["version"]
 description = "moniplot is a Python data visualization library for (satellite) instrument monitoring"
 readme = "README.md"
-requires-python = ">=3.8"
 license = {text = "GPL-3.0-only"}
 authors = [
   {name = "Richard van Hees", email = "R.M.van.Hees@sron.nl"},
@@ -24,11 +24,12 @@ classifiers = [
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
-  "Topic :: Scientific/Engineering :: Visualization",
-  "Topic :: Scientific/Engineering :: Atmospheric Science"
+  "Topic :: Scientific/Engineering :: Atmospheric Science",
+  "Topic :: Scientific/Engineering :: Visualization"
 ]
+requires-python = ">=3.8"
 dependencies = [
-  # "cartopy>=0.20",
+  # "cartopy>=0.21",
   "h5py~=2.10.0; python_version=='3.9'",
   "h5py>=3.5; python_version!='3.9'",
   "matplotlib~=3.3.4; python_version=='3.9'",
@@ -37,7 +38,6 @@ dependencies = [
   "xarray~=0.19.0; python_version=='3.9'",
   "xarray>=2022.3; python_version!='3.9'",
 ]
-dynamic = ["version"]
 
 [project.urls]
 homepage = "https://github.com/rmvanhees/moniplot"
