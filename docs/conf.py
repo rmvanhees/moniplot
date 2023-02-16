@@ -12,6 +12,7 @@
 #
 import os
 import sys
+from importlib import metadata
 sys.path.insert(0, os.path.abspath('../src'))
 
 
@@ -22,7 +23,7 @@ copyright = '2022, SRON'
 author = 'Richard van Hees'
 
 # The full version, including alpha/beta/rc tags
-release = '0.5.2'
+release = metadata.version('moniplot').split('+')[0]
 
 
 # -- General configuration ---------------------------------------------------
@@ -33,6 +34,7 @@ release = '0.5.2'
 extensions = [
     # 'numpydoc',
     'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon'
 ]
