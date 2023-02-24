@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,7 @@ import matplotlib.pyplot as plt
 from matplotlib.dates import DateFormatter
 
 
-def fig_draw_lplot(axx, xdata, ydata, use_steps=False, **kwargs):
+def fig_draw_lplot(axx, xdata, ydata, use_steps: bool = False, **kwargs):
     """Add line plot to figure.
 
     Parameters
@@ -56,7 +56,8 @@ def fig_draw_lplot(axx, xdata, ydata, use_steps=False, **kwargs):
         axx.plot(xdata, ydata, **kwargs)
 
 
-def close_draw_lplot(axx, time_axis: bool, title: str, **kwargs):
+def close_draw_lplot(axx, time_axis: bool, title: str | None,
+                     kwlegend: dict | None, **kwargs):
     """Close the figure created with MONplot::draw_lplot().
 
     Parameters
@@ -65,8 +66,11 @@ def close_draw_lplot(axx, time_axis: bool, title: str, **kwargs):
        Matplotlib Axes object of plot window
     time_axis : bool
        The xlabels represent date/time
-    title : str
+    title : str | None
        Title of the figure
+    kwlegend : dict | None
+       Provide keywords for the function `Axes.legend`.
+       Default: {'fontsize': 'small', 'loc': 'best'}
     **kwargs : keyword arguments
        Recognized are 'xlabel', 'ylabel', 'xlim', 'ylim', 'xscale', 'yscale'
     """
@@ -98,4 +102,7 @@ def close_draw_lplot(axx, time_axis: bool, title: str, **kwargs):
 
     # draw legenda in figure
     if axx.get_legend_handles_labels()[1]:
-        axx.legend(fontsize='small', loc='best')
+        if kwlegend is None:
+            axx.legend(fontsize='small', loc='best')
+        else:
+            axx.legend(**kwlegend)

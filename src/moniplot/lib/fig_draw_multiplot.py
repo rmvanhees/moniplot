@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -73,9 +73,9 @@ def draw_subplot(axx, xarr, xylabels) -> None:
     ----------
     axx : matplotlib.Axes
        Matplotlib Axes object of subplot
-    xarr
+    xarr :  xarray.DataArray
       Data with attrubutes of subplot
-    xylabels
+    xylabels :  list[str]
       X,Y labels of subplot
     """
     if '_plot' in xarr.attrs:
@@ -104,7 +104,5 @@ def draw_subplot(axx, xarr, xylabels) -> None:
         axx.text(0.05, 0.985, kwargs['text'],
                  transform=axx.transAxes,
                  fontsize='small', verticalalignment='top',
-                 bbox=dict(boxstyle='round',
-                           facecolor='#FFFFFF',
-                           edgecolor='#BBBBBB',
-                           alpha=0.5))
+                 bbox={'boxstyle': 'round', 'alpha': 0.5,
+                       'facecolor': '#FFFFFF', 'edgecolor': '#BBBBBB'})

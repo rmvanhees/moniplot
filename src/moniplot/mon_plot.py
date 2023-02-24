@@ -3,7 +3,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -931,8 +931,9 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_lplot(self, xdata=None, ydata=None, *, square=False,
-                   fig_info=None, title=None, **kwargs) -> None:
+    def draw_lplot(self, xdata=None, ydata=None, *, square: bool = False,
+                   fig_info: FIGinfo = None, title: str | None = None,
+                   kwlegend: dict | None = None, **kwargs) -> None:
         """Plot y versus x lines, maybe called multiple times to add lines.
         Figure is closed when called with xdata equals None.
 
@@ -950,7 +951,10 @@ class MONplot:
            ``[close figure]`` Meta-data to be displayed in the figure.
         title :  str, optional
            ``[close figure]`` Title of figure (using `Axis.set_title`).
-        **kwargs :   other keywords
+        kwlegend :  dict, optional
+           ``[close figure]`` Provide keywords for the function `Axes.legend`.
+           Default: {'fontsize': 'small', 'loc': 'best'}
+        **kwargs :  other keywords
            ``[add line]`` Keywords are passed to `matplotlib.pyplot.plot`;
            ``[close figure]`` Keywords are passed to appropriate
            `matplotlib.Axes` method, and the keyword 'text' can be used to
@@ -1034,10 +1038,11 @@ class MONplot:
                 axx.text(0.05, 0.985, kwargs.pop('text'),
                          transform=axx.transAxes,
                          fontsize='small', verticalalignment='top',
-                         bbox=dict(boxstyle='round', facecolor='#FFFFFF',
-                                   edgecolor='#BBBBBB', alpha=0.5))
+                         bbox={'boxstyle': 'round', 'alpha': 0.5,
+                               'facecolor': '#FFFFFF', 'edgecolor': '#BBBBBB'})
 
-            close_draw_lplot(axx, self.__mpl['time_axis'], title, **kwargs)
+            close_draw_lplot(axx, self.__mpl['time_axis'],
+                             title, kwlegend, **kwargs)
 
             # add annotation and save the figure
             self.__add_copyright(axx)
