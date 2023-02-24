@@ -35,7 +35,7 @@ for ii in range(35):
     plot.draw_lplot(ydata=np.arange(10)*(ii+1),
                     label=f'label {ii}')
 plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
-                legend={'fontsize': 'x-small', 'loc': 'upper left',
-                        'bbox_to_anchor': (0.975, 1)},
-                title='draw_lplot [cset="rainbow_PyBr"]')
+                title='draw_lplot [cset="rainbow_PyBr"]',
+                kwlegend={'fontsize': 'x-small', 'loc': 'upper left',
+                          'bbox_to_anchor': (0.975, 1)})
 plot.close()
