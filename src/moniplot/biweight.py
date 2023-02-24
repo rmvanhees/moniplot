@@ -52,16 +52,18 @@ class Biweight:
 
     Examples
     --------
-    Calculate biweight median, spread and unbiased estimator
-    >>> from moniplot.biweight import Biweight
-    >>> Biweight((1, 2, 2.5, 1.75, 2)).median
-    1.962936462507155
-    >>> Biweight((1, 2, 2.5, 1.75, 2)).spread
-    0.5042069490893494
-    >>> Biweight((1, 2, 2.5, 1.75, 2)).unbiased_std
-    0.6131156500926488
+    Calculate biweight median, spread and unbiased estimator::
+
+     >>> from moniplot.biweight import Biweight
+     >>> Biweight((1, 2, 2.5, 1.75, 2)).median
+     1.962936462507155
+     >>> Biweight((1, 2, 2.5, 1.75, 2)).spread
+     0.5042069490893494
+     >>> Biweight((1, 2, 2.5, 1.75, 2)).unbiased_std
+     0.6131156500926488
+
     """
-    def __init__(self, data, axis=None):
+    def __init__(self, data, axis: int | None = None):
         """Initialize an Biweight object
         """
         data = np.asarray(data)
@@ -109,7 +111,7 @@ class Biweight:
             self.__med_data = np.squeeze(self.__med_data)
 
     @property
-    def median(self):
+    def median(self) -> float | np.ndarray:
         """Return biweight median.
         """
         if self.axis is None:
@@ -129,7 +131,7 @@ class Biweight:
         return self.__med_data
 
     @property
-    def spread(self):
+    def spread(self) -> float | np.ndarray:
         """Return biweight spread.
         """
         if self.axis is None:
@@ -155,7 +157,7 @@ class Biweight:
         return np.sqrt(biweight_var)
 
     @property
-    def unbiased_std(self):
+    def unbiased_std(self) -> float | np.ndarray:
         """Return unbiased estimator.
         """
         count = self.nr_valid
