@@ -19,6 +19,7 @@
 """
 This module contains our Python of the Tukey's biweight algorithm.
 """
+from __future__ import annotations
 __all__ = ['Biweight', 'biweight']
 
 import warnings
@@ -64,7 +65,7 @@ class Biweight:
 
     """
     def __init__(self, data, axis: int | None = None):
-        """Initialize an Biweight object
+        """Initialize a Biweight object
         """
         data = np.asarray(data)
 
@@ -202,6 +203,6 @@ def biweight(data, axis=None, spread=False):
     """
     bwght = Biweight(data, axis=axis)
     if spread:
-        return (bwght.median, bwght.spread)
+        return bwght.median, bwght.spread
 
     return bwght.median

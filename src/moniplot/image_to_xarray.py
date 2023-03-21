@@ -21,6 +21,7 @@ This module contains the routines `h5_to_xr` and `data_to_xr`.
 These functions store a HDF5 dataset or numpy array in a labeled array
 (class `xarray.DataArray`).
 """
+from __future__ import annotations
 __all__ = ['h5_to_xr', 'data_to_xr']
 
 from pathlib import PurePath
@@ -120,7 +121,7 @@ def __get_coords(dset, data_sel: slice) -> list:
     return coords
 
 
-def __set_coords(dset, data_sel: slice, dims: list) -> list:
+def __set_coords(dset, data_sel: slice | None, dims: list | None) -> list:
     r"""Set coordinates of the HDF5 dataset.
 
     Parameters
@@ -192,7 +193,7 @@ def __get_data(dset, data_sel: tuple, field: str):
     return data
 
 
-def __check_selection(data_sel: tuple, ndim: int) -> tuple:
+def __check_selection(data_sel: tuple, ndim: int) -> tuple | None:
     r"""Check and correct user provided data selection.
 
     Notes
@@ -211,7 +212,7 @@ def __check_selection(data_sel: tuple, ndim: int) -> tuple:
         return None
 
     if np.isscalar(data_sel):
-        return (np.s_[data_sel:data_sel+1],)
+        return np.s_[data_sel:data_sel+1]
 
     buff = ()
     for val in data_sel:
@@ -227,7 +228,7 @@ def __check_selection(data_sel: tuple, ndim: int) -> tuple:
 
 
 # - main function ----------------------------------
-def h5_to_xr(h5_dset, data_sel=None, *, dims=None, field=None):
+def h5_to_xr(h5_dset, data_sel: slice | None = None, *, dims=None, field=None):
     r"""Create xarray::DataArray from a HDF5 dataset (with dimension scales).
 
     Implements a lite interface with the xarray::DataArray, should work for all
@@ -237,7 +238,7 @@ def h5_to_xr(h5_dset, data_sel=None, *, dims=None, field=None):
     ----------
     h5_dset :  h5py.Dataset
        Data, dimensions, coordinates and attributes are read for this dataset
-    data_sel :  slice, optional
+    data_sel :  slice | None, optional
        A numpy slice generated for example `numpy.s\_`
     dims :  list of strings, optional
        Alternative names for the dataset dimensions if not attached to dataset

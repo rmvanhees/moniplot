@@ -48,6 +48,7 @@ class FIGinfo:
         """Create FIGinfo instance to hold information on the current plot.
         """
         self.fig_info = {} if info_dict is None else info_dict
+        self._location = None
         self.set_location(loc)
 
     def __bool__(self) -> bool:
@@ -61,6 +62,10 @@ class FIGinfo:
         """
         return deepcopy(self)
 
+    @property
+    def location(self):
+        return self._location
+
     def set_location(self, loc: str) -> None:
         """Set the location of the fig_info box.
 
@@ -72,7 +77,7 @@ class FIGinfo:
         if loc not in ('above', 'none'):
             raise KeyError("location should be: 'above' or 'none'")
 
-        self.location = loc
+        self._location = loc
 
     def add(self, key: str, value, fmt='{}') -> None:
         r"""Extent fig_info by adding a new line.

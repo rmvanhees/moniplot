@@ -20,6 +20,7 @@
 This module contains `add_subplot` and `add_hk_subplot`
 which are used by `draw_trend`.
 """
+from __future__ import annotations
 __all__ = ['add_subplot', 'add_hk_subplot']
 
 from numbers import Integral
@@ -140,7 +141,7 @@ def adjust_ylim(data, err1, err2, vperc: list, vrange_last_orbits: int):
     else:
         delta = (ylim[1] - ylim[0]) / factor
 
-    return (ylim[0] - delta, ylim[1] + delta)
+    return ylim[0] - delta, ylim[1] + delta
 
 
 def adjust_units(zunit: str) -> str:
@@ -261,13 +262,13 @@ def add_subplot(axx, xarr) -> None:
     # adjust data X-coordinate
     axx.locator_params(axis='y', nbins=5)
     if 'orbit' in xarr.coords:
-        axx.set_ylim(adjust_ylim(avg, err1, err2, None, -1))
+        axx.set_ylim(adjust_ylim(avg, err1, err2, [], -1))
 
     axx.set_ylabel(ylabel)
     axx.grid(True)
 
 
-def add_hk_subplot(axx, xarr, vperc=None, vrange_last_orbits=-1) -> None:
+def add_hk_subplot(axx, xarr, vperc: list | None = None, vrange_last_orbits=-1) -> None:
     """Add a subplot for housekeeping data.
 
     Parameters
@@ -277,7 +278,7 @@ def add_hk_subplot(axx, xarr, vperc=None, vrange_last_orbits=-1) -> None:
     xarr :  xarray.DataArray
        Object holding housekeeping data data and attributes.
        Dimension must be 'orbit', 'hours' or 'time'.
-    vperc :  list, optional
+    vperc :  list | None, optional
        Reject outliers before determining vrange
        (neglected when vrange_last_orbits is used)
     vrange_last_orbits :  int

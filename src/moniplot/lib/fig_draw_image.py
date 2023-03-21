@@ -74,7 +74,7 @@ def adjust_zunit(zunits: str, vmin: float, vmax: float) -> tuple:
         key_to_zunit = {-4: 'p', -3: 'n', -2: r'\xb5', -1: 'm',
                         0: '', 1: 'k', 2: 'M', 3: 'G', 4: 'T'}
         max_value = max(abs(vmin), abs(vmax))
-        key = min(4, max(-4, log10(max_value) // 3))
+        key = min(4, max(-4, int(log10(max_value)) // 3))
 
         return 1000 ** key, key_to_zunit[key] + zunits
 
@@ -366,7 +366,7 @@ def fig_qdata_to_xarr(data, ref_data=None, data_sel=None,
             exclude_region = np.full(data.shape, True)
             exclude_region[data_sel] = False
 
-    def float_to_quality(arr):
+    def float_to_quality(arr: np.ndarray):
         """
         Convert float value [0, 1] to quality classes
         """

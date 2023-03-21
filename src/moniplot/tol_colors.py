@@ -150,7 +150,7 @@ def _rainbow_discrete(lut=None):
                '#DC050C', '#A5170E', '#72190E', '#42150A')
 
     if lut is None:
-        return hexclrs + ['#777777']
+        return hexclrs + ('#777777',)
 
     if lut < 1 or lut > 23:
         lut = 22
@@ -249,7 +249,7 @@ def tol_cmap(colormap=None, lut=0):
 
     Examples
     --------
-    >>> cmap = tol_cmap(<scheme>)
+    >>> cmap = tol_cmap('rainbow')
 
     """
     if colormap is None:
@@ -297,7 +297,7 @@ def tol_cset(colorset=None):
 
     Examples
     --------
-    >>> cset = tol_cset(<scheme>)
+    >>> cset = tol_cset('bright')
 
     """
     if colorset is None:

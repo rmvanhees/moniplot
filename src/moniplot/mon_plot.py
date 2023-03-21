@@ -23,6 +23,7 @@ This module contains the class `MONplot` with the methods:
 `draw_hist`, `draw_lplot`, `draw_multiplot`, `draw_qhist`, `draw_quality`,
 `draw_signal`, `draw_tracks`, `draw_trend`, draw_fov_ckd.
 """
+from __future__ import annotations
 __all__ = ['MONplot']
 
 from datetime import datetime
@@ -146,9 +147,8 @@ class MONplot:
 
         Parameters
         ----------
-        institute :  str
-           Provide abbreviation of the name of your institute to be used in
-           the copyright statement in the main panel of the figures.
+        caption :  str
+           Default title of all pages at the top of the page.
         """
         self.__caption = caption
 
@@ -549,7 +549,7 @@ class MONplot:
         'bad'       : 0 <= value < thres_bad
         'good'      : thres_bad <= value <= 1
 
-        Otherwise the labels for quality ranking indicate which pixels have
+        Otherwise, the labels for quality ranking indicate which pixels have
         changed w.r.t. reference. The labels are::
 
         'unusable'  : pixels outside the illuminated region
@@ -697,6 +697,7 @@ class MONplot:
 
         # add figures with trend data
         ipanel = 0
+        xlabel = 'time'
         if xds is not None:
             xlabel = 'orbit' if 'orbit' in xds.coords else 'time [hours]'
             for name in xds.data_vars:
@@ -730,7 +731,7 @@ class MONplot:
            Select a region on the detector by fancy indexing (using a
            boolean/interger arrays), or using index tuples for arrays
            (generated with `numpy.s\_`).
-        vrange :  list, default=[data.min(), data.max()]
+        vrange :  list[float, float], default=[data.min(), data.max()]
            The lower and upper range of the bins.
            Note data will also be clipped according to this range.
         fig_info :  FIGinfo, optional
