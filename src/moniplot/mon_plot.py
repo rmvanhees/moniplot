@@ -85,7 +85,7 @@ class MONplot:
     the software will use the name of the xarray class, coordinate names and
     data attributes, such as `long_name` and `units`.
     """
-    def __init__(self, figname, caption=None):
+    def __init__(self, figname: str, caption: str | None = None):
         """Initialize multi-page PDF document or a single-page PNG.
         """
         self.__cset = tol_rgba(DEFAULT_CSET)
@@ -117,8 +117,7 @@ class MONplot:
             self.__pdf.savefig()
 
     def close(self) -> None:
-        """Close PNG or (multipage) PDF document.
-        """
+        """Close PNG or (multipage) PDF document."""
         if self.__pdf is None:
             return
 
@@ -135,11 +134,9 @@ class MONplot:
         self.__pdf.close()
         plt.close('all')
 
-    # --------------------------------------------------
     @property
     def caption(self) -> str:
-        """Return figure caption.
-        """
+        """Returns caption of figure."""
         return self.__caption
 
     def set_caption(self, caption: str) -> None:
@@ -164,8 +161,7 @@ class MONplot:
     # --------------------------------------------------
     @property
     def cmap(self):
-        """Return matplotlib colormap.
-        """
+        """Returns current Matplotlib colormap."""
         return self.__cmap
 
     def set_cmap(self, cmap) -> None:
@@ -185,11 +181,10 @@ class MONplot:
     # --------------------------------------------------
     @property
     def cset(self) -> str:
-        """Return name of current color-set.
-        """
+        """Returns name of current color-set."""
         return self.__cset
 
-    def set_cset(self, cname: str, cnum=None) -> None:
+    def set_cset(self, cname: str, cnum: int | None = None) -> None:
         """Use alternative color-set through which `draw_lplot` will cycle.
 
         Parameters
@@ -209,8 +204,7 @@ class MONplot:
     # --------------------------------------------------
     @property
     def institute(self) -> str:
-        """Return name of your institute.
-        """
+        """Returns name of institute."""
         return self.__institute
 
     def set_institute(self, institute: str) -> None:
@@ -239,7 +233,7 @@ class MONplot:
                  transform=axx.transAxes)
 
     @staticmethod
-    def __add_fig_box(fig, fig_info) -> None:
+    def __add_fig_box(fig, fig_info: FIGinfo) -> None:
         """Add a box with meta information in the current figure.
 
         Parameters
@@ -263,7 +257,7 @@ class MONplot:
 
     # -------------------------
     def __draw_image__(self, xarr: xr.DataArray, side_panels: str,
-                       fig_info: FIGinfo, title: str) -> None:
+                       fig_info: FIGinfo | None, title: str | None) -> None:
         """Does the actual drawing of the image data for the public methods
         `draw_signal` and `draw_quality`.
         """
@@ -395,8 +389,10 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_signal(self, data, *, fig_info=None, side_panels='nanmedian',
-                    title=None, **kwargs) -> None:
+    def draw_signal(self, data: xr.DataArray | np.ndarray, *,
+                    fig_info: FIGinfo | None = None,
+                    side_panels: str = 'nanmedian',
+                    title: str | None = None, **kwargs) -> None:
         """Display 2D array as an image and averaged column/row signal
         in the side-panels (optional).
 
@@ -496,8 +492,11 @@ class MONplot:
         self.__draw_image__(xarr, side_panels, fig_info, title)
 
     # --------------------------------------------------
-    def draw_quality(self, data, ref_data=None, *, side_panels='quality',
-                     fig_info=None, title=None, **kwargs) -> None:
+    def draw_quality(self, data: xr.DataArray | np.ndarray,
+                     ref_data: np.ndarray | None = None, *,
+                     side_panels: str = 'quality',
+                     fig_info: FIGinfo | None = None,
+                     title: str | None = None, **kwargs) -> None:
         """Display pixel-quality 2D array as image with column/row statistics.
 
         Parameters
@@ -611,8 +610,10 @@ class MONplot:
         self.__draw_image__(xarr, side_panels, fig_info, title)
 
     # --------------------------------------------------
-    def draw_trend(self, xds=None, hk_xds=None, *,
-                   fig_info=None, title=None, **kwargs) -> None:
+    def draw_trend(self, xds: xr.DataArray | None = None,
+                   hk_xds: xr.DataArray | None = None, *,
+                   fig_info: FIGinfo | None = None,
+                   title: str | None = None, **kwargs) -> None:
         """
         Display trends of measurement data and/or housekeeping data
 
@@ -715,8 +716,11 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_hist(self, data, data_sel=None, vrange=None,
-                  fig_info=None, title=None, **kwargs) -> None:
+    def draw_hist(self, data: xr.DataArray | np.ndarray,
+                  data_sel: tuple[slice | int] | None = None,
+                  vrange: list[float, float] | None = None,
+                  fig_info: FIGinfo | None = None,
+                  title: str | None = None, **kwargs) -> None:
         r"""Display data as histograms.
 
         Parameters
@@ -839,8 +843,11 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_qhist(self, xds, data_sel=None, density=True,
-                   fig_info=None, title=None) -> None:
+    def draw_qhist(self, xds: xr.DataArray,
+                   data_sel: tuple[slice, int] | None = None,
+                   density: bool = True,
+                   fig_info: FIGinfo | None = None,
+                   title: str | None = None) -> None:
         r"""Display pixel-quality data as histograms.
 
         Parameters
@@ -927,8 +934,11 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_lplot(self, xdata=None, ydata=None, *, square: bool = False,
-                   fig_info: FIGinfo = None, title: str | None = None,
+    def draw_lplot(self, xdata: np.ndarray | None = None,
+                   ydata: np.ndarray | None = None, *,
+                   square: bool = False,
+                   fig_info: FIGinfo | None = None,
+                   title: str | None = None,
                    kwlegend: dict | None = None, **kwargs) -> None:
         """Plot y versus x lines, maybe called multiple times to add lines.
         Figure is closed when called with xdata equals None.
@@ -1071,7 +1081,8 @@ class MONplot:
 
     # --------------------------------------------------
     def draw_multiplot(self, data_tuple: tuple, gridspec=None, *,
-                       fig_info=None, title=None, **kwargs) -> None:
+                       fig_info: FIGinfo | None = None,
+                       title: str | None = None, **kwargs) -> None:
         """Display multiple subplots on one page using
         `matplotlib.gridspec.GridSpec`.
 
@@ -1087,7 +1098,7 @@ class MONplot:
            Title of this figure using `Axis.set_title`.
            Ignored when data is a `xarray` data-structure.
         **kwargs :   other keywords
-           Keywords are passed to `matplotlib.pyplot.plot`.
+           The keywords are passed to `matplotlib.pyplot.plot`.
            Ignored when data is a `xarray` data-structure.
 
         See Also
@@ -1185,8 +1196,9 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_tracks(self, lons: np.ndarray, lats: np.ndarray, icids: np.ndarray,
-                    *, saa_region: np.ndarray | None = None,
+    def draw_tracks(self, lons: np.ndarray, lats: np.ndarray,
+                    icids: np.ndarray, *,
+                    saa_region: np.ndarray | None = None,
                     fig_info: FIGinfo | None = None,
                     title: str | None = None) -> None:
         """Display tracks of satellite on a world map
@@ -1239,14 +1251,12 @@ class MONplot:
 
     # --------------------------------------------------
     def draw_fov_ckd(self, data: xr.DataArray | np.ndarray, *,
-                     vp_blocks: tuple, vp_labels: tuple[str] | None = None,
+                     vp_blocks: tuple,
+                     vp_labels: tuple[str] | None = None,
                      fig_info: FIGinfo | None = None,
                      title: str | None = None, **kwargs) -> None:
         """Display a 2D CKD parameter which consists of data from several
         viewports.
-
-        The current implementation only works for SPEXone CKD: FIELD_OF_VIEW,
-        POLARIMETRIC, RADIOMETRIC and WAVELENGTH
 
         Parameters
         ----------
@@ -1263,6 +1273,11 @@ class MONplot:
            Title of this figure using `Axis.set_title`.
         **kwargs :   other keywords
            Keyword arguments: `zscale`, `vperc` or `vrange`
+
+        Notes
+        -----
+        The current implementation only works for SPEXone CKD: FIELD_OF_VIEW,
+        POLARIMETRIC, RADIOMETRIC and WAVELENGTH
 
         See also
         --------
