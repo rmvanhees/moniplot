@@ -19,16 +19,18 @@
 """
 This module contains the class `FIGinfo`.
 """
+from __future__ import annotations
 __all__ = ['FIGinfo']
 
 from copy import deepcopy
 from datetime import datetime
+from typing import Any
 
 
 # - main function -------------------------
 class FIGinfo:
     """
-    The figure information constists of [key, value] combinations which are
+    The figure information consists of [key, value] combinations which are
     to be displayed upper-right corner of the figure.
 
     Parameters
@@ -42,9 +44,10 @@ class FIGinfo:
     -----
     The figure-box can only hold a limited number of entries, because it will
     grow with the number of lines and overlap with the main image or its
-    colorbar. You may try loc='below', which is only available for image plots.
+    color bar. You may try loc='below', which is only available for image plots.
     """
-    def __init__(self, loc='above', info_dict=None) -> None:
+    def __init__(self, loc: str = 'above',
+                 info_dict: dict | None = None) -> None:
         """Create FIGinfo instance to hold information on the current plot.
         """
         self.fig_info = {} if info_dict is None else info_dict
@@ -64,6 +67,7 @@ class FIGinfo:
 
     @property
     def location(self):
+        """Return location of the fig_info box."""
         return self._location
 
     def set_location(self, loc: str) -> None:
@@ -79,7 +83,7 @@ class FIGinfo:
 
         self._location = loc
 
-    def add(self, key: str, value, fmt='{}') -> None:
+    def add(self, key: str, value: Any, fmt: str = '{}') -> None:
         r"""Extent fig_info by adding a new line.
 
         Parameters

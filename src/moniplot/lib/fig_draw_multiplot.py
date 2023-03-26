@@ -19,13 +19,15 @@
 """
 This module holds `draw_subplot` which is used by `draw_multiplot`.
 """
-__all__ = ['draw_subplot']
+from __future__ import annotations
+__all__ = ['draw_subplot', 'get_xylabels']
 
 import numpy as np
+import xarray as xr
 
 
 # - local functions --------------------------------
-def get_xylabels(gridspec, data_tuple):
+def get_xylabels(gridspec, data_tuple: tuple) -> np.ndarray:
     """Define xlabel and ylabel for each subplot panel.
 
     Parameters
@@ -66,7 +68,7 @@ def get_xylabels(gridspec, data_tuple):
 
 
 # - main functions ---------------------------------
-def draw_subplot(axx, xarr, xylabels) -> None:
+def draw_subplot(axx, xarr: xr.DataArray, xylabels: list[str, str]) -> None:
     """Draw a subplot figure.
 
     Parameters

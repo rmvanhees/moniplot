@@ -249,8 +249,9 @@ def tol_cmap(colormap=None, lut=0):
 
     Examples
     --------
-    >>> cmap = tol_cmap('rainbow')
+    Typical usage::
 
+    > cmap = tol_cmap('rainbow')
     """
     if colormap is None:
         return _cmap_dict.keys()
@@ -297,8 +298,9 @@ def tol_cset(colorset=None):
 
     Examples
     --------
-    >>> cset = tol_cset('bright')
+    Typical usage::
 
+    > cset = tol_cset('bright')
     """
     if colorset is None:
         return _cset_dict.keys()

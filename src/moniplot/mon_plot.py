@@ -100,7 +100,7 @@ class MONplot:
 
         self.__pdf = PdfPages(figname)
 
-        # turn off Matplotlib's automatic offset notation
+        # turn-off the automatic offset notation of Matplotlib
         mpl.rcParams['axes.formatter.useoffset'] = False
 
     def __repr__(self) -> None:
@@ -447,32 +447,31 @@ class MONplot:
         Examples
         --------
         Create a PDF document 'test.pdf' and add figure of dataset img
-        (`numpy.ndarray` or `xarray.DataArray`) with side-panels and title.
+        (`numpy.ndarray` or `xarray.DataArray`) with side-panels and title::
 
-        >>> plot = MONplot('test.pdf', caption='my caption')
-        >>> plot.set_institute('SRON')
-        >>> plot.draw_signal(img, title='my title')
+        > plot = MONplot('test.pdf', caption='my caption')
+        > plot.set_institute('SRON')
+        > plot.draw_signal(img, title='my title')
 
-        Add the same figure without side-panels
+        Add the same figure without side-panels::
 
-        >>> plot.draw_signal(img, side_panels='none', title='my title')
+        > plot.draw_signal(img, side_panels='none', title='my title')
 
-        Add a figure using a fixed data-range that the colormap covers
+        Add a figure using a fixed data-range that the colormap covers::
 
-        >>> plot.draw_signal(img1, title='my title', vrange=[zmin, zmax])
+        > plot.draw_signal(img1, title='my title', vrange=[zmin, zmax])
 
-        Add a figure where img2 = img - img_ref
+        Add a figure where img2 = img - img_ref::
 
-        >>> plot.draw_signal(img2, title='my title', zscale='diff')
+        > plot.draw_signal(img2, title='my title', zscale='diff')
 
-        Add a figure where img2 = img / img_ref
+        Add a figure where img2 = img / img_ref::
 
-        >>> plot.draw_signal(img2, title='my title', zscale='ratio')
+        > plot.draw_signal(img2, title='my title', zscale='ratio')
 
-        Finalize the PDF file
+        Finalize the PDF file::
 
-        >>> plot.close()
-
+        > plot.close()
         """
         # convert, if necessary, input data to xarray.DataArray
         if isinstance(data, xr.DataArray) and '_zscale' in data.attrs:
@@ -565,23 +564,22 @@ class MONplot:
         Examples
         --------
         Create a PDF document 'test.pdf' and add figure of dataset img
-        (`numpy.ndarray` or `xarray.DataArray`) with side-panels and title
+        (`numpy.ndarray` or `xarray.DataArray`) with side-panels and title::
 
-        >>> plot = MONplot('test.pdf', caption='my caption', institute='SRON')
-        >>> plot.draw_quality(img, title='my title')
+        > plot = MONplot('test.pdf', caption='my caption', institute='SRON')
+        > plot.draw_quality(img, title='my title')
 
-        Add the same figure without side-panels
+        Add the same figure without side-panels::
 
-        >>> plot.draw_quality(img, side_panels='none', title='my title')
+        > plot.draw_quality(img, side_panels='none', title='my title')
 
-        Add a figure where img_ref is a quality map from early in the mission
+        Add a figure where img_ref is a quality map from early in the mission::
 
-        >>> plot.draw_quality(img, img_ref, title='my title')
+        > plot.draw_quality(img, img_ref, title='my title')
 
-        Finalize the PDF file
+        Finalize the PDF file::
 
-        >>> plot.close()
-
+        > plot.close()
         """
         # convert, if necessary, input data to xarray.DataArray
         if isinstance(data, xr.DataArray) and '_zscale' in data.attrs:
@@ -650,21 +648,20 @@ class MONplot:
         Create a PDF document 'test.pdf' and add figure of dataset 'xds'
         (`numpy.ndarray` or `xarray.DataArray`) with a title. The dataset 'xds'
         may contain multiple DataArrays with a common X-coordinate. Each
-        DataArray will be displayed in a seperate sub-panel.
+        DataArray will be displayed in a seperate sub-panel::
 
-        >>> plot = MONplot('test.pdf', caption='my caption', institute='SRON')
-        >>> plot.draw_trend(xds, hk_xds=None, title='my title')
+        > plot = MONplot('test.pdf', caption='my caption', institute='SRON')
+        > plot.draw_trend(xds, hk_xds=None, title='my title')
 
         Add a figure with the same Dataset 'xds' and a few trends of
         housekeeping data (again each parameter in a seperate DataArray with
-        with a common X-coordinate).
+        a common X-coordinate)::
 
-        >>> plot.draw_trend(xds, hk_xds, title='my title')
+        > plot.draw_trend(xds, hk_xds, title='my title')
 
-        Finalize the PDF file
+        Finalize the PDF file::
 
-        >>> plot.close()
-
+        > plot.close()
         """
         if xds is None and hk_xds is None:
             raise ValueError('both xds and hk_xds are None')
@@ -763,14 +760,13 @@ class MONplot:
         Both pages have the caption "My Caption", the title of the figure on
         the first page is "my title" and on the second page the title of the
         figure is `f"Histogram of {xarr.attrs['long_name']}"`, if xarr has
-        attribute "long_name".
+        attribute "long_name"::
 
-        >>> plot = MONplot('test.pdf', caption='My Caption')
-        >>> plot.set_institute('SRON')
-        >>> plot.draw_hist(data, title='my title')
-        >>> plot.draw_hist(xarr)
-        >>> plot.close()
-
+        > plot = MONplot('test.pdf', caption='My Caption')
+        > plot.set_institute('SRON')
+        > plot.draw_hist(data, title='my title')
+        > plot.draw_hist(xarr)
+        > plot.close()
         """
         long_name = ''
         zunits = '1'
@@ -963,68 +959,63 @@ class MONplot:
 
         Examples
         --------
-        General example:
+        General example::
 
-        >>> plot = MONplot(fig_name)
-        >>> for ii, xarr, yarr in enumerate(data_of_each_line):
-        ...    plot.draw_lplot(xarr, yarr, label=mylabel[ii], marker='o')
-        ...
-        >>> plot.draw_lplot(xlim=[0, 0.5], ylim=[-10, 10],
-        ...    xlabel='x-axis, ylabel=y-axis')
-        >>> plot.close()
+        > plot = MONplot(fig_name)
+        > for ii, xarr, yarr in enumerate(data_of_each_line):
+        ...   plot.draw_lplot(xarr, yarr, label=mylabel[ii], marker='o')
 
-        Using a time-axis:
+        > plot.draw_lplot(xlim=[0, 0.5], ylim=[-10, 10],
+        ...   xlabel='x-axis, ylabel=y-axis')
+        > plot.close()
 
-        >>> from datetime import datetime, timedelta
-        >>> tt0 = (datetime(year=2020, month=10, day=1)
-        ...        + timedelta(seconds=sec_in_day))
-        >>> tt = [tt0 + iy * t_step for iy in range(yy.size)]
-        >>> plot = MONplot(fig_name)
-        >>> plot.draw_lplot(tt, yy, label='mylabel', marker='o')
-        >>> plot.draw_lplot(ylim=[-10, 10], xlabel='t-axis', ylabel='y-axis')
-        >>> plot.close()
+        Using a time-axis::
+
+        > from datetime import datetime, timedelta
+        > tt0 = (datetime(year=2020, month=10, day=1)
+        ...      + timedelta(seconds=sec_in_day))
+        > tt = [tt0 + iy * t_step for iy in range(yy.size)]
+        > plot = MONplot(fig_name)
+        > plot.draw_lplot(tt, yy, label='mylabel', marker='o')
+        > plot.draw_lplot(ylim=[-10, 10], xlabel='t-axis', ylabel='y-axis')
+        > plot.close()
 
         You can use different sets of colors and cycle through them.
-        First, we use default colors defined by matplotlib:
+        First, we use default colors defined by matplotlib::
 
-        >>> plot = MONplot('test_lplot.pdf')
-        >>> plot.set_cset(None)
-        >>> for i in range(5):
-        ...    plot.draw_lplot(np.arange(10), np.arange(10)*(i+1))
-        ...
-        >>> plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
-        ...    title='draw_lplot [cset is None]')
+        > plot = MONplot('test_lplot.pdf')
+        > plot.set_cset(None)
+        > for ii in range(5):
+        ...   plot.draw_lplot(np.arange(10), np.arange(10)*(ii+1))
+        > plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
+        ...   title='draw_lplot [cset is None]')
 
-        You can also assign colors to each line:
+        You can also assign colors to each line::
 
-        >>> for i, clr in enumerate('rgbym'):
-        ...    plot.draw_lplot(np.arange(10), np.arange(10)*(i+1), color=clr)
-        ...
-        >>> plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
-        ...    title='draw_lplot [cset="rgbym"]')
+        > for ii, clr in enumerate('rgbym'):
+        ...   plot.draw_lplot(np.arange(10), np.arange(10)*(ii+1), color=clr)
+        > plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
+        ...   title='draw_lplot [cset="rgbym"]')
 
-        You can use one of the color sets as defined in ``tol_colors``:
+        You can use one of the color sets as defined in ``tol_colors``::
 
-        >>> plot.set_cset('mute')   # Note the default is 'bright'
-        >>> for i in range(5):
-        ...    plot.draw_lplot(ydata=np.arange(10)*(i+1))
-        ...
-        >>> plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
-        ...    title='draw_lplot [cset="mute"]')
+        > plot.set_cset('mute')   # Note the default is 'bright'
+        > for ii in range(5):
+        ...   plot.draw_lplot(ydata=np.arange(10)*(ii+1))
+        > plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
+        ...   title='draw_lplot [cset="mute"]')
 
         Or you can use a color map as defined in ``tol_colors`` where
         you can define the number of colors you need. If you need less than 24
-        colors, you can use 'rainbow_discrete' or you can choose an other
-        color map if you need more colors, for example:
+        colors, you can use 'rainbow_discrete' or you can choose one
+        color map if you need more colors, for example::
 
-        >>> plot.set_cset('rainbow_PuBr', 25)
-        >>> for i in range(25):
-        ...    plot.draw_lplot(ydata=np.arange(10)*(i+1))
-        ...
-        >>> plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
-        ...    title='draw_lplot [cset="rainbow_PyBr"]')
-        >>> plot.close()
-
+        > plot.set_cset('rainbow_PuBr', 25)
+        > for ii in range(25):
+        ...   plot.draw_lplot(ydata=np.arange(10)*(ii+1))
+        > plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
+        ...   title='draw_lplot [cset="rainbow_PyBr"]')
+        > plot.close()
         """
         if ydata is None:
             if self.__mpl is None:
@@ -1093,7 +1084,7 @@ class MONplot:
            Instance of `matplotlib.gridspec.GridSpec`.
         fig_info  :  FIGinfo, optional
            Meta-data to be displayed in the figure.
-        title :  str, default=None
+        title :  str, optional
            Title of this figure using `Axis.set_title`.
            Ignored when data is a `xarray` data-structure.
         **kwargs :   other keywords
@@ -1122,33 +1113,32 @@ class MONplot:
         --------
         Show two numpy arrays, each in a different panel. The subplots are
         above each other (row=2, col=1). The X-coordinates are generated
-        using np.range(ndarray1) and  np.range(ndarray2):
+        using np.range(ndarray1) and  np.range(ndarray2)::
 
-        >>> data_tuple = (ndarray1, ndarray2)
-        >>> plot = MONplot(fig_name)
-        >>> plot.draw_multiplot(data_tuple, title='my title',
-        ...                     marker='o', linestyle='', color='r')
-        >>> plot.close()
+        > data_tuple = (ndarray1, ndarray2)
+        > plot = MONplot(fig_name)
+        > plot.draw_multiplot(data_tuple, title='my title',
+        ...                   marker='o', linestyle='', color='r')
+        > plot.close()
 
         Show four DataArrays, each in a different panel. The subplots
         are above each other in 2 columns (row=2, col=2). The X-coordinates
-        are generated from the first dimension of the DataArrays:
+        are generated from the first dimension of the DataArrays::
 
-        >>> data_tuple = (xarr1, xarr2, xarr3, xarr4)
-        >>> plot = MONplot(fig_name)
-        >>> plot.draw_multiplot(data_tuple, title='my title',
-        ...                     marker='o', linestyle='')
-        >>> plot.close()
+        > data_tuple = (xarr1, xarr2, xarr3, xarr4)
+        > plot = MONplot(fig_name)
+        > plot.draw_multiplot(data_tuple, title='my title',
+        ...                   marker='o', linestyle='')
+        > plot.close()
 
         Show the DataArrays in a Dataset, each in a different panel. If there
         are 3 DataArrays preset then the subplots are above each other (row=3,
         col=1). The X-coordinates are generated from the (shared?) first
-        dimension of the DataArrays:
+        dimension of the DataArrays::
 
-        >>> plot = MONplot(fig_name)
-        >>> plot.draw_multiplot(xds, title='my title')
-        >>> plot.close()
-
+        > plot = MONplot(fig_name)
+        > plot.draw_multiplot(xds, title='my title')
+        > plot.close()
         """
         # generate figure using contrained layout
         fig = plt.figure(figsize=(10, 10))
@@ -1196,24 +1186,28 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_tracks(self, lons, lats, icids, *, saa_region=None,
-                    fig_info=None, title=None) -> None:
+    def draw_tracks(self, lons: np.ndarray, lats: np.ndarray, icids: np.ndarray,
+                    *, saa_region: np.ndarray | None = None,
+                    fig_info: FIGinfo | None = None,
+                    title: str | None = None) -> None:
         """Display tracks of satellite on a world map
         using a Robinson projection.
 
         Parameters
         ----------
         lons :  (N, 2) array-like
-           Longitude coordinates at start and end of measurement.
+           Longitude coordinates at start and end of measurement
         lats :  (N, 2) array-like
-           Latitude coordinates at start and end of measurement.
+           Latitude coordinates at start and end of measurement
         icids :  (N) array-like
-           ICID of measurements per (lon, lat).
+           ICID of measurements per (lon, lat)
         saa_region :  (N, 2) array-like, optional
            The coordinates of the vertices. When defined, then show SAA region
-           as a matplotlib polygon patch.
+           as a matplotlib polygon patch
         fig_info :  FIGinfo, optional
-           OrderedDict holding meta-data to be displayed in the figure.
+           OrderedDict holding meta-data to be displayed in the figure
+        title :  str, optional
+           Title of this figure using `Axis.set_title`
 
         The information provided in the parameter 'fig_info' will be displayed
         in a small box.
@@ -1275,30 +1269,33 @@ class MONplot:
 
         Examples
         --------
-        Read SPEXone CKD:
-        >>> from pyspex.ckd_io import CKDio
-        >>> with CKDio(ckd_file) as ckd:
-        >>>     fov_ckd = ckd.fov()
-        >>>     rad_ckd = ckd.radiometric()
+        Read SPEXone CKD::
 
-        Set row-ranges belonging to one viewport
-        >>> nview = fov_ckd.dims['viewports']
-        >>> vp_blocks = ()
-        >>> for ii in range(nview):
-        >>>    ibgn = int(fov_ckd['fov_ifov_start_vp'][nview - ii - 1])
-        >>>    iend = int(ibgn + fov_ckd['fov_nfov_vp'][nview - ii - 1] + 1)
-        >>>    vp_blocks += ([ibgn, iend],)
+        > from pyspex.ckd_io import CKDio
+        > with CKDio(ckd_file) as ckd:
+        >     fov_ckd = ckd.fov()
+        >     rad_ckd = ckd.radiometric()
 
-        Create figures:
-        >>> from moniplot.mon_plot import MONplot
-        >>> plot = MONplot('test_spx1_fov_ckd.pdf', caption='SPEXone CKD')
-        >>> plot.draw_fov_ckd(rad_ckd.isel(polarization_directions=0),
-        >>>                   vp_blocks=vp_blocks,
-        >>>                   title=rad_ckd.attrs['long_name'] + ' (S+)')
-        >>> plot.draw_fov_ckd(rad_ckd.isel(polarization_directions=1),
-        >>>                   vp_blocks=vp_blocks, zscale='log',
-        >>>                   title=rad_ckd.attrs['long_name'] + ' (S-)')
-        >>> plot.close()
+        Set row-ranges belonging to one viewport::
+
+        > nview = fov_ckd.dims['viewports']
+        > vp_blocks = ()
+        > for ii in range(nview):
+        >    ibgn = int(fov_ckd['fov_ifov_start_vp'][nview - ii - 1])
+        >    iend = int(ibgn + fov_ckd['fov_nfov_vp'][nview - ii - 1] + 1)
+        >    vp_blocks += ([ibgn, iend],)
+
+        Create figures::
+
+        > from moniplot.mon_plot import MONplot
+        > plot = MONplot('test_spx1_fov_ckd.pdf', caption='SPEXone CKD')
+        > plot.draw_fov_ckd(rad_ckd.isel(polarization_directions=0),
+        >                   vp_blocks=vp_blocks,
+        >                   title=rad_ckd.attrs['long_name'] + ' (S+)')
+        > plot.draw_fov_ckd(rad_ckd.isel(polarization_directions=1),
+        >                   vp_blocks=vp_blocks, zscale='log',
+        >                   title=rad_ckd.attrs['long_name'] + ' (S-)')
+        > plot.close()
         """
         if vp_labels is None:
             vp_labels = ('+50', '+20', '0', '-20', '-50')

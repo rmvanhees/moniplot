@@ -23,8 +23,11 @@ which are used by `draw_trend`.
 from __future__ import annotations
 __all__ = ['add_subplot', 'add_hk_subplot']
 
+from typing import Iterable
+
 from numbers import Integral
 import numpy as np
+import xarray as xr
 
 from matplotlib.ticker import AutoMinorLocator, MultipleLocator
 
@@ -37,7 +40,7 @@ CSET = tol_cset('bright')
 
 
 # - local functions --------------------------------
-def set_labels_colors(xarr) -> tuple:
+def set_labels_colors(xarr: xr.DataArray) -> tuple[str, str, str, str]:
     """Determine name and units of housekeeping data and line and fill color.
 
     Parameters
@@ -87,7 +90,9 @@ def set_labels_colors(xarr) -> tuple:
     return hk_title, hk_label, lcolor, fcolor
 
 
-def adjust_ylim(data, err1, err2, vperc: list, vrange_last_orbits: int):
+def adjust_ylim(data: np.ndarray | Iterable, err1: np.ndarray | Iterable | None,
+                err2: np.ndarray | Iterable | None, vperc: list[int, int],
+                vrange_last_orbits: int) -> tuple[float, float]:
     """Set minimum and maximum values of ylim.
 
     Parameters
@@ -105,7 +110,7 @@ def adjust_ylim(data, err1, err2, vperc: list, vrange_last_orbits: int):
 
     Returns
     -------
-    list
+    tuple of floats
        Return the limits of the Y-coordinate
     """
     if err1 is not None and err2 is not None:
@@ -141,7 +146,7 @@ def adjust_ylim(data, err1, err2, vperc: list, vrange_last_orbits: int):
     else:
         delta = (ylim[1] - ylim[0]) / factor
 
-    return ylim[0] - delta, ylim[1] + delta
+    return float(ylim[0] - delta), float(ylim[1] + delta)
 
 
 def adjust_units(zunit: str) -> str:
@@ -155,7 +160,7 @@ def adjust_units(zunit: str) -> str:
     Returns
     -------
     str
-       Units with consistent abriviations of electron(s) and Volt
+       Units with consistent abbreviation of electron(s) and Volt
     """
     if zunit is None or zunit == '1':
         return '1'
@@ -170,7 +175,7 @@ def adjust_units(zunit: str) -> str:
     return zunit
 
 
-def get_gap_list(xdata: np.ndarray) -> list:
+def get_gap_list(xdata: np.ndarray) -> tuple:
     """Identify data gaps for data where xdata = offs + N * xstep.
 
     Parameters
@@ -184,18 +189,18 @@ def get_gap_list(xdata: np.ndarray) -> list:
        Indices to xdata where np.diff(xdata) greater than xstep
     """
     if not issubclass(xdata.dtype.type, Integral):
-        return []
+        return ()
 
     uvals, counts = np.unique(np.diff(xdata), return_counts=True)
     if counts.size > 1 and counts.max() / xdata.size > 0.5:
         xstep = uvals[counts.argmax()]
-        return (np.diff(xdata) > xstep).nonzero()[0].tolist()
+        return tuple(i for i in (np.diff(xdata) > xstep).nonzero()[0])
 
-    return []
+    return ()
 
 
 # - main functions ---------------------------------
-def add_subplot(axx, xarr) -> None:
+def add_subplot(axx, xarr: xr.DataArray) -> None:
     """Add a subplot for measurement data.
 
     Parameters
@@ -211,7 +216,7 @@ def add_subplot(axx, xarr) -> None:
     lcolor = xarr.attrs['_color'] if '_color' in xarr.attrs else CSET.blue
     fcolor = '#BBCCEE'
 
-    # define xdata and determine gap_list (always atleast one element!)
+    # define xdata and determine gap_list (always at least one element!)
     if 'orbit' in xarr.coords:
         xdata = xarr.coords['orbit'].values
         isel = np.s_[:]
@@ -219,7 +224,7 @@ def add_subplot(axx, xarr) -> None:
         xdata = xarr.coords['time'].values
         isel = np.s_[0, :]
     gap_list = get_gap_list(xdata)
-    gap_list.append(xdata.size - 1)
+    gap_list += (xdata.size - 1,)
 
     # define avg, err1, err2
     # check if xarr.values is a structured array:
@@ -268,7 +273,8 @@ def add_subplot(axx, xarr) -> None:
     axx.grid(True)
 
 
-def add_hk_subplot(axx, xarr, vperc: list | None = None, vrange_last_orbits=-1) -> None:
+def add_hk_subplot(axx, xarr: xr.DataArray, vperc: list | None = None,
+                   vrange_last_orbits: int = -1) -> None:
     """Add a subplot for housekeeping data.
 
     Parameters
@@ -276,7 +282,7 @@ def add_hk_subplot(axx, xarr, vperc: list | None = None, vrange_last_orbits=-1) 
     axx :  matplotlib.Axes
        Matplotlib Axes object of the current panel
     xarr :  xarray.DataArray
-       Object holding housekeeping data data and attributes.
+       Object holding housekeeping data and attributes.
        Dimension must be 'orbit', 'hours' or 'time'.
     vperc :  list | None, optional
        Reject outliers before determining vrange
@@ -299,7 +305,7 @@ def add_hk_subplot(axx, xarr, vperc: list | None = None, vrange_last_orbits=-1) 
         xdata = xarr.coords['time'].values
         isel = np.s_[0, :]
         gap_list = get_gap_list(xdata)
-    gap_list.append(xdata.size - 1)
+    gap_list += (xdata.size - 1,)
 
     # define avg, err1, err2
     avg = xarr.values['mean'][isel]

@@ -26,18 +26,19 @@ __all__ = ['h5_to_xr', 'data_to_xr']
 
 from pathlib import PurePath
 
+import h5py
 import numpy as np
 import xarray as xr
 
 
 # - local functions --------------------------------
-def __get_attrs(dset, field: str) -> dict:
+def __get_attrs(dset: h5py.Dataset, field: str) -> dict:
     """Return attributes of the HDF5 dataset.
 
     Parameters
     ----------
     dset :  h5py.Dataset
-       h5py dataset from which the attributes are read
+       HDF5 dataset from which the attributes are read
     field : str
        Name of field in compound dataset
 
@@ -80,14 +81,14 @@ def __get_attrs(dset, field: str) -> dict:
     return attrs
 
 
-def __get_coords(dset, data_sel: slice) -> list:
+def __get_coords(dset: h5py.Dataset, data_sel: tuple[slice | int]) -> list:
     r"""Return coordinates of the HDF5 dataset with dimension scales.
 
     Parameters
     ----------
     dset :  h5py.Dataset
-       h5py dataset from which the data is read
-    data_sel :  slice
+       HDF5 dataset from which the data is read
+    data_sel :  tuple of slice or int
        A numpy slice generated for example `numpy.s\_`
 
     Returns
@@ -121,14 +122,16 @@ def __get_coords(dset, data_sel: slice) -> list:
     return coords
 
 
-def __set_coords(dset, data_sel: slice | None, dims: list | None) -> list:
+def __set_coords(dset: h5py.Dataset | np.ndarray,
+                 data_sel: tuple[slice | int] | None,
+                 dims: list | None) -> list:
     r"""Set coordinates of the HDF5 dataset.
 
     Parameters
     ----------
-    dset :  h5py.Dataset or numpy.array
-       h5py dataset from which the data is read
-    data_sel :  slice
+    dset :  h5py.Dataset or np.ndarray
+       HDF5 dataset from which the data is read, or numpy array
+    data_sel :  tuple of slice or int
        A numpy slice generated for example `numpy.s\_`
     dims : list of strings
        Alternative names for the dataset dimensions if not attached to dataset
@@ -155,14 +158,15 @@ def __set_coords(dset, data_sel: slice | None, dims: list | None) -> list:
     return coords
 
 
-def __get_data(dset, data_sel: tuple, field: str):
+def __get_data(dset: h5py.Dataset, data_sel: tuple[slice | int] | None,
+               field: str) -> np.ndarray:
     r"""Return data of the HDF5 dataset.
 
     Parameters
     ----------
     dset :  h5py.Dataset
-       h5py dataset from which the data is read
-    data_sel :  slice
+       HDF5 dataset from which the data is read
+    data_sel :  tuple of slice or int
        A numpy slice generated for example `numpy.s\_`
     field : str
        Name of field in compound dataset or None
@@ -193,7 +197,8 @@ def __get_data(dset, data_sel: tuple, field: str):
     return data
 
 
-def __check_selection(data_sel: tuple, ndim: int) -> tuple | None:
+def __check_selection(data_sel: slice | tuple | int,
+                      ndim: int) -> slice | tuple | None:
     r"""Check and correct user provided data selection.
 
     Notes
@@ -228,17 +233,19 @@ def __check_selection(data_sel: tuple, ndim: int) -> tuple | None:
 
 
 # - main function ----------------------------------
-def h5_to_xr(h5_dset, data_sel: slice | None = None, *, dims=None, field=None):
-    r"""Create xarray::DataArray from a HDF5 dataset (with dimension scales).
+def h5_to_xr(h5_dset: h5py.Dataset, data_sel: tuple[slice | int] | None = None,
+             *, dims: list[str] | None = None,
+             field: str | None = None) -> xr.DataArray:
+    r"""Create xarray.DataArray from a HDF5 dataset (with dimension scales).
 
-    Implements a lite interface with the xarray::DataArray, should work for all
+    Implements a lite interface with the xarray.DataArray, should work for all
     2-D detector images, sequences of detector measurements and trend data.
 
     Parameters
     ----------
     h5_dset :  h5py.Dataset
        Data, dimensions, coordinates and attributes are read for this dataset
-    data_sel :  slice | None, optional
+    data_sel :  tuple of slice or int, optional
        A numpy slice generated for example `numpy.s\_`
     dims :  list of strings, optional
        Alternative names for the dataset dimensions if not attached to dataset
@@ -269,25 +276,26 @@ def h5_to_xr(h5_dset, data_sel: slice | None = None, *, dims=None, field=None):
 
     Examples
     --------
-    >>> fid = h5py.File(flname, 'r')        # flname is a HDF5/netCDF4 file
-    >>> xdata = h5_to_xr(fid['signal'])
-    >>> fid.close()
+    Read HDF5 dataset 'signal' from file::
 
-    Combine Tropomi SWIR data of band7 and band8
+    > fid = h5py.File(flname, 'r')        # flname is a HDF5/netCDF4 file
+    > xdata = h5_to_xr(fid['signal'])
+    > fid.close()
 
-    >>> fid = h5py.File(s5p_b7_prod, 'r')   # Tropomi band7 product
-    >>> xdata7 = h5_to_xr(fid['signal'])
-    >>> fid.close()
-    >>> fid = h5py.File(s5p_b8_prod, 'r')   # Tropomi band8 product
-    >>> xdata8 = h5_to_xr(fid['signal'])
-    >>> fid.close()
-    >>> xdata = xr.concat((xdata7, xdata8), dim='spectral_channel')
+    Combine Tropomi SWIR data of band7 and band8::
 
-    Optionally, fix the 'column' dimension
+    > fid = h5py.File(s5p_b7_prod, 'r')   # Tropomi band7 product
+    > xdata7 = h5_to_xr(fid['signal'])
+    > fid.close()
+    > fid = h5py.File(s5p_b8_prod, 'r')   # Tropomi band8 product
+    > xdata8 = h5_to_xr(fid['signal'])
+    > fid.close()
+    > xdata = xr.concat((xdata7, xdata8), dim='spectral_channel')
 
-    >>> xdata = xdata.assign_coords(
-    >>> ... column=np.arange(xdata.column.size, dtype='u4'))
+    Optionally, fix the 'column' dimension::
 
+    > xdata = xdata.assign_coords(
+    > ... column = np.arange(xdata.column.size, dtype='u4'))
     """
     # Check data selection
     if data_sel is not None:
@@ -327,15 +335,17 @@ def h5_to_xr(h5_dset, data_sel: slice | None = None, *, dims=None, field=None):
                         coords=co_dict, dims=dims, name=name, attrs=attrs)
 
 
-def data_to_xr(data, *, dims=None, name=None, long_name=None, units=None):
-    """Create xarray::DataArray from a dataset.
+def data_to_xr(data: np.ndarray, *, dims: list[str] | None = None,
+               name: str | None = None, long_name: str | None = None,
+               units: str | None = None) -> xr.DataArray:
+    """Create xarray.DataArray from a dataset.
 
-    Implements a lite interface with the xarray::DataArray, should work for all
+    Implements a lite interface with the xarray.DataArray, should work for all
     2-D detector images, sequences of detector measurements and trend data.
 
     Parameters
     ----------
-    data :  array-like
+    data :  np.ndarray
        Data to be stored in the xarray
     dims :  list of strings
        Names for the dataset dimensions
@@ -355,9 +365,8 @@ def data_to_xr(data, *, dims=None, name=None, long_name=None, units=None):
     All floating datasets are converted to Python type 'float'
     """
     coords = __set_coords(data, None, dims)
-    attrs = {}
-    attrs['units'] = '1' if units is None else units
-    attrs['long_name'] = '' if long_name is None else long_name
+    attrs = {'units': '1' if units is None else units,
+             'long_name': '' if long_name is None else long_name}
 
     return xr.DataArray(data,
                         coords=coords, name=name, attrs=attrs)

@@ -55,14 +55,13 @@ class Biweight:
     --------
     Calculate biweight median, spread and unbiased estimator::
 
-     >>> from moniplot.biweight import Biweight
-     >>> Biweight((1, 2, 2.5, 1.75, 2)).median
-     1.962936462507155
-     >>> Biweight((1, 2, 2.5, 1.75, 2)).spread
-     0.5042069490893494
-     >>> Biweight((1, 2, 2.5, 1.75, 2)).unbiased_std
-     0.6131156500926488
-
+       > from moniplot.biweight import Biweight
+       > Biweight((1, 2, 2.5, 1.75, 2)).median
+       1.962936462507155
+       > Biweight((1, 2, 2.5, 1.75, 2)).spread
+       0.5042069490893494
+       > Biweight((1, 2, 2.5, 1.75, 2)).unbiased_std
+       0.6131156500926488
     """
     def __init__(self, data, axis: int | None = None):
         """Initialize a Biweight object

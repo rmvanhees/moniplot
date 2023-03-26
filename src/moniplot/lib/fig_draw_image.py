@@ -20,7 +20,9 @@
 This module holds `fig_data_to_xarr` and `fig_qdata_to_xarr`
 which are used by resp. `draw_signal` and `draw_quality`.
 """
-__all__ = ['fig_data_to_xarr', 'fig_qdata_to_xarr']
+from __future__ import annotations
+__all__ = ['adjust_img_ticks', 'fig_data_to_xarr',
+           'fig_draw_panels', 'fig_qdata_to_xarr']
 
 from math import log10
 import warnings
@@ -39,7 +41,8 @@ CSET = tol_cset('bright')
 
 
 # - local functions --------------------------------
-def adjust_zunit(zunits: str, vmin: float, vmax: float) -> tuple:
+def adjust_zunit(zunits: str,
+                 vmin: float, vmax: float) -> tuple[int, str | None]:
     """
     Adjust units: electron to `e` and Volt to `V`
     and scale data range to <-1000, 1000>.
@@ -90,9 +93,9 @@ def set_norm(zscale: str, vmin: float, vmax: float):
         Scaling of the data values. Recognized values are: 'linear', 'log',
         'diff' or 'ratio'.
     vmin : float
-        Mininum of the data range
+        Minimum of the data range
     vmax : float
-        Mininum of the data range
+        Minimum of the data range
 
     Returns
     -------
@@ -129,7 +132,7 @@ def set_norm(zscale: str, vmin: float, vmax: float):
     return mcolors.Normalize(vmin=vmin, vmax=vmax)
 
 
-def adjust_img_ticks(axx, xarr, dims=None) -> None:
+def adjust_img_ticks(axx, xarr: xr.DataArray, dims: str | None = None) -> None:
     """Adjust ticks of the image axis.
 
     Parameters
@@ -156,7 +159,7 @@ def adjust_img_ticks(axx, xarr, dims=None) -> None:
         axx.yaxis.set_minor_locator(AutoMinorLocator())
 
 
-def fig_draw_panels(axx_p: dict, xarr, side_panels: str) -> None:
+def fig_draw_panels(axx_p: dict, xarr: xr.DataArray, side_panels: str) -> None:
     """Draw two side-panels, one left and one under the main image panel.
 
     Parameters
@@ -225,7 +228,9 @@ def fig_draw_panels(axx_p: dict, xarr, side_panels: str) -> None:
 
 
 # - main functions ---------------------------------
-def fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None):
+def fig_data_to_xarr(data, zscale: str = None,
+                     vperc: list[int, int] | None = None,
+                     vrange: list[float, float] | None = None) -> xr.DataArray:
     """Prepare image data for plotting.
 
     Parameters
@@ -309,8 +314,10 @@ def fig_data_to_xarr(data, zscale=None, vperc=None, vrange=None):
 
 
 # pylint: disable=too-many-arguments
-def fig_qdata_to_xarr(data, ref_data=None, data_sel=None,
-                      thres_worst=0.1, thres_bad=0.8, qlabels=None):
+def fig_qdata_to_xarr(data, ref_data: np.ndarray | None = None,
+                      data_sel: slice | None = None,
+                      thres_worst: float = 0.1, thres_bad: float = 0.8,
+                      qlabels: tuple[str] = None) -> xr.DataArray:
     r"""Prepare pixel-quality data for plotting.
 
     Parameters

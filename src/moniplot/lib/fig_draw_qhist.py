@@ -28,7 +28,7 @@ from .fig_legend import blank_legend_handle
 
 
 # - main functions ---------------------------------
-def fig_draw_qhist(axx, qdata, label: str, density: bool) -> None:
+def fig_draw_qhist(axx, qdata: np.ndarray, label: str, density: bool) -> None:
     """Add a subplot showing pixel-quality data as a histogram.
 
     Parameters
