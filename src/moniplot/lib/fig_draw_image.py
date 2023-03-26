@@ -21,16 +21,16 @@ This module holds `fig_data_to_xarr` and `fig_qdata_to_xarr`
 which are used by resp. `draw_signal` and `draw_quality`.
 """
 from __future__ import annotations
+
 __all__ = ['adjust_img_ticks', 'fig_data_to_xarr',
            'fig_draw_panels', 'fig_qdata_to_xarr']
 
-from math import log10
 import warnings
-
-import numpy as np
-import xarray as xr
+from math import log10
 
 import matplotlib.colors as mcolors
+import numpy as np
+import xarray as xr
 from matplotlib.ticker import AutoMinorLocator
 
 from ..image_to_xarray import data_to_xr

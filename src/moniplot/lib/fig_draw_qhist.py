@@ -21,8 +21,8 @@ This module holds `fig_draw_qhist` which are used by `draw_qhist`.
 """
 __all__ = ['fig_draw_qhist']
 
-from matplotlib.ticker import AutoMinorLocator
 import numpy as np
+from matplotlib.ticker import AutoMinorLocator
 
 from .fig_legend import blank_legend_handle
 

@@ -30,13 +30,10 @@ __all__ = ['tol_cmap', 'tol_cset', 'tol_rgba']
 
 from typing import NamedTuple
 
-import numpy as np
 import matplotlib.pyplot as plt
-
+import numpy as np
 from matplotlib.cm import ScalarMappable
-from matplotlib.colors import (LinearSegmentedColormap, Normalize,
-                               to_rgba_array)
-
+from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba_array
 
 # Dictionary with all color maps as tuple of strings.
 # The last element contains the color to indicate bad or out-of-range values.

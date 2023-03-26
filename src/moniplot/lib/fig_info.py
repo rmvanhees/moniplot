@@ -20,6 +20,7 @@
 This module contains the class `FIGinfo`.
 """
 from __future__ import annotations
+
 __all__ = ['FIGinfo']
 
 from copy import deepcopy

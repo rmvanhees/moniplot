@@ -29,11 +29,10 @@ except ModuleNotFoundError:
     FOUND_CARTOPY = False
 else:
     FOUND_CARTOPY = True
-from matplotlib.patches import Polygon
 import matplotlib.pyplot as plt
+from matplotlib.patches import Polygon
 
 from ..tol_colors import tol_cset
-
 
 # - main functions ---------------------------------
 if FOUND_CARTOPY:

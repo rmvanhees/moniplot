@@ -44,6 +44,14 @@ moniplot.tol\_colors module
    :undoc-members:
    :show-inheritance:
 
+moniplot.unbiased\_std module
+-----------------------------
+
+.. automodule:: moniplot.unbiased_std
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

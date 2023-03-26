@@ -21,11 +21,11 @@ This module holds `fig_draw_lplot` and `close_draw_lplot`
 which are used by `draw_lplot`.
 """
 from __future__ import annotations
+
 __all__ = ['fig_draw_lplot', 'close_draw_lplot']
 
-import numpy as np
-
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.dates import DateFormatter
 
 

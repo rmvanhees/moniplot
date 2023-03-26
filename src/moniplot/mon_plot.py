@@ -24,6 +24,7 @@ This module contains the class `MONplot` with the methods:
 `draw_signal`, `draw_tracks`, `draw_trend`, draw_fov_ckd.
 """
 from __future__ import annotations
+
 __all__ = ['MONplot']
 
 from datetime import datetime
@@ -44,16 +45,15 @@ from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.gridspec import GridSpec
 
 from .biweight import Biweight
-from .lib.fig_info import FIGinfo
-from .lib.fig_draw_image import (adjust_img_ticks,
-                                 fig_data_to_xarr,
-                                 fig_qdata_to_xarr,
-                                 fig_draw_panels)
-from .lib.fig_draw_lplot import fig_draw_lplot, close_draw_lplot
-from .lib.fig_draw_multiplot import get_xylabels, draw_subplot
+from .lib.fig_draw_image import (adjust_img_ticks, fig_data_to_xarr,
+                                 fig_draw_panels, fig_qdata_to_xarr)
+from .lib.fig_draw_lplot import close_draw_lplot, fig_draw_lplot
+from .lib.fig_draw_multiplot import draw_subplot, get_xylabels
 from .lib.fig_draw_qhist import fig_draw_qhist
-from .lib.fig_draw_trend import add_subplot, add_hk_subplot
+from .lib.fig_draw_trend import add_hk_subplot, add_subplot
+from .lib.fig_info import FIGinfo
 from .tol_colors import tol_rgba
+
 if FOUND_CARTOPY:
     from .lib.fig_draw_tracks import fig_draw_tracks
 
@@ -226,8 +226,7 @@ class MONplot:
 
     # --------------------------------------------------
     def __add_copyright(self, axx) -> None:
-        """
-        Show value of institute as copyright in the lower right corner
+        """Show value of institute as copyright in the lower right corner
         of the current figure.
         """
         if not self.institute:
@@ -1239,8 +1238,10 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_fov_ckd(self, data, *, vp_blocks: tuple, vp_labels=None,
-                     fig_info=None, title=None, **kwargs) -> None:
+    def draw_fov_ckd(self, data: xr.DataArray | np.ndarray, *,
+                     vp_blocks: tuple, vp_labels: tuple[str] | None = None,
+                     fig_info: FIGinfo | None = None,
+                     title: str | None = None, **kwargs) -> None:
         """Display a 2D CKD parameter which consists of data from several
         viewports.
 

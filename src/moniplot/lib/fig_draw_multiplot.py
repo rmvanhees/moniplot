@@ -20,6 +20,7 @@
 This module holds `draw_subplot` which is used by `draw_multiplot`.
 """
 from __future__ import annotations
+
 __all__ = ['draw_subplot', 'get_xylabels']
 
 import numpy as np

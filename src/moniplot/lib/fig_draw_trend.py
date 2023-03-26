@@ -21,18 +21,17 @@ This module contains `add_subplot` and `add_hk_subplot`
 which are used by `draw_trend`.
 """
 from __future__ import annotations
+
 __all__ = ['add_subplot', 'add_hk_subplot']
 
+from numbers import Integral
 from typing import Iterable
 
-from numbers import Integral
 import numpy as np
 import xarray as xr
-
 from matplotlib.ticker import AutoMinorLocator, MultipleLocator
 
 from ..tol_colors import tol_cset
-
 from .fig_legend import blank_legend_handle
 
 # - global parameters ------------------------------

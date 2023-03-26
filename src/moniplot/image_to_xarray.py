@@ -22,6 +22,7 @@ These functions store a HDF5 dataset or numpy array in a labeled array
 (class `xarray.DataArray`).
 """
 from __future__ import annotations
+
 __all__ = ['h5_to_xr', 'data_to_xr']
 
 from pathlib import PurePath

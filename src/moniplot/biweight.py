@@ -20,6 +20,7 @@
 This module contains our Python of the Tukey's biweight algorithm.
 """
 from __future__ import annotations
+
 __all__ = ['Biweight', 'biweight']
 
 import warnings
