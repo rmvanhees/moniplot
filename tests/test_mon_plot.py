@@ -18,9 +18,9 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 Perform a small unit test on the methods of the class `MONplot`.
-
 """
 from datetime import datetime, timedelta
+import pytest
 
 import numpy as np
 import xarray as xr
@@ -46,8 +46,7 @@ def get_test_data(data_sel=None, xy_min=-5, xy_max=5, delta=0.01, error=0):
 
     return data_to_xr(data, long_name='bogus data', units='Volt')
 
-
-def run_draw_lplot():
+def test_lplot():
     """
     Run unit tests on MONplot::draw_lplot
     """
@@ -100,7 +99,7 @@ def run_draw_lplot():
     plot.close()
 
 
-def run_draw_qhist():
+def test_qhist():
     """
     Run unit tests on MONplot::draw_qhist
     """
@@ -121,20 +120,21 @@ def run_draw_qhist():
     frame = np.concatenate((buff0, buff1, buff2, buff3, buff4,
                             buff5, buff6, buff7, buff8, buff9,
                             buffa)).reshape(256, 1000)
-    msm = xr.merge([data_to_xr(frame, name='dpqm',
-                               long_name='pixel-quality map'),
-                    data_to_xr(frame, name='dpqm_dark',
-                               long_name='pixel-quality map (dark)'),
-                    data_to_xr(frame, name='dpqm_noise',
-                               long_name='pixel-quality map (noise average)'),
-                    data_to_xr(frame, name='dpqm_noise_var',
-                               long_name='pixel-quality map (noise variance)')])
-
+    msm = xr.merge([
+        data_to_xr(frame, name='dpqm',
+                   long_name='pixel-quality map'),
+        data_to_xr(frame, name='dpqm_dark',
+                   long_name='pixel-quality map (dark)'),
+        data_to_xr(frame, name='dpqm_noise',
+                   long_name='pixel-quality map (noise average)'),
+        data_to_xr(frame, name='dpqm_noise_var',
+                   long_name='pixel-quality map (noise variance)')
+    ])
     plot.draw_qhist(msm, data_sel=np.s_[11:228, 16:991], title='my histogram')
     plot.close()
 
 
-def run_draw_quality():
+def test_quality():
     """
     Run unit tests on MONplot::draw_quality
     """
@@ -172,7 +172,7 @@ def run_draw_quality():
     plot.close()
 
 
-def run_draw_signal():
+def test_signal():
     """
     Run unit tests on MONplot::draw_signal
     """
@@ -262,7 +262,7 @@ def run_draw_signal():
     plot.close()
 
 
-def run_draw_trend():
+def test_trend():
     """
     Run unit tests on MONplot::draw_trend
     """
@@ -320,39 +320,3 @@ def run_draw_trend():
     plot.set_institute('SRON')
     plot.draw_trend(msm_ds, hk_ds, title='two datasets and house-keeping')
     plot.close()
-
-
-# --------------------------------------------------
-def unit_tests():
-    """Perform unit tests.
-    """
-    check_draw_lplot = True
-    check_draw_qhist = True
-    check_draw_quality = True
-    check_draw_signal = True
-    check_draw_trend = True
-
-    # ---------- UNIT TEST: draw_lplot ----------
-    if check_draw_lplot:
-        run_draw_lplot()
-
-    # ---------- UNIT TEST: draw_qhist ----------
-    if check_draw_qhist:
-        run_draw_qhist()
-
-    # ---------- UNIT TEST: draw_quality ----------
-    if check_draw_quality:
-        run_draw_quality()
-
-    # ---------- UNIT TEST: draw_signal ----------
-    if check_draw_signal:
-        run_draw_signal()
-
-    # ---------- UNIT TEST: draw_trend ----------
-    if check_draw_trend:
-        run_draw_trend()
-
-
-# - main code --------------------------------------
-if __name__ == '__main__':
-    unit_tests()

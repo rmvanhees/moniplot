@@ -348,13 +348,13 @@ def data_to_xr(data: np.ndarray, *, dims: list[str] | None = None,
     ----------
     data :  np.ndarray
        Data to be stored in the xarray
-    dims :  list of strings
+    dims :  list of strings, optional
        Names for the dataset dimensions
-    name : str
+    name : str, optional
        A string that names the instance
-    units :  str
+    units :  str, optional
        Units of the data, default: '1'
-    long_name : str
+    long_name : str, optional
        Long name describing the data, default: empty string
 
     Returns

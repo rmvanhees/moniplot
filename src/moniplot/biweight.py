@@ -24,8 +24,10 @@ from __future__ import annotations
 __all__ = ['Biweight', 'biweight']
 
 import warnings
+from typing import Iterable
 
 import numpy as np
+from numpy import ndarray
 
 
 # ----- class Biweight -------------------------
@@ -64,7 +66,7 @@ class Biweight:
        > Biweight((1, 2, 2.5, 1.75, 2)).unbiased_std
        0.6131156500926488
     """
-    def __init__(self, data, axis: int | None = None):
+    def __init__(self, data: ndarray | Iterable, axis: int | None = None):
         """Initialize a Biweight object
         """
         data = np.asarray(data)
@@ -112,7 +114,7 @@ class Biweight:
             self.__med_data = np.squeeze(self.__med_data)
 
     @property
-    def median(self) -> float | np.ndarray:
+    def median(self) -> float | ndarray:
         """Return biweight median.
         """
         if self.axis is None:
@@ -132,7 +134,7 @@ class Biweight:
         return self.__med_data
 
     @property
-    def spread(self) -> float | np.ndarray:
+    def spread(self) -> float | ndarray:
         """Return biweight spread.
         """
         if self.axis is None:
@@ -158,7 +160,7 @@ class Biweight:
         return np.sqrt(biweight_var)
 
     @property
-    def unbiased_std(self) -> float | np.ndarray:
+    def unbiased_std(self) -> float | ndarray:
         """Return unbiased estimator.
         """
         count = self.nr_valid
@@ -183,7 +185,8 @@ class Biweight:
 
 
 # ----- main function -------------------------
-def biweight(data, axis=None, spread=False):
+def biweight(data: ndarray | Iterable, axis: int | None = None,
+             spread: bool = False) -> ndarray | tuple[ndarray, ndarray]:
     """Python implementation of the Tukey's biweight algorithm.
 
     Parameters

@@ -17,6 +17,8 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+import pytest
 
 import numpy as np
 
@@ -71,7 +73,12 @@ def add_fig_box(axx_c, aspect: int, fig_info: FIGinfo) -> None:
 
 
 # -------------------------
-def draw_figure(aspect: int) -> None:
+@pytest.mark.parametrize(
+    "aspect",
+    [
+        1, 2, 3, 4
+    ])
+def test_layout(aspect: int) -> None:
     """
     Show figure with given aspect ratio
     """
@@ -164,18 +171,3 @@ def draw_figure(aspect: int) -> None:
     add_fig_box(axx_c, aspect, fig_info)
 
     plt.show()
-
-
-def main():
-    """
-    Main function
-    """
-    draw_figure(1)
-    draw_figure(2)
-    draw_figure(3)
-    draw_figure(4)
-
-
-# --------------------------------------------------
-if __name__ == '__main__':
-    main()
