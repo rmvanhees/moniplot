@@ -24,11 +24,10 @@ This module contains the class `MONplot` with the methods:
 `draw_signal`, `draw_tracks`, `draw_trend`, draw_fov_ckd.
 """
 from __future__ import annotations
-
 __all__ = ['MONplot']
 
 from datetime import datetime
-from pathlib import PurePath
+from pathlib import Path
 
 import numpy as np
 import xarray as xr
@@ -71,7 +70,7 @@ class MONplot:
 
     Parameters
     ----------
-    figname :  str
+    figname :  str or path-like
         Name of PDF or PNG file (extension required)
     caption :  str, optional
         Caption repeated on each page of the PDF
@@ -85,7 +84,7 @@ class MONplot:
     the software will use the name of the xarray class, coordinate names and
     data attributes, such as `long_name` and `units`.
     """
-    def __init__(self, figname: str, caption: str | None = None):
+    def __init__(self, figname: str | Path, caption: str | None = None):
         """Initialize multi-page PDF document or a single-page PNG.
         """
         self.__cset = tol_rgba(DEFAULT_CSET)
@@ -94,11 +93,11 @@ class MONplot:
         self.__institute = ''
         self.__mpl = None
         self.__pdf = None
-        self.filename = figname
-        if PurePath(figname).suffix.lower() != '.pdf':
+        self.filename = Path(figname)
+        if self.filename.suffix.lower() != '.pdf':
             return
 
-        self.__pdf = PdfPages(figname)
+        self.__pdf = PdfPages(self.filename)
 
         # turn-off the automatic offset notation of Matplotlib
         mpl.rcParams['axes.formatter.useoffset'] = False
