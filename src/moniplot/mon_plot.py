@@ -24,7 +24,6 @@ This module contains the class `MONplot` with the methods:
 `draw_signal`, `draw_tracks`, `draw_trend`, draw_fov_ckd.
 """
 from __future__ import annotations
-
 __all__ = ['MONplot']
 
 from datetime import datetime
@@ -98,7 +97,7 @@ class MONplot:
         if self.filename.suffix.lower() != '.pdf':
             return
 
-        self.__pdf = PdfPages(figname)
+        self.__pdf = PdfPages(self.filename)
 
         # turn-off the automatic offset notation of Matplotlib
         mpl.rcParams['axes.formatter.useoffset'] = False
