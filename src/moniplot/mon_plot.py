@@ -28,7 +28,7 @@ from __future__ import annotations
 __all__ = ['MONplot']
 
 from datetime import datetime
-from pathlib import PurePath
+from pathlib import Path
 
 import numpy as np
 import xarray as xr
@@ -71,7 +71,7 @@ class MONplot:
 
     Parameters
     ----------
-    figname :  str
+    figname :  Path | str
         Name of PDF or PNG file (extension required)
     caption :  str, optional
         Caption repeated on each page of the PDF
@@ -85,17 +85,17 @@ class MONplot:
     the software will use the name of the xarray class, coordinate names and
     data attributes, such as `long_name` and `units`.
     """
-    def __init__(self, figname: str, caption: str | None = None):
+    def __init__(self, figname: Path | str, caption: str | None = None):
         """Initialize multi-page PDF document or a single-page PNG.
         """
         self.__cset = tol_rgba(DEFAULT_CSET)
         self.__cmap = None
         self.__caption = '' if caption is None else caption
         self.__institute = ''
-        self.__mpl = None
+        self.__mpl: dict | None = None
         self.__pdf = None
-        self.filename = figname
-        if PurePath(figname).suffix.lower() != '.pdf':
+        self.filename = Path(figname)
+        if self.filename.suffix.lower() != '.pdf':
             return
 
         self.__pdf = PdfPages(figname)
@@ -419,7 +419,7 @@ class MONplot:
 
         Notes
         -----
-        When data is an xarray.DataArray then the following attributes
+        When data is a xarray.DataArray then the following attributes
         are used::
 
         'long_name' : used as the title of the main panel when parameter \
@@ -524,7 +524,7 @@ class MONplot:
 
         Notes
         -----
-        When data is an xarray.DataArray then the following attributes
+        When data is a xarray.DataArray then the following attributes
         are used::
 
         'long_name'     : used as the title of the main panel when parameter \
@@ -637,7 +637,7 @@ class MONplot:
 
         Notes
         -----
-        When data is an xarray.DataArray then the following attributes are used:
+        When data is a xarray.DataArray then the following attributes are used:
 
         - long_name: used as the title of the main panel when parameter 'title'\
           is not defined.
@@ -679,7 +679,7 @@ class MONplot:
 
         # initialize matplotlib using 'subplots'
         figsize = (10., 1 + (npanels + 1) * 1.5)
-        fig, axarr = plt.subplots(npanels, sharex=True, figsize=figsize)
+        fig, axarr = plt.subplots(npanels, sharex='all', figsize=figsize)
         if npanels == 1:
             axarr = [axarr]
         margin = min(1. / (1.65 * (npanels + 1)), .25)
@@ -751,7 +751,7 @@ class MONplot:
 
         Notes
         -----
-        When data is an xarray.DataArray then the following attributes are used:
+        When data is a xarray.DataArray then the following attributes are used:
 
         - long_name: used as the title of the main panel when parameter 'title'\
           is not defined.
@@ -873,7 +873,7 @@ class MONplot:
 
         Notes
         -----
-        When data is an xarray.DataArray then the following attributes are used:
+        When data is a xarray.DataArray then the following attributes are used:
 
         - long_name: used as the title of the main panel when parameter 'title'\
           is not defined.
@@ -902,7 +902,7 @@ class MONplot:
 
         # initialize matplotlib using 'subplots'
         figsize = (10., 1 + (npanels + 1) * 1.65)
-        fig, axarr = plt.subplots(npanels, sharex=True, figsize=figsize)
+        fig, axarr = plt.subplots(npanels, sharex='all', figsize=figsize)
         if npanels == 1:
             axarr = [axarr]
         margin = min(1. / (1.8 * (npanels + 1)), .25)
@@ -1107,7 +1107,7 @@ class MONplot:
 
         Notes
         -----
-        When data is an xarray.DataArray then the following attributes are used:
+        When data is a xarray.DataArray then the following attributes are used:
 
         - long_name: used as the title of the main panel when parameter 'title'\
           is not defined.
@@ -1171,6 +1171,7 @@ class MONplot:
         self.__add_caption(fig)
 
         # add subplots, cycle the DataArrays of the Dataset
+        axx = None
         data_iter = iter(data_tuple)
         for iy in range(gridspec.nrows):
             for ix in range(gridspec.ncols):
@@ -1331,7 +1332,7 @@ class MONplot:
         # define plot layout
         figsize = (1.75 * (xarr.sizes['spectral_detector_pixels']
                            // xarr.sizes['spatial_samples_per_image']), 4.5)
-        fig, axs = plt.subplots(nview, 1, figsize=figsize, sharex=True)
+        fig, axs = plt.subplots(nview, 1, figsize=figsize, sharex='all')
         fig.subplots_adjust(hspace=0, wspace=0,
                             left=0.075, right=1.05,
                             top=0.8)
@@ -1345,6 +1346,7 @@ class MONplot:
         elif 'long_name' in xarr.attrs:
             axs[0].set_title(xarr.attrs['long_name'])
 
+        ax_img = None
         cmap = self.cmap if self.cmap else xarr.attrs['_cmap']
         for ii in range(nview):
             axs[ii].set_anchor((.5, (nview - ii - 1) * 0.25))
