@@ -64,17 +64,16 @@ def adjust_zunit(zunits: str,
 
     zunits = zunits.replace('electron', 'e')
     zunits = zunits.replace('Volt', 'V')
-    if zunits.find('.s-1') >= 0:
-        zunits = zunits.replace('.s-1', ' s$^{-1}$')
-    else:
-        zunits = zunits.replace('-1', '$^{-1}$')
+    zunits = zunits.replace('-1', '$^{-1}$')
     zunits = zunits.replace('-2', '$^{-2}$')
     zunits = zunits.replace('-3', '$^{-3}$')
-    zunits = zunits.replace('um', r'$\xb5$m')
-    zunits = zunits.replace(' ', r'$\,$')
+    zunits = zunits.replace('um', '\u03bcm')
+    # 'thin space', alternative is 'mid space': '\u2005'
+    zunits = zunits.replace('.', '\u2009')
+    zunits = zunits.replace(' ', '\u2009')
 
     if zunits[0] in ('e', 'V', 'A'):
-        key_to_zunit = {-4: 'p', -3: 'n', -2: r'\xb5', -1: 'm',
+        key_to_zunit = {-4: 'p', -3: 'n', -2: '\u03bc', -1: 'm',
                         0: '', 1: 'k', 2: 'M', 3: 'G', 4: 'T'}
         max_value = max(abs(vmin), abs(vmax))
         key = min(4, max(-4, int(log10(max_value)) // 3))
