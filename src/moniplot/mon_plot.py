@@ -33,7 +33,7 @@ import numpy as np
 import xarray as xr
 
 try:
-    from cartopy import crs as ccrs
+    from Cartopy import crs as ccrs
 except ModuleNotFoundError:
     FOUND_CARTOPY = False
 else:
@@ -647,13 +647,13 @@ class MONplot:
         Create a PDF document 'test.pdf' and add figure of dataset 'xds'
         (`numpy.ndarray` or `xarray.DataArray`) with a title. The dataset 'xds'
         may contain multiple DataArrays with a common X-coordinate. Each
-        DataArray will be displayed in a seperate sub-panel::
+        DataArray will be displayed in a separate sub-panel::
 
         > plot = MONplot('test.pdf', caption='my caption', institute='SRON')
         > plot.draw_trend(xds, hk_xds=None, title='my title')
 
         Add a figure with the same Dataset 'xds' and a few trends of
-        housekeeping data (again each parameter in a seperate DataArray with
+        housekeeping data (again each parameter in a separate DataArray with
         a common X-coordinate)::
 
         > plot.draw_trend(xds, hk_xds, title='my title')
@@ -684,7 +684,7 @@ class MONplot:
         margin = min(1. / (1.65 * (npanels + 1)), .25)
         fig.subplots_adjust(bottom=margin, top=1-margin, hspace=0.05)
 
-        # add a centered suptitle to the figure
+        # add a centered subtitle to the figure
         self.__add_caption(fig)
 
         # add title to image panel
@@ -728,7 +728,7 @@ class MONplot:
            Object holding measurement data and attributes.
         data_sel :  mask or index tuples for arrays, optional
            Select a region on the detector by fancy indexing (using a
-           boolean/interger arrays), or using index tuples for arrays
+           boolean/integer arrays), or using index tuples for arrays
            (generated with `numpy.s\_`).
         vrange :  list[float, float], default=[data.min(), data.max()]
            The lower and upper range of the bins.
@@ -802,7 +802,7 @@ class MONplot:
         # create figure
         fig, axx = plt.subplots(1, figsize=(9, 8))
 
-        # add a centered suptitle to the figure
+        # add a centered subtitle to the figure
         self.__add_caption(fig)
 
         # add title to image panel and set xlabel
@@ -907,7 +907,7 @@ class MONplot:
         margin = min(1. / (1.8 * (npanels + 1)), .25)
         fig.subplots_adjust(bottom=margin, top=1-margin, hspace=0.02)
 
-        # add a centered suptitle to the figure
+        # add a centered subtitle to the figure
         self.__add_caption(fig)
 
         # add title to image panel
@@ -1066,7 +1066,7 @@ class MONplot:
                                   plt.subplots(1, figsize=figsize)))
             self.__mpl['time_axis'] = isinstance(xdata[0], datetime)
 
-            # add a centered suptitle to the figure
+            # add a centered subtitle to the figure
             self.__add_caption(self.__mpl['fig'])
 
             # set color cycle
@@ -1149,7 +1149,7 @@ class MONplot:
         > plot.draw_multiplot(xds, title='my title')
         > plot.close()
         """
-        # generate figure using contrained layout
+        # generate figure using contained layout
         fig = plt.figure(figsize=(10, 10))
 
         # define grid layout to place subplots within a figure
@@ -1166,7 +1166,7 @@ class MONplot:
         # determine xylabels
         xylabels = get_xylabels(gridspec, data_tuple)
 
-        # add a centered suptitle to the figure
+        # add a centered subtitle to the figure
         self.__add_caption(fig)
 
         # add subplots, cycle the DataArrays of the Dataset
@@ -1234,7 +1234,7 @@ class MONplot:
         myproj = {'projection': ccrs.Robinson(central_longitude=11.5)}
         fig, axx = plt.subplots(figsize=(12.85, 6), subplot_kw=myproj)
 
-        # add a centered suptitle of the Figure
+        # add a centered subtitle of the Figure
         self.__add_caption(fig)
 
         # add title to image panel
@@ -1263,8 +1263,8 @@ class MONplot:
         data :  numpy.ndarray or xarray.DataArray
            Object holding measurement data and attributes.
         vp_blocks : tuple
-           Ranges of rows beloning to the data of one viewport. Each block
-           is show in a seperate subplot.
+           Ranges of rows belonging to the data of one viewport. Each block
+           is show in a separate subplot.
         vp_labels :  tuple of str
            Label for each viewport, default=('+50', '+20', '0', '-20', '-50').
         fig_info :  FIGinfo, default=None
@@ -1336,7 +1336,7 @@ class MONplot:
                             left=0.075, right=1.05,
                             top=0.8)
 
-        # add a centered suptitle of the Figure
+        # add a centered subtitle of the Figure
         self.__add_caption(fig)
 
         # add title to image panel

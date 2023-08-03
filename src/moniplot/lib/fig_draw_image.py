@@ -247,7 +247,7 @@ def fig_data_to_xarr(data, zscale: str = None,
     Returns
     -------
     xarray.DataArray
-        DataArray with image data and attributes ready for plotting
+        image data and attributes ready for plotting
 
     Notes
     -----
@@ -329,7 +329,7 @@ def fig_qdata_to_xarr(data, ref_data: np.ndarray | None = None,
         respect to the reference data.
     data_sel :  slice, optional
         Select a region on the detector by fancy indexing (using a
-        boolean/interger arrays), or using index tuples for arrays
+        boolean/integer arrays), or using index tuples for arrays
         (generated with `numpy.s\_`).
         Outside this region the pixels will be labeled: 'unusable'.
     thres_worst :  float, default=0.1
@@ -343,7 +343,7 @@ def fig_qdata_to_xarr(data, ref_data: np.ndarray | None = None,
     Returns
     -------
     xarray.DataArray
-        DataArray with image data and attributes ready for plotting
+        image data and attributes ready for plotting
 
     Notes
     -----
@@ -354,7 +354,7 @@ def fig_qdata_to_xarr(data, ref_data: np.ndarray | None = None,
     'bad'      :  0 <= value < thres_bad
     'good'     :  thres_bad <= value <= 1
 
-    Otherwise the default quality ranking labels are::
+    Otherwise, the default quality ranking labels are::
 
     'unusable'    :  pixels outside the illuminated region
     'to worst'    :  from good or bad to worst

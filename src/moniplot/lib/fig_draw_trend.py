@@ -336,6 +336,6 @@ def add_hk_subplot(axx, xarr: xr.DataArray, vperc: list | None = None,
     axx.grid(True)
 
     # add hk_title inside current subplots
-    legenda = axx.legend([blank_legend_handle()],
-                         [hk_title], loc='upper left')
-    legenda.draw_frame(False)
+    legend = axx.legend([blank_legend_handle()],
+                        [hk_title], loc='upper left')
+    legend.draw_frame(False)

@@ -48,9 +48,9 @@ def fig_draw_qhist(axx, qdata: np.ndarray, label: str, density: bool) -> None:
              histtype='bar', align='mid', log=True, fill=True,
              edgecolor='#4477AA', facecolor='#77AADD', linewidth=1.5)
     # add label
-    legenda = axx.legend([blank_legend_handle()],
-                         [label], loc='upper left')
-    legenda.draw_frame(False)
+    legend = axx.legend([blank_legend_handle()],
+                        [label], loc='upper left')
+    legend.draw_frame(False)
     # add decoration
     axx.grid(which='major', axis='y', color='#AAAAAA', ls='--')
     axx.set_xlim([0, 1])
