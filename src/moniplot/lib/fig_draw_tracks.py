@@ -24,7 +24,7 @@ __all__ = ['fig_draw_tracks']
 import numpy as np
 
 try:
-    from Cartopy import crs as ccrs
+    from cartopy import crs as ccrs
 except ModuleNotFoundError:
     FOUND_CARTOPY = False
 else:

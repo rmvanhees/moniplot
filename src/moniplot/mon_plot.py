@@ -24,6 +24,7 @@ This module contains the class `MONplot` with the methods:
 `draw_signal`, `draw_tracks`, `draw_trend`, draw_fov_ckd.
 """
 from __future__ import annotations
+
 __all__ = ['MONplot']
 
 from datetime import datetime
@@ -33,7 +34,7 @@ import numpy as np
 import xarray as xr
 
 try:
-    from Cartopy import crs as ccrs
+    from cartopy import crs as ccrs
 except ModuleNotFoundError:
     FOUND_CARTOPY = False
 else:
