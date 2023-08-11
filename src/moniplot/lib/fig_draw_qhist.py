@@ -16,9 +16,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
-This module holds `fig_draw_qhist` which are used by `draw_qhist`.
-"""
+"""This module holds `fig_draw_qhist` which are used by `draw_qhist`."""
 __all__ = ['fig_draw_qhist']
 
 import numpy as np

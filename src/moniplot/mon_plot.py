@@ -85,9 +85,9 @@ class MONplot:
     the software will use the name of the xarray class, coordinate names and
     data attributes, such as `long_name` and `units`.
     """
+
     def __init__(self, figname: Path | str, caption: str | None = None):
-        """Initialize multi-page PDF document or a single-page PNG.
-        """
+        """Initialize multi-page PDF document or a single-page PNG."""
         self.__cset = tol_rgba(DEFAULT_CSET)
         self.__cmap = None
         self.__caption = '' if caption is None else caption
@@ -103,12 +103,8 @@ class MONplot:
         # turn-off the automatic offset notation of Matplotlib
         mpl.rcParams['axes.formatter.useoffset'] = False
 
-    def __repr__(self) -> None:
-        pass
-
     def __close_this_page(self, fig) -> None:
-        """Save the current figure and close the MONplot instance.
-        """
+        """Save the current figure and close the MONplot instance."""
         # add save figure
         if self.__pdf is None:
             plt.savefig(self.filename)
@@ -150,8 +146,7 @@ class MONplot:
         self.__caption = caption
 
     def __add_caption(self, fig):
-        """Add figure caption.
-        """
+        """Add figure caption."""
         if not self.caption:
             return
 
@@ -174,8 +169,7 @@ class MONplot:
         self.__cmap = cmap
 
     def unset_cmap(self) -> None:
-        """Unset user supplied colormap, and use default colormap.
-        """
+        """Unset user supplied colormap, and use default colormap."""
         self.__cmap = None
 
     # --------------------------------------------------
@@ -197,8 +191,7 @@ class MONplot:
         self.__cset = tol_rgba(cname, cnum)
 
     def unset_cset(self) -> None:
-        """Set color set to its default.
-        """
+        """Set color set to its default."""
         self.__cset = tol_rgba(DEFAULT_CSET)
 
     # --------------------------------------------------
@@ -258,12 +251,11 @@ class MONplot:
     # -------------------------
     def __draw_image__(self, xarr: xr.DataArray, side_panels: str,
                        fig_info: FIGinfo | None, title: str | None) -> None:
-        """Does the actual drawing of the image data for the public methods
-        `draw_signal` and `draw_quality`.
+        """Draw of the image data for the public methods `draw_signal`
+        and `draw_quality`.
         """
         def add_fig_box() -> None:
-            """Add a box with meta information in the current figure.
-            """
+            """Add a box with meta information in the current figure."""
             if fig_info is None:
                 return
 
@@ -615,7 +607,7 @@ class MONplot:
                    fig_info: FIGinfo | None = None,
                    title: str | None = None, **kwargs) -> None:
         """
-        Display trends of measurement data and/or housekeeping data
+        Display trends of measurement data and/or housekeeping data.
 
         Parameters
         ----------
@@ -1225,7 +1217,7 @@ class MONplot:
         in a small box.
         """
         if not FOUND_CARTOPY:
-            raise RuntimeError("You need Cartopy to use this method")
+            raise RuntimeError('You need Cartopy to use this method')
 
         if fig_info is None:
             fig_info = FIGinfo()

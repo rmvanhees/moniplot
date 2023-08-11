@@ -18,6 +18,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
+"""Perform a unit test on several aspect ratios and image sizes."""
 import pytest
 
 import numpy as np
@@ -28,8 +29,7 @@ from moniplot.lib.fig_info import FIGinfo
 
 
 def add_fig_box(axx_c, aspect: int, fig_info: FIGinfo) -> None:
-    """
-    Add a box with meta information for draw_signal and draw_quality
+    """Add a box with meta information for draw_signal and draw_quality.
 
     Parameters
     ----------
@@ -74,14 +74,12 @@ def add_fig_box(axx_c, aspect: int, fig_info: FIGinfo) -> None:
 
 # -------------------------
 @pytest.mark.parametrize(
-    "aspect",
+    'aspect',
     [
         1, 2, 3, 4
     ])
 def test_layout(aspect: int) -> None:
-    """
-    Show figure with given aspect ratio
-    """
+    """Show figure with given aspect ratio."""
     attrs = {1: {'figsize': (10, 8),
                  'w_ratios': (1., 7., 0.5, 1.5),
                  'h_ratios': (7., 1.)},                  # 7 x 7

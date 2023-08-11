@@ -16,9 +16,8 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
-This module contains the class `FIGinfo`.
-"""
+"""This module contains the class `FIGinfo`."""
+
 from __future__ import annotations
 
 __all__ = ['FIGinfo']
@@ -30,8 +29,7 @@ from typing import Any
 
 # - main function -------------------------
 class FIGinfo:
-    """
-    The figure information consists of [key, value] combinations which are
+    """The figure information consists of [key, value] combinations which are
     to be displayed upper-right corner of the figure.
 
     Parameters
@@ -47,23 +45,24 @@ class FIGinfo:
     grow with the number of lines and overlap with the main image or its
     color bar. You may try loc='below', which is only available for image plots.
     """
+
     def __init__(self, loc: str = 'above',
                  info_dict: dict | None = None) -> None:
-        """Create FIGinfo instance to hold information on the current plot.
-        """
+        """Create FIGinfo instance to hold information on the current plot."""
         self.fig_info = {} if info_dict is None else info_dict
         self._location = None
         self.set_location(loc)
 
     def __bool__(self) -> bool:
+        """Return True when an instance of fig_info exists."""
         return bool(self.fig_info)
 
     def __len__(self) -> int:
+        """Return the length of the instance fig_info."""
         return len(self.fig_info)
 
     def copy(self):
-        """Return a deep copy of the current object.
-        """
+        """Return a deep copy of the current object."""
         return deepcopy(self)
 
     @property
@@ -102,8 +101,7 @@ class FIGinfo:
             self.fig_info[key] = fmt.format(value)
 
     def as_str(self) -> str:
-        """Return figure information as one long string
-        """
+        """Return figure information as one long string."""
         info_str = ''
         for key, value in self.fig_info.items():
             info_str += f'{key} : {value}\n'

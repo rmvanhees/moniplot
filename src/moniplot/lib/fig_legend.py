@@ -16,9 +16,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
-This module contains `blank_legend_handle`.
-"""
+"""This module contains `blank_legend_handle`."""
 __all__ = ['blank_legend_handle']
 
 import matplotlib as mpl

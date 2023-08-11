@@ -16,9 +16,8 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
-Calculate the unbiased estimator for the standard deviation.
-"""
+"""Calculate the unbiased estimator for the standard deviation."""
+
 __all__ = ['unbiased_std']
 
 from math import pi, sqrt
@@ -29,8 +28,7 @@ import scipy.special as sc
 
 
 def unbiased_std(data):
-    """Returns the unbiased estimator for the standard deviation.
-    """
+    """Return the unbiased estimator for the standard deviation."""
     nval = data.shape[0]
     unbias = sqrt((nval - 1) / (2 * pi)) * sc.beta((nval - 1) / 2, 1 / 2)
 

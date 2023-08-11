@@ -16,9 +16,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
-This module contains `fig_draw_tracks` used by `draw_tracks`.
-"""
+"""This module contains `fig_draw_tracks` used by `draw_tracks`."""
 __all__ = ['fig_draw_tracks']
 
 import numpy as np

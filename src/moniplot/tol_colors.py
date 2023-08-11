@@ -40,8 +40,8 @@ from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba_array
 # - Define color maps -------------------------
 @dataclass
 class SunSet:
-    """Defines diverging color scheme 'SunSet'
-    """
+    """Defines diverging color scheme 'SunSet'."""
+
     bad_color: str = '#FFFFFF'
     colors: tuple[str] = field(default_factory=tuple)
 
@@ -53,8 +53,8 @@ class SunSet:
 
 @dataclass
 class NightFall:
-    """Defines diverging color scheme 'NightFall'.
-    """
+    """Defines diverging color scheme 'NightFall'."""
+
     bad_color: str = '#FFFFFF'
     colors: tuple[str] = field(default_factory=tuple)
 
@@ -68,8 +68,8 @@ class NightFall:
 
 @dataclass
 class BuRd:
-    """Defines diverging color scheme 'BuRd'.
-    """
+    """Defines diverging color scheme 'BuRd'."""
+
     bad_color: str = '#FFEE99'
     colors: tuple[str] = field(default_factory=tuple)
 
@@ -81,8 +81,8 @@ class BuRd:
 
 @dataclass
 class PRGn:
-    """Defines diverging color scheme 'PRGn'.
-    """
+    """Defines diverging color scheme 'PRGn'."""
+
     bad_color: str = '#FFEE99'
     colors: tuple[str] = field(default_factory=tuple)
 
@@ -94,8 +94,8 @@ class PRGn:
 
 @dataclass
 class YlOrBr:
-    """Defines sequential color scheme 'YlOrBr'.
-    """
+    """Defines sequential color scheme 'YlOrBr'."""
+
     bad_color: str = '#888888'
     colors: tuple[str] = field(default_factory=tuple)
 
@@ -107,8 +107,8 @@ class YlOrBr:
 
 @dataclass
 class WhOrBr:
-    """Defines sequential color scheme 'WhOrBr'.
-    """
+    """Defines sequential color scheme 'WhOrBr'."""
+
     bad_color: str = '#888888'
     colors: tuple[str] = field(default_factory=tuple)
 
@@ -120,8 +120,8 @@ class WhOrBr:
 
 @dataclass
 class IriDescent:
-    """Defines sequential color scheme 'IriDescent'.
-    """
+    """Defines sequential color scheme 'IriDescent'."""
+
     bad_color: str = '#999999'
     colors: tuple[str] = field(default_factory=tuple)
 
@@ -136,8 +136,8 @@ class IriDescent:
 
 @dataclass
 class RainbowPuRd:
-    """Defines sequential color scheme 'RainbowPuRd'.
-    """
+    """Defines sequential color scheme 'RainbowPuRd'."""
+
     bad_color: str = '#FFFFFF'
     colors: tuple[str] = field(default_factory=tuple)
 
@@ -152,8 +152,8 @@ class RainbowPuRd:
 
 @dataclass
 class RainbowPuBr:
-    """Defines sequential color scheme 'RainbowPuBr'.
-    """
+    """Defines sequential color scheme 'RainbowPuBr'."""
+
     bad_color: str = '#FFFFFF'
     colors: tuple[str] = field(default_factory=tuple)
 
@@ -169,8 +169,8 @@ class RainbowPuBr:
 
 @dataclass
 class RainbowWhRd:
-    """Defines sequential color scheme 'RainbowWhRd'.
-    """
+    """Defines sequential color scheme 'RainbowWhRd'."""
+
     bad_color: str = '#666666'
     colors: tuple[str] = field(default_factory=tuple)
 
@@ -186,8 +186,8 @@ class RainbowWhRd:
 
 @dataclass
 class RainbowWhBr:
-    """Defines sequential color scheme 'RainbowWhBr'.
-    """
+    """Defines sequential color scheme 'RainbowWhBr'."""
+
     bad_color: str = '#666666'
     colors: tuple[str] = field(default_factory=tuple)
 
@@ -204,8 +204,8 @@ class RainbowWhBr:
 
 @dataclass
 class RainbowDiscrete:
-    """Defines sequential color scheme 'RainbowDiscrete'.
-    """
+    """Defines sequential color scheme 'RainbowDiscrete'."""
+
     bad_color: str = '#777777'
     colors: list[str] = field(default_factory=list)
 
@@ -213,8 +213,7 @@ class RainbowDiscrete:
         self.set_lut()
 
     def set_lut(self, lut: int = 22):
-        """Define list of colors of 'rainbow_discrete'.
-        """
+        """Define list of colors of 'rainbow_discrete'."""
         hexclrs = (
             '#E8ECFB', '#D9CCE3', '#D1BBD7', '#CAACCB', '#BA8DB4',
             '#AE76A3', '#AA6F9E', '#994F88', '#882E72', '#1965B0',
@@ -268,6 +267,7 @@ class Bright:
     """Defines a qualitative colour scheme that is colour-blind safe.
     The main scheme for lines and their labels.
     """
+
     blue: str = '#4477AA'
     cyan: str = '#66CCEE'
     green: str = '#228833'
@@ -290,6 +290,7 @@ class HighContrast:
     underneath are shades of grey with the same luminance; this scheme also
     works well for people with monochrome vision and in a monochrome printout.
     """
+
     blue: str = '#004488'
     yellow: str = '#DDAA33'
     red: str = '#BB5566'
@@ -310,6 +311,7 @@ class MediumContrast:
     shown by the three rectangles, with the lower half in the greyscale
     equivalent.
     """
+
     light_yellow: str = '#EECC66'
     light_red: str = '#EE99AA'
     light_blue: str = '#6699CC'
@@ -331,6 +333,7 @@ class Vibrant:
     visualization framework TensorBoard, built around their signature orange
     FF7043. That colour has been replaced here to make it print-friendly.
     """
+
     blue: str = '#0077BB'
     cyan: str = '#33BBEE'
     teal: str = '#009988'
@@ -352,6 +355,7 @@ class Muted:
     that is equally colour-blind safe with more colours, but lacking a clear
     red or medium blue. Pale grey is meant for bad data in maps.
     """
+
     indigo: str = '#332288'
     cyan: str = '#88CCEE'
     teal: str = '#44AA99'
@@ -379,6 +383,7 @@ class Light:
     clearly readable. However, it can also be used for general qualitative
     maps.
     """
+
     light_blue: str = '#77AADD'
     light_cyan: str = '#99DDFF'
     mint: str = '#44BB99'
@@ -527,8 +532,7 @@ def tol_rgba(cname: str, lut: int | None = None) -> list[str, ...]:
 
 # - test functions -------------------------
 def __show_cset():
-    """Show colormaps tol_cset().
-    """
+    """Show colormaps tol_cset()."""
     schemes = tol_cset()
     fig, axes = plt.subplots(ncols=len(schemes), figsize=(9, 3))
     fig.subplots_adjust(top=0.9, bottom=0.02, left=0.02, right=0.92)
@@ -543,8 +547,7 @@ def __show_cset():
 
 
 def __show_cmap():
-    """Show colormaps tol_cmap(<non-discrete>).
-    """
+    """Show colormaps tol_cmap(<non-discrete>)."""
     schemes = tol_cmap()
     gradient = np.linspace(0, 1, 256)
     gradient = np.vstack((gradient, gradient))
@@ -560,8 +563,7 @@ def __show_cmap():
 
 
 def __show_discrete():
-    """Show colormaps tol_cmap('rainbow_discrete', <lut>).
-    """
+    """Show colormaps tol_cmap('rainbow_discrete', <lut>)."""
     gradient = np.linspace(0, 1, 256)
     gradient = np.vstack((gradient, gradient))
     fig, axes = plt.subplots(nrows=23)
@@ -577,8 +579,7 @@ def __show_discrete():
 
 
 def __show_rgba():
-    """Show usage of tol_rgba().
-    """
+    """Show usage of tol_rgba()."""
     cname = 'sunset'
     print(cname, clrs := tol_rgba(cname, 16))
     fig = plt.figure()

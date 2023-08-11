@@ -16,9 +16,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
-This module holds `draw_subplot` which is used by `draw_multiplot`.
-"""
+"""This module holds `draw_subplot` which is used by `draw_multiplot`."""
 from __future__ import annotations
 
 __all__ = ['draw_subplot', 'get_xylabels']

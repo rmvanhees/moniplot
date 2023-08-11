@@ -16,9 +16,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
-This module contains our Python of the Tukey's biweight algorithm.
-"""
+"""This module contains our Python of the Tukey's biweight algorithm."""
 from __future__ import annotations
 
 __all__ = ['Biweight', 'biweight']
@@ -66,9 +64,9 @@ class Biweight:
        > Biweight((1, 2, 2.5, 1.75, 2)).unbiased_std
        0.6131156500926488
     """
+
     def __init__(self, data: ndarray | Iterable, axis: int | None = None):
-        """Initialize a Biweight object
-        """
+        """Initialize a Biweight object."""
         data = np.asarray(data)
 
         self.axis = axis
@@ -115,8 +113,7 @@ class Biweight:
 
     @property
     def median(self) -> float | ndarray:
-        """Return biweight median.
-        """
+        """Return biweight median."""
         if self.axis is None:
             if self.__med_delta == 0:
                 return self.__med_data
@@ -135,8 +132,7 @@ class Biweight:
 
     @property
     def spread(self) -> float | ndarray:
-        """Return biweight spread.
-        """
+        """Return biweight spread."""
         if self.axis is None:
             if self.__med_delta == 0:
                 return 0.
@@ -161,8 +157,7 @@ class Biweight:
 
     @property
     def unbiased_std(self) -> float | ndarray:
-        """Return unbiased estimator.
-        """
+        """Return unbiased estimator."""
         count = self.nr_valid
         if self.axis is None:
             if count == 2:

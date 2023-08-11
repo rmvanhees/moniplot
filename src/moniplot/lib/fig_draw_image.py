@@ -373,9 +373,7 @@ def fig_qdata_to_xarr(data, ref_data: np.ndarray | None = None,
             exclude_region[data_sel] = False
 
     def float_to_quality(arr: np.ndarray):
-        """
-        Convert float value [0, 1] to quality classes
-        """
+        """Convert float value [0, 1] to quality classes."""
         res = np.empty(arr.shape, dtype='i1')
         buff = arr.values if isinstance(arr, xr.DataArray) else arr
         res[buff >= thres_bad] = 4
@@ -405,7 +403,7 @@ def fig_qdata_to_xarr(data, ref_data: np.ndarray | None = None,
     # define colors, data-range
     if ref_data is None:
         if qlabels is None:
-            xarr.attrs['flag_meanings'] = ("unusable", "worst", "bad", "good")
+            xarr.attrs['flag_meanings'] = ('unusable', 'worst', 'bad', 'good')
         elif len(qlabels) != 4:
             raise TypeError('keyword qlabels requires four labels')
         else:
@@ -416,9 +414,9 @@ def fig_qdata_to_xarr(data, ref_data: np.ndarray | None = None,
         xarr.attrs['flag_values'] = np.array([0, 1, 2, 4, 8], dtype='i1')
     else:
         if qlabels is None:
-            xarr.attrs['flag_meanings'] = ("unusable", "to worst",
-                                           "good to bad ",
-                                           "to good", "unchanged")
+            xarr.attrs['flag_meanings'] = ('unusable', 'to worst',
+                                           'good to bad ',
+                                           'to good', 'unchanged')
         elif len(qlabels) != 5:
             raise TypeError('keyword qlabels requires five labels')
         else:

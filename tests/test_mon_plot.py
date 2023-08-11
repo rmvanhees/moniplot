@@ -16,11 +16,8 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
-Perform a small unit test on the methods of the class `MONplot`.
-"""
+"""Perform a small unit test on the methods of the class `MONplot`."""
 from datetime import datetime, timedelta
-import pytest
 
 import numpy as np
 import xarray as xr
@@ -31,9 +28,7 @@ from moniplot.mon_plot import MONplot
 
 
 def get_test_data(data_sel=None, xy_min=-5, xy_max=5, delta=0.01, error=0):
-    """
-    Generate synthetic data to simulate a square-detector image
-    """
+    """Generate synthetic data to simulate a square-detector image."""
     if data_sel is None:
         data_sel = [(), ()]
 
@@ -47,9 +42,7 @@ def get_test_data(data_sel=None, xy_min=-5, xy_max=5, delta=0.01, error=0):
     return data_to_xr(data, long_name='bogus data', units='Volt')
 
 def test_lplot():
-    """
-    Run unit tests on MONplot::draw_lplot
-    """
+    """Run unit tests on MONplot::draw_lplot."""
     print('Run unit tests on MONplot::draw_lplot')
     plot = MONplot('mon_plot_draw_lplot-1.png')
     plot.set_institute('SRON')
@@ -100,9 +93,7 @@ def test_lplot():
 
 
 def test_qhist():
-    """
-    Run unit tests on MONplot::draw_qhist
-    """
+    """Run unit tests on MONplot::draw_qhist."""
     print('Run unit tests on MONplot::draw_qhist')
     plot = MONplot('mon_plot_draw_qhist-1.png')
     plot.set_institute('SRON')
@@ -135,9 +126,7 @@ def test_qhist():
 
 
 def test_quality():
-    """
-    Run unit tests on MONplot::draw_quality
-    """
+    """Run unit tests on MONplot::draw_quality."""
     print('Run unit tests on MONplot::draw_quality')
     row = np.linspace(0, 1., 1000)
     ref_data = np.repeat(row[None, :], 256, axis=0)
@@ -173,9 +162,7 @@ def test_quality():
 
 
 def test_signal():
-    """
-    Run unit tests on MONplot::draw_signal
-    """
+    """Run unit tests on MONplot::draw_signal."""
     print('Run unit tests on MONplot::draw_signal')
     msm = get_test_data(error=.1)
     # msm_ref = get_test_data(error=0.025)
@@ -263,9 +250,7 @@ def test_signal():
 
 
 def test_trend():
-    """
-    Run unit tests on MONplot::draw_trend
-    """
+    """Run unit tests on MONplot::draw_trend."""
     print('Run unit tests on MONplot::draw_trend')
     n_elmnt = 200
     xval = np.arange(n_elmnt) / 100
@@ -298,11 +283,11 @@ def test_trend():
     hk_attrs = {'long_name': 'SWIR OBM temperature', 'units': 'K'}
     res.append(xr.DataArray(buff, name='obm_temp', attrs=hk_attrs,
                             coords={'orbit': np.arange(n_elmnt)}))
-    hk_ds = xr.merge(res, combine_attrs="drop_conflicts")
+    hk_ds = xr.merge(res, combine_attrs='drop_conflicts')
 
     msm1 = data_to_xr(np.sin(xval * np.pi), name='msm1', dims=['orbit'])
     msm2 = data_to_xr(np.cos(xval * np.pi), name='msm2', dims=['orbit'])
-    msm_ds = xr.merge((msm1, msm2), combine_attrs="drop_conflicts")
+    msm_ds = xr.merge((msm1, msm2), combine_attrs='drop_conflicts')
 
     # plot.draw_trend(msm_ds, title='one dataset, no house-keeping')
     plot = MONplot('mon_plot_draw_trend-1.png',
