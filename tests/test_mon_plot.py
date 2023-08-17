@@ -21,7 +21,6 @@ from datetime import datetime, timedelta
 
 import numpy as np
 import xarray as xr
-
 from moniplot.image_to_xarray import data_to_xr
 from moniplot.lib.fig_info import FIGinfo
 from moniplot.mon_plot import MONplot
@@ -97,17 +96,18 @@ def test_qhist():
     print('Run unit tests on MONplot::draw_qhist')
     plot = MONplot('mon_plot_draw_qhist-1.png')
     plot.set_institute('SRON')
-    buff0 = np.repeat(0.9 + np.random.rand(1000) / 10, 56)
-    buff1 = np.repeat(np.random.rand(1000) / 10, 10)
-    buff2 = 0.1 + np.random.rand(1000) / 10
-    buff3 = np.repeat(0.2 + np.random.rand(1000) / 10, 2)
-    buff4 = np.repeat(0.3 + np.random.rand(1000) / 10, 3)
-    buff5 = np.repeat(0.4 + np.random.rand(1000) / 10, 4)
-    buff6 = np.repeat(0.5 + np.random.rand(1000) / 10, 8)
-    buff7 = np.repeat(0.6 + np.random.rand(1000) / 10, 12)
-    buff8 = np.repeat(0.7 + np.random.rand(1000) / 10, 20)
-    buff9 = np.repeat(0.8 + np.random.rand(1000) / 10, 40)
-    buffa = np.repeat(0.9 + np.random.rand(1000) / 10, 100)
+    rng = np.random.default_rng()
+    buff0 = np.repeat(0.9 + rng.random(1000) / 10, 56)
+    buff1 = np.repeat(rng.random(1000) / 10, 10)
+    buff2 = 0.1 + rng.random(1000) / 10
+    buff3 = np.repeat(0.2 + rng.random(1000) / 10, 2)
+    buff4 = np.repeat(0.3 + rng.random(1000) / 10, 3)
+    buff5 = np.repeat(0.4 + rng.random(1000) / 10, 4)
+    buff6 = np.repeat(0.5 + rng.random(1000) / 10, 8)
+    buff7 = np.repeat(0.6 + rng.random(1000) / 10, 12)
+    buff8 = np.repeat(0.7 + rng.random(1000) / 10, 20)
+    buff9 = np.repeat(0.8 + rng.random(1000) / 10, 40)
+    buffa = np.repeat(0.9 + rng.random(1000) / 10, 100)
     frame = np.concatenate((buff0, buff1, buff2, buff3, buff4,
                             buff5, buff6, buff7, buff8, buff9,
                             buffa)).reshape(256, 1000)

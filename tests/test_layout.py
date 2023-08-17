@@ -19,12 +19,9 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 """Perform a unit test on several aspect ratios and image sizes."""
-import pytest
-
-import numpy as np
-
 import matplotlib.pyplot as plt
-
+import numpy as np
+import pytest
 from moniplot.lib.fig_info import FIGinfo
 
 
@@ -141,8 +138,8 @@ def test_layout(aspect: int) -> None:
     #                             top=.85 if aspect == 2 else 0.825)
 
     axx = fig.add_subplot(gspec[0, 1])
-    pcm = axx.pcolormesh(np.random.randn(30, aspect * 30),
-                         vmin=-2, vmax=2)
+    rng = np.random.default_rng()
+    pcm = axx.pcolormesh(rng.standard_normal(30, aspect * 30), vmin=-2, vmax=2)
     # image panel
     axx.set_title(f'aspect={aspect}')
     axx.grid(True)

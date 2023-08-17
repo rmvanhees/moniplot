@@ -21,9 +21,8 @@
 Moniplot is a Python data visualization library for (satellite)
 instrument monitoring.
 """
+import contextlib
 from importlib.metadata import PackageNotFoundError, version
 
-try:
+with contextlib.suppress(PackageNotFoundError):
     __version__ = version(__name__)
-except PackageNotFoundError:
-    pass

@@ -33,8 +33,8 @@ import numpy as np
 import xarray as xr
 from matplotlib.ticker import AutoMinorLocator
 
-from ..image_to_xarray import data_to_xr
-from ..tol_colors import tol_cmap, tol_cset
+from moniplot.image_to_xarray import data_to_xr
+from moniplot.tol_colors import tol_cmap, tol_cset
 
 # - global parameters ------------------------------
 CSET = tol_cset('bright')
@@ -178,7 +178,7 @@ def fig_draw_panels(axx_p: dict, xarr: xr.DataArray, side_panels: str) -> None:
         'nanmean': np.nanmean,
         'quality': 'quality',
         'std': np.std,
-        'nanstd': np.nanstd}.get(side_panels, None)
+        'nanstd': np.nanstd}.get(side_panels)
     if func_panels is None:
         raise KeyError(f'unknown function for side_panels: {side_panels}')
 

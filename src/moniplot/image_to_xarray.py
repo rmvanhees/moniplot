@@ -26,10 +26,13 @@ from __future__ import annotations
 __all__ = ['h5_to_xr', 'data_to_xr']
 
 from pathlib import PurePath
+from typing import TYPE_CHECKING
 
-import h5py
 import numpy as np
 import xarray as xr
+
+if TYPE_CHECKING:
+    import h5py
 
 
 # - local functions --------------------------------
@@ -70,9 +73,8 @@ def __get_attrs(dset: h5py.Dataset, field: str) -> dict:
             if len(attr_value) == 1:
                 attr_value = attr_value[0]
                 # print('# ----- ', key, type(attr_value), attr_value)
-            elif _field is not None:
-                if len(attr_value) == _field['oneof']:
-                    attr_value = attr_value[_field['index']]
+            elif _field is not None and len(attr_value) == _field['oneof']:
+                attr_value = attr_value[_field['index']]
                 # elif isinstance(attr_value, np.void):
                 #    attr_value = attr_value[0]
 

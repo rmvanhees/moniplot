@@ -30,7 +30,7 @@ else:
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
 
-from ..tol_colors import tol_cset
+from moniplot.tol_colors import tol_cset
 
 # - main functions ---------------------------------
 if FOUND_CARTOPY:

@@ -45,8 +45,12 @@ from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.gridspec import GridSpec
 
 from .biweight import Biweight
-from .lib.fig_draw_image import (adjust_img_ticks, fig_data_to_xarr,
-                                 fig_draw_panels, fig_qdata_to_xarr)
+from .lib.fig_draw_image import (
+    adjust_img_ticks,
+    fig_data_to_xarr,
+    fig_draw_panels,
+    fig_qdata_to_xarr,
+)
 from .lib.fig_draw_lplot import close_draw_lplot, fig_draw_lplot
 from .lib.fig_draw_multiplot import draw_subplot, get_xylabels
 from .lib.fig_draw_qhist import fig_draw_qhist

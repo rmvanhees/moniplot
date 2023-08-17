@@ -21,8 +21,12 @@ from __future__ import annotations
 
 __all__ = ['draw_subplot', 'get_xylabels']
 
+from typing import TYPE_CHECKING
+
 import numpy as np
-import xarray as xr
+
+if TYPE_CHECKING:
+    import xarray as xr
 
 
 # - local functions --------------------------------
@@ -79,10 +83,7 @@ def draw_subplot(axx, xarr: xr.DataArray, xylabels: list[str, str]) -> None:
     xylabels :  list[str]
       X,Y labels of subplot
     """
-    if '_plot' in xarr.attrs:
-        kwargs = xarr.attrs['_plot']
-    else:
-        kwargs = {'color': '#4477AA'}
+    kwargs = xarr.attrs.get('_plot', {'color': '#4477AA'})
 
     label = xarr.attrs['long_name'] \
         if 'long_name' in xarr.attrs else None

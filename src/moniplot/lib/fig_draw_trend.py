@@ -25,14 +25,17 @@ from __future__ import annotations
 __all__ = ['add_subplot', 'add_hk_subplot']
 
 from numbers import Integral
-from typing import Iterable
+from typing import TYPE_CHECKING, Iterable
 
 import numpy as np
-import xarray as xr
 from matplotlib.ticker import AutoMinorLocator, MultipleLocator
 
-from ..tol_colors import tol_cset
+from moniplot.tol_colors import tol_cset
+
 from .fig_legend import blank_legend_handle
+
+if TYPE_CHECKING:
+    import xarray as xr
 
 # - global parameters ------------------------------
 CSET = tol_cset('bright')
