@@ -305,7 +305,7 @@ def h5_to_xr(h5_dset: h5py.Dataset, data_sel: tuple[slice | int] | None = None,
         data_sel = __check_selection(data_sel, h5_dset.ndim)
 
     # Name of this array
-    name = PurePath(h5_dset.name).name
+    name = PurePath(h5_dset.name).name if field is None else field
 
     # Values for this array
     data = __get_data(h5_dset, data_sel, field)
