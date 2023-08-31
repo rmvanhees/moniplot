@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,9 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Perform a small unit test on the methods of the class `MONplot`."""
+
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 
 import numpy as np
@@ -26,7 +29,10 @@ from moniplot.lib.fig_info import FIGinfo
 from moniplot.mon_plot import MONplot
 
 
-def get_test_data(data_sel=None, xy_min=-5, xy_max=5, delta=0.01, error=0):
+def get_test_data(data_sel: list[tuple, tuple] | None = None,
+                  xy_min: float = -5, xy_max: float = 5,
+                  delta: float = 0.01,
+                  error: float = 0) -> xr.DataArray:
     """Generate synthetic data to simulate a square-detector image."""
     if data_sel is None:
         data_sel = [(), ()]
@@ -40,7 +46,7 @@ def get_test_data(data_sel=None, xy_min=-5, xy_max=5, delta=0.01, error=0):
 
     return data_to_xr(data, long_name='bogus data', units='Volt')
 
-def test_lplot():
+def test_lplot() -> xr.DataArray:
     """Run unit tests on MONplot::draw_lplot."""
     print('Run unit tests on MONplot::draw_lplot')
     plot = MONplot('mon_plot_draw_lplot-1.png')
@@ -91,7 +97,7 @@ def test_lplot():
     plot.close()
 
 
-def test_qhist():
+def test_qhist() -> xr.Dataset:
     """Run unit tests on MONplot::draw_qhist."""
     print('Run unit tests on MONplot::draw_qhist')
     plot = MONplot('mon_plot_draw_qhist-1.png')
@@ -125,7 +131,7 @@ def test_qhist():
     plot.close()
 
 
-def test_quality():
+def test_quality() -> None:
     """Run unit tests on MONplot::draw_quality."""
     print('Run unit tests on MONplot::draw_quality')
     row = np.linspace(0, 1., 1000)
@@ -161,7 +167,7 @@ def test_quality():
     plot.close()
 
 
-def test_signal():
+def test_signal() -> None:
     """Run unit tests on MONplot::draw_signal."""
     print('Run unit tests on MONplot::draw_signal')
     msm = get_test_data(error=.1)
@@ -249,7 +255,7 @@ def test_signal():
     plot.close()
 
 
-def test_trend():
+def test_trend() -> None:
     """Run unit tests on MONplot::draw_trend."""
     print('Run unit tests on MONplot::draw_trend')
     n_elmnt = 200

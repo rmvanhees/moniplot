@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2019-2022 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2019-2023 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -17,15 +17,18 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """This module contains our Python of the Tukey's biweight algorithm."""
+
 from __future__ import annotations
 
 __all__ = ['Biweight', 'biweight']
 
 import warnings
-from typing import Iterable
+from typing import TYPE_CHECKING, Iterable
 
 import numpy as np
-from numpy import ndarray
+
+if TYPE_CHECKING:
+    from numpy import ndarray
 
 
 # ----- class Biweight -------------------------
@@ -65,7 +68,9 @@ class Biweight:
        0.6131156500926488
     """
 
-    def __init__(self, data: ndarray | Iterable, axis: int | None = None):
+    def __init__(self: Biweight,
+                 data: ndarray | Iterable,
+                 axis: int | None = None) -> None:
         """Initialize a Biweight object."""
         data = np.asarray(data)
 
@@ -112,7 +117,7 @@ class Biweight:
             self.__med_data = np.squeeze(self.__med_data)
 
     @property
-    def median(self) -> float | ndarray:
+    def median(self: Biweight) -> float | ndarray:
         """Return biweight median."""
         if self.axis is None:
             if self.__med_delta == 0:
@@ -131,7 +136,7 @@ class Biweight:
         return self.__med_data
 
     @property
-    def spread(self) -> float | ndarray:
+    def spread(self: Biweight) -> float | ndarray:
         """Return biweight spread."""
         if self.axis is None:
             if self.__med_delta == 0:
@@ -156,7 +161,7 @@ class Biweight:
         return np.sqrt(biweight_var)
 
     @property
-    def unbiased_std(self) -> float | ndarray:
+    def unbiased_std(self: Biweight) -> float | ndarray:
         """Return unbiased estimator."""
         count = self.nr_valid
         if self.axis is None:

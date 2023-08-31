@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -36,6 +36,7 @@ from .fig_legend import blank_legend_handle
 
 if TYPE_CHECKING:
     import xarray as xr
+    from mathplotlib import Axes
 
 # - global parameters ------------------------------
 CSET = tol_cset('bright')
@@ -92,8 +93,10 @@ def set_labels_colors(xarr: xr.DataArray) -> tuple[str, str, str, str]:
     return hk_title, hk_label, lcolor, fcolor
 
 
-def adjust_ylim(data: np.ndarray | Iterable, err1: np.ndarray | Iterable | None,
-                err2: np.ndarray | Iterable | None, vperc: list[int, int],
+def adjust_ylim(data: np.ndarray | Iterable,
+                err1: np.ndarray | Iterable | None,
+                err2: np.ndarray | Iterable | None,
+                vperc: list[int, int],
                 vrange_last_orbits: int) -> tuple[float, float]:
     """Set minimum and maximum values of ylim.
 
@@ -202,7 +205,7 @@ def get_gap_list(xdata: np.ndarray) -> tuple:
 
 
 # - main functions ---------------------------------
-def add_subplot(axx, xarr: xr.DataArray) -> None:
+def add_subplot(axx: Axes, xarr: xr.DataArray) -> None:
     """Add a subplot for measurement data.
 
     Parameters
@@ -275,7 +278,8 @@ def add_subplot(axx, xarr: xr.DataArray) -> None:
     axx.grid(True)
 
 
-def add_hk_subplot(axx, xarr: xr.DataArray, vperc: list | None = None,
+def add_hk_subplot(axx: Axes, xarr: xr.DataArray,
+                   vperc: list | None = None,
                    vrange_last_orbits: int = -1) -> None:
     """Add a subplot for housekeeping data.
 

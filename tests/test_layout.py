@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
 # All rights reserved.
 #
 # License:  GPLv3
@@ -19,13 +19,21 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 """Perform a unit test on several aspect ratios and image sizes."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 from moniplot.lib.fig_info import FIGinfo
 
+if TYPE_CHECKING:
+    from matplotlib import Axes
 
-def add_fig_box(axx_c, aspect: int, fig_info: FIGinfo) -> None:
+
+def add_fig_box(axx_c: Axes, aspect: int, fig_info: FIGinfo) -> None:
     """Add a box with meta information for draw_signal and draw_quality.
 
     Parameters

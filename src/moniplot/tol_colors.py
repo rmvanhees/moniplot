@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2019-2022, Paul Tol
+# Copyright (c) 2019-2023, Paul Tol
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -26,14 +26,20 @@ Routines in this module::
    tol_cset(colorset=None)
    tol_rgba(cname, cnum=None)
 """
+from __future__ import annotations
+
 __all__ = ['tol_cmap', 'tol_cset', 'tol_rgba']
 
 from dataclasses import astuple, dataclass, field
+from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba_array
+
+if TYPE_CHECKING:
+    from matplotlib import colormaps
 
 
 # pylint: disable=too-many-instance-attributes
@@ -43,9 +49,9 @@ class SunSet:
     """Defines diverging color scheme 'SunSet'."""
 
     bad_color: str = '#FFFFFF'
-    colors: tuple[str] = field(default_factory=tuple)
+    colors: tuple[str, ...] = field(default_factory=tuple)
 
-    def __post_init__(self):
+    def __post_init__(self: SunSet) -> tuple[str, ...]:
         self.colors += (
             '#364B9A', '#4A7BB7', '#6EA6CD', '#98CAE1', '#C2E4EF',
             '#EAECCC', '#FEDA8B', '#FDB366', '#F67E4B', '#DD3D2D', '#A50026')
@@ -58,7 +64,7 @@ class NightFall:
     bad_color: str = '#FFFFFF'
     colors: tuple[str] = field(default_factory=tuple)
 
-    def __post_init__(self):
+    def __post_init__(self: NightFall) -> tuple[str, ...]:
         self.colors += (
             '#125A56', '#00767B', '#238F9D', '#42A7C6', '#60BCE9',
             '#9DCCEF', '#C6DBED', '#DEE6E7', '#ECEADA', '#F0E6B2',
@@ -73,7 +79,7 @@ class BuRd:
     bad_color: str = '#FFEE99'
     colors: tuple[str] = field(default_factory=tuple)
 
-    def __post_init__(self):
+    def __post_init__(self: BuRd) -> tuple[str, ...]:
         self.colors += (
             '#2166AC', '#4393C3', '#92C5DE', '#D1E5F0', '#F7F7F7',
             '#FDDBC7', '#F4A582', '#D6604D', '#B2182B')
@@ -86,7 +92,7 @@ class PRGn:
     bad_color: str = '#FFEE99'
     colors: tuple[str] = field(default_factory=tuple)
 
-    def __post_init__(self):
+    def __post_init__(self: PRGn) -> tuple[str, ...]:
         self.colors += (
             '#762A83', '#9970AB', '#C2A5CF', '#E7D4E8', '#F7F7F7',
             '#D9F0D3', '#ACD39E', '#5AAE61', '#1B7837')
@@ -99,7 +105,7 @@ class YlOrBr:
     bad_color: str = '#888888'
     colors: tuple[str] = field(default_factory=tuple)
 
-    def __post_init__(self):
+    def __post_init__(self: YlOrBr) -> tuple[str, ...]:
         self.colors += (
             '#FFFFE5', '#FFF7BC', '#FEE391', '#FEC44F', '#FB9A29',
             '#EC7014', '#CC4C02', '#993404', '#662506')
@@ -112,7 +118,7 @@ class WhOrBr:
     bad_color: str = '#888888'
     colors: tuple[str] = field(default_factory=tuple)
 
-    def __post_init__(self):
+    def __post_init__(self: WhOrBr) -> tuple[str, ...]:
         self.colors += (
             '#FFFFFF', '#FFF7BC', '#FEE391', '#FEC44F', '#FB9A29',
             '#EC7014', '#CC4C02', '#993404', '#662506')
@@ -125,7 +131,7 @@ class IriDescent:
     bad_color: str = '#999999'
     colors: tuple[str] = field(default_factory=tuple)
 
-    def __post_init__(self):
+    def __post_init__(self: IriDescent) -> tuple[str, ...]:
         self.colors += (
             '#FEFBE9', '#FCF7D5', '#F5F3C1', '#EAF0B5', '#DDECBF',
             '#D0E7CA', '#C2E3D2', '#B5DDD8', '#A8D8DC', '#9BD2E1',
@@ -141,7 +147,7 @@ class RainbowPuRd:
     bad_color: str = '#FFFFFF'
     colors: tuple[str] = field(default_factory=tuple)
 
-    def __post_init__(self):
+    def __post_init__(self: RainbowPuRd) -> tuple[str, ...]:
         self.colors += (
             '#6F4C9B', '#6059A9', '#5568B8', '#4E79C5', '#4D8AC6',
             '#4E96BC', '#549EB3', '#59A5A9', '#60AB9E', '#69B190',
@@ -157,7 +163,7 @@ class RainbowPuBr:
     bad_color: str = '#FFFFFF'
     colors: tuple[str] = field(default_factory=tuple)
 
-    def __post_init__(self):
+    def __post_init__(self: RainbowPuBr) -> tuple[str, ...]:
         self.colors += (
             '#6F4C9B', '#6059A9', '#5568B8', '#4E79C5', '#4D8AC6',
             '#4E96BC', '#549EB3', '#59A5A9', '#60AB9E', '#69B190',
@@ -174,7 +180,7 @@ class RainbowWhRd:
     bad_color: str = '#666666'
     colors: tuple[str] = field(default_factory=tuple)
 
-    def __post_init__(self):
+    def __post_init__(self: RainbowWhRd) -> tuple[str, ...]:
         self.colors += (
             '#E8ECFB', '#DDD8EF', '#D1C1E1', '#C3A8D1', '#B58FC2',
             '#A778B4', '#9B62A7', '#8C4E99', '#6F4C9B', '#6059A9',
@@ -191,7 +197,7 @@ class RainbowWhBr:
     bad_color: str = '#666666'
     colors: tuple[str] = field(default_factory=tuple)
 
-    def __post_init__(self):
+    def __post_init__(self: RainbowWhBr) -> tuple[str, ...]:
         self.colors += (
             '#E8ECFB', '#DDD8EF', '#D1C1E1', '#C3A8D1', '#B58FC2',
             '#A778B4', '#9B62A7', '#8C4E99', '#6F4C9B', '#6059A9',
@@ -209,10 +215,10 @@ class RainbowDiscrete:
     bad_color: str = '#777777'
     colors: list[str] = field(default_factory=list)
 
-    def __post_init__(self):
+    def __post_init__(self: RainbowDiscrete) -> None:
         self.set_lut()
 
-    def set_lut(self, lut: int = 22):
+    def set_lut(self: RainbowDiscrete, lut: int = 22) -> tuple[str, ...]:
         """Define list of colors of 'rainbow_discrete'."""
         hexclrs = (
             '#E8ECFB', '#D9CCE3', '#D1BBD7', '#CAACCB', '#BA8DB4',
@@ -278,7 +284,7 @@ class Bright:
     black: str = '#000000'
 
     @property
-    def colors(self):
+    def colors(self: Bright) -> tuple[str, ...]:
         """Return tuple with colors."""
         return astuple(self)
 
@@ -297,7 +303,7 @@ class HighContrast:
     black: str = '#000000'
 
     @property
-    def colors(self):
+    def colors(self: HighContrast) -> tuple[str, ...]:
         """Return tuple with colors."""
         return astuple(self)
 
@@ -321,7 +327,7 @@ class MediumContrast:
     black: str = '#000000'
 
     @property
-    def colors(self):
+    def colors(self: MediumContrast) -> tuple[str, ...]:
         """Return tuple with colors."""
         return astuple(self)
 
@@ -344,7 +350,7 @@ class Vibrant:
     black: str = '#000000'
 
     @property
-    def colors(self):
+    def colors(self: Vibrant) -> tuple[str, ...]:
         """Return tuple with colors."""
         return astuple(self)
 
@@ -369,7 +375,7 @@ class Muted:
     black: str = '#000000'
 
     @property
-    def colors(self):
+    def colors(self: Muted) -> tuple[str, ...]:
         """Return tuple with colors."""
         return astuple(self)
 
@@ -396,7 +402,7 @@ class Light:
     black: str = '#000000'
 
     @property
-    def colors(self):
+    def colors(self: Light) -> tuple[str, ...]:
         """Return tuple with colors."""
         return astuple(self)
 
@@ -426,7 +432,7 @@ _cmap_dict = {
 
 
 # - functions --------------------------------------
-def tol_cmap(colormap: str = None, lut: int = 0):
+def tol_cmap(colormap: str = None, lut: int = 0) -> colormaps:
     """Continuous and discrete color sets for ordered data.
 
     Definition of colour schemes for lines which also work for colour-blind
@@ -531,7 +537,7 @@ def tol_rgba(cname: str, lut: int | None = None) -> list[str, ...]:
 
 
 # - test functions -------------------------
-def __show_cset():
+def __show_cset() -> None:
     """Show colormaps tol_cset()."""
     schemes = tol_cset()
     fig, axes = plt.subplots(ncols=len(schemes), figsize=(9, 3))
@@ -546,7 +552,7 @@ def __show_cset():
     plt.show()
 
 
-def __show_cmap():
+def __show_cmap() -> None:
     """Show colormaps tol_cmap(<non-discrete>)."""
     schemes = tol_cmap()
     gradient = np.linspace(0, 1, 256)
@@ -562,7 +568,7 @@ def __show_cmap():
     plt.show()
 
 
-def __show_discrete():
+def __show_discrete() -> None:
     """Show colormaps tol_cmap('rainbow_discrete', <lut>)."""
     gradient = np.linspace(0, 1, 256)
     gradient = np.vstack((gradient, gradient))
@@ -578,7 +584,7 @@ def __show_discrete():
     plt.show()
 
 
-def __show_rgba():
+def __show_rgba() -> None:
     """Show usage of tol_rgba()."""
     cname = 'sunset'
     print(cname, clrs := tol_rgba(cname, 16))

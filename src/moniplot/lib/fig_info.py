@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -46,31 +46,31 @@ class FIGinfo:
     color bar. You may try loc='below', which is only available for image plots.
     """
 
-    def __init__(self, loc: str = 'above',
+    def __init__(self: FIGinfo, loc: str = 'above',
                  info_dict: dict | None = None) -> None:
         """Create FIGinfo instance to hold information on the current plot."""
         self.fig_info = {} if info_dict is None else info_dict
         self._location = None
         self.set_location(loc)
 
-    def __bool__(self) -> bool:
+    def __bool__(self: FIGinfo) -> bool:
         """Return True when an instance of fig_info exists."""
         return bool(self.fig_info)
 
-    def __len__(self) -> int:
+    def __len__(self: FIGinfo) -> int:
         """Return the length of the instance fig_info."""
         return len(self.fig_info)
 
-    def copy(self):
+    def copy(self: FIGinfo) -> FIGinfo:
         """Return a deep copy of the current object."""
         return deepcopy(self)
 
     @property
-    def location(self):
+    def location(self: FIGinfo) -> str:
         """Return location of the fig_info box."""
         return self._location
 
-    def set_location(self, loc: str) -> None:
+    def set_location(self: FIGinfo, loc: str) -> None:
         """Set the location of the fig_info box.
 
         Parameters
@@ -83,7 +83,7 @@ class FIGinfo:
 
         self._location = loc
 
-    def add(self, key: str, value: Any, fmt: str = '{}') -> None:
+    def add(self: FIGinfo, key: str, value: Any, fmt: str = '{}') -> None:
         r"""Extent fig_info by adding a new line.
 
         Parameters
@@ -100,7 +100,7 @@ class FIGinfo:
         else:
             self.fig_info[key] = fmt.format(value)
 
-    def as_str(self) -> str:
+    def as_str(self: FIGinfo) -> str:
         """Return figure information as one long string."""
         info_str = ''
         for key, value in self.fig_info.items():

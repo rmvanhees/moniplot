@@ -17,6 +17,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """This module holds `draw_subplot` which is used by `draw_multiplot`."""
+
 from __future__ import annotations
 
 __all__ = ['draw_subplot', 'get_xylabels']
@@ -27,10 +28,12 @@ import numpy as np
 
 if TYPE_CHECKING:
     import xarray as xr
+    from matplotlib import Axes
+    from matplotlib.gridspec import GridSpec
 
 
 # - local functions --------------------------------
-def get_xylabels(gridspec, data_tuple: tuple) -> np.ndarray:
+def get_xylabels(gridspec: GridSpec, data_tuple: tuple) -> np.ndarray:
     """Define xlabel and ylabel for each subplot panel.
 
     Parameters
@@ -71,7 +74,9 @@ def get_xylabels(gridspec, data_tuple: tuple) -> np.ndarray:
 
 
 # - main functions ---------------------------------
-def draw_subplot(axx, xarr: xr.DataArray, xylabels: list[str, str]) -> None:
+def draw_subplot(axx: Axes,
+                 xarr: xr.DataArray,
+                 xylabels: list[str, str]) -> None:
     """Draw a subplot figure.
 
     Parameters

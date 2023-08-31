@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,12 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """This module contains `fig_draw_tracks` used by `draw_tracks`."""
+
+from __future__ import annotations
+
 __all__ = ['fig_draw_tracks']
+
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -32,9 +37,17 @@ from matplotlib.patches import Polygon
 
 from moniplot.tol_colors import tol_cset
 
+if TYPE_CHECKING:
+    from matplotlib import Axes
+
+
 # - main functions ---------------------------------
 if FOUND_CARTOPY:
-    def fig_draw_tracks(axx, lons, lats, icids, saa_region) -> None:
+    def fig_draw_tracks(axx: Axes,
+                        lons: np.ndarray,
+                        lats: np.ndarray,
+                        icids: np.ndarray,
+                        saa_region: list[tuple[float, float], ...]) -> None:
         """Draw satellite tracks projected on the Earth surface.
 
         Parameters

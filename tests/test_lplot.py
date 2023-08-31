@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
 # All rights reserved.
 #
 # License:  GPLv3
@@ -20,10 +20,12 @@
 #
 """Perform a unit test on MONplot::draw_lplot."""
 
+from __future__ import annotations
+
 import numpy as np
 
 
-def test_lplot():
+def test_lplot() -> None:
     """Extensive test with MONplot::draw_lplot()."""
     from moniplot.mon_plot import MONplot
 

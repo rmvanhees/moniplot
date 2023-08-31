@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -27,6 +27,7 @@ __all__ = ['adjust_img_ticks', 'fig_data_to_xarr',
 
 import warnings
 from math import log10
+from typing import TYPE_CHECKING
 
 import matplotlib.colors as mcolors
 import numpy as np
@@ -35,6 +36,9 @@ from matplotlib.ticker import AutoMinorLocator
 
 from moniplot.image_to_xarray import data_to_xr
 from moniplot.tol_colors import tol_cmap, tol_cset
+
+if TYPE_CHECKING:
+    from matplotlib import Axes
 
 # - global parameters ------------------------------
 CSET = tol_cset('bright')
@@ -83,7 +87,7 @@ def adjust_zunit(zunits: str,
     return 1, zunits
 
 
-def set_norm(zscale: str, vmin: float, vmax: float):
+def set_norm(zscale: str, vmin: float, vmax: float) -> mcolors:
     """Set data-range normalization.
 
     Parameters
@@ -131,7 +135,8 @@ def set_norm(zscale: str, vmin: float, vmax: float):
     return mcolors.Normalize(vmin=vmin, vmax=vmax)
 
 
-def adjust_img_ticks(axx, xarr: xr.DataArray, dims: str | None = None) -> None:
+def adjust_img_ticks(axx: Axes, xarr: xr.DataArray,
+                     dims: str | None = None) -> None:
     """Adjust ticks of the image axis.
 
     Parameters
@@ -158,7 +163,8 @@ def adjust_img_ticks(axx, xarr: xr.DataArray, dims: str | None = None) -> None:
         axx.yaxis.set_minor_locator(AutoMinorLocator())
 
 
-def fig_draw_panels(axx_p: dict, xarr: xr.DataArray, side_panels: str) -> None:
+def fig_draw_panels(axx_p: dict, xarr: xr.DataArray,
+                    side_panels: str) -> None:
     """Draw two side-panels, one left and one under the main image panel.
 
     Parameters
@@ -227,7 +233,8 @@ def fig_draw_panels(axx_p: dict, xarr: xr.DataArray, side_panels: str) -> None:
 
 
 # - main functions ---------------------------------
-def fig_data_to_xarr(data, zscale: str = None,
+def fig_data_to_xarr(data: np.ndarray,
+                     zscale: str = None,
                      vperc: list[int, int] | None = None,
                      vrange: list[float, float] | None = None) -> xr.DataArray:
     """Prepare image data for plotting.
@@ -313,7 +320,8 @@ def fig_data_to_xarr(data, zscale: str = None,
 
 
 # pylint: disable=too-many-arguments
-def fig_qdata_to_xarr(data, ref_data: np.ndarray | None = None,
+def fig_qdata_to_xarr(data: np.ndarray,
+                      ref_data: np.ndarray | None = None,
                       data_sel: slice | None = None,
                       thres_worst: float = 0.1, thres_bad: float = 0.8,
                       qlabels: tuple[str] = None) -> xr.DataArray:
@@ -372,7 +380,7 @@ def fig_qdata_to_xarr(data, ref_data: np.ndarray | None = None,
             exclude_region = np.full(data.shape, True)
             exclude_region[data_sel] = False
 
-    def float_to_quality(arr: np.ndarray):
+    def float_to_quality(arr: np.ndarray) -> np.ndarray:
         """Convert float value [0, 1] to quality classes."""
         res = np.empty(arr.shape, dtype='i1')
         buff = arr.values if isinstance(arr, xr.DataArray) else arr

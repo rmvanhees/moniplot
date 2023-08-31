@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2019-2022 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2019-2023 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,8 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Calculate the unbiased estimator for the standard deviation."""
 
+from __future__ import annotations
+
 __all__ = ['unbiased_std']
 
 from math import pi, sqrt
@@ -28,7 +30,7 @@ import numpy as np
 import scipy.special as sc
 
 
-def unbiased_std(data):
+def unbiased_std(data: np.ndarray) -> np.ndarray:
     """Return the unbiased estimator for the standard deviation."""
     nval = data.shape[0]
     unbias = sqrt((nval - 1) / (2 * pi)) * sc.beta((nval - 1) / 2, 1 / 2)

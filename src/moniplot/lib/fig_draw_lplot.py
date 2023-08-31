@@ -24,12 +24,21 @@ from __future__ import annotations
 
 __all__ = ['fig_draw_lplot', 'close_draw_lplot']
 
+from typing import TYPE_CHECKING
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.dates import DateFormatter
 
+if TYPE_CHECKING:
+    from matplotlib import Axes
 
-def fig_draw_lplot(axx, xdata, ydata, use_steps: bool = False, **kwargs):
+
+def fig_draw_lplot(axx: Axes,
+                   xdata: np.ndarray,
+                   ydata: np.ndarray, use_steps:
+                   bool = False,
+                   **kwargs: int) -> None:
     """Add line plot to figure.
 
     Parameters
@@ -57,8 +66,11 @@ def fig_draw_lplot(axx, xdata, ydata, use_steps: bool = False, **kwargs):
         axx.plot(xdata, ydata, **kwargs)
 
 
-def close_draw_lplot(axx, time_axis: bool, title: str | None,
-                     kwlegend: dict | None, **kwargs):
+def close_draw_lplot(axx: Axes,
+                     time_axis: bool,
+                     title: str | None,
+                     kwlegend: dict | None,
+                     **kwargs: int) -> None:
     """Close the figure created with MONplot::draw_lplot().
 
     Parameters

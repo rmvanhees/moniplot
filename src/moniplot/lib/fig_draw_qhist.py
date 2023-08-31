@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -17,16 +17,27 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """This module holds `fig_draw_qhist` which are used by `draw_qhist`."""
+
+from __future__ import annotations
+
 __all__ = ['fig_draw_qhist']
+
+from typing import TYPE_CHECKING
 
 import numpy as np
 from matplotlib.ticker import AutoMinorLocator
 
 from .fig_legend import blank_legend_handle
 
+if TYPE_CHECKING:
+    from matplotlib import Axes
+
 
 # - main functions ---------------------------------
-def fig_draw_qhist(axx, qdata: np.ndarray, label: str, density: bool) -> None:
+def fig_draw_qhist(axx: Axes,
+                   qdata: np.ndarray,
+                   label: str,
+                   density: bool) -> None:
     """Add a subplot showing pixel-quality data as a histogram.
 
     Parameters

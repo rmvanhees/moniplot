@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -17,17 +17,22 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """This module contains `blank_legend_handle`."""
+
+from __future__ import annotations
+
 __all__ = ['blank_legend_handle']
 
-import matplotlib as mpl
+from matplotlib.patches import Rectangle
 
 
-def blank_legend_handle():
+def blank_legend_handle() -> Rectangle:
     """Show only label in a legend entry, no handle.
 
     See Also
     --------
     matplotlib.pyplot.legend : Place a legend on the Axes.
     """
-    return mpl.patches.Rectangle((0, 0), 0, 0, fill=False,
-                                 edgecolor='none', visible=False)
+    return Rectangle((0, 0), 0, 0,
+                     fill=False,
+                     edgecolor='none',
+                     visible=False)
