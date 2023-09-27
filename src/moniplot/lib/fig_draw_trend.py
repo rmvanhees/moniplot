@@ -16,10 +16,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
-This module contains `add_subplot` and `add_hk_subplot`
-which are used by `draw_trend`.
-"""
+"""This module contains the functions: `add_subplot` and `add_hk_subplot`."""
 from __future__ import annotations
 
 __all__ = ['add_subplot', 'add_hk_subplot']
@@ -27,7 +24,9 @@ __all__ = ['add_subplot', 'add_hk_subplot']
 from numbers import Integral
 from typing import TYPE_CHECKING, Iterable
 
+import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.dates import DateFormatter
 from matplotlib.ticker import AutoMinorLocator, MultipleLocator
 
 from moniplot.tol_colors import tol_cset
@@ -314,6 +313,9 @@ def add_hk_subplot(axx: Axes, xarr: xr.DataArray,
     else:
         xdata = xarr.coords['time'].values
         gap_list = get_gap_list(xdata)
+        plt.gcf().autofmt_xdate()
+        plt.gca().xaxis.set_major_formatter(DateFormatter('%H:%M:%S'))
+
     gap_list += (xdata.size - 1,)
 
     # define avg, err1, err2
