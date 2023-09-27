@@ -222,13 +222,17 @@ def add_subplot(axx: Axes, xarr: xr.DataArray) -> None:
     fcolor = '#BBCCEE'
 
     # define xdata and determine gap_list (always at least one element!)
+    isel = np.s_[:]
     if 'orbit' in xarr.coords:
         xdata = xarr.coords['orbit'].values
-        isel = np.s_[:]
+        gap_list = get_gap_list(xdata)
+    elif 'hours' in xarr.coords:
+        xdata = xarr.coords['hours'].values
+        isel = np.s_[0, :]
+        gap_list = get_gap_list(np.round(3600 * xdata).astype(int))
     else:
         xdata = xarr.coords['time'].values
-        isel = np.s_[0, :]
-    gap_list = get_gap_list(xdata)
+        gap_list = get_gap_list(xdata)
     gap_list += (xdata.size - 1,)
 
     # define avg, err1, err2
@@ -299,9 +303,9 @@ def add_hk_subplot(axx: Axes, xarr: xr.DataArray,
     hk_title, hk_label, lcolor, fcolor = set_labels_colors(xarr)
 
     # define xdata and determine gap_list (always one element!)
+    isel = np.s_[:]
     if 'orbit' in xarr.coords:
         xdata = xarr.coords['orbit'].values
-        isel = np.s_[:]
         gap_list = get_gap_list(xdata)
     elif 'hours' in xarr.coords:
         xdata = xarr.coords['hours'].values
@@ -309,7 +313,6 @@ def add_hk_subplot(axx: Axes, xarr: xr.DataArray,
         gap_list = get_gap_list(np.round(3600 * xdata).astype(int))
     else:
         xdata = xarr.coords['time'].values
-        isel = np.s_[0, :]
         gap_list = get_gap_list(xdata)
     gap_list += (xdata.size - 1,)
 

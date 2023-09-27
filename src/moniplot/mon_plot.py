@@ -613,8 +613,8 @@ class MONplot:
         self.__draw_image__(xarr, side_panels, fig_info, title)
 
     # --------------------------------------------------
-    def draw_trend(self: MONplot, xds: xr.DataArray | None = None,
-                   hk_xds: xr.DataArray | None = None, *,
+    def draw_trend(self: MONplot, xds: xr.Dataset | None = None,
+                   hk_xds: xr.Dataset | None = None, *,
                    fig_info: FIGinfo | None = None,
                    title: str | None = None, **kwargs: int) -> None:
         """
@@ -636,6 +636,7 @@ class MONplot:
 
         See Also
         --------
+        add_subplot : Add a subplot for measurement data.
         add_hk_subplot : Add a subplot for housekeeping data.
 
         Notes
@@ -665,6 +666,61 @@ class MONplot:
         Finalize the PDF file::
 
         > plot.close()
+
+
+        The following Dataset-definitions for measurement data are accepted::
+
+          <xarray.Dataset>
+          Dimensions:           (days: 1, hours: 480)
+          Coordinates:
+            * days              (days) int32 1690329600
+            * hours             (hours) float64 0.0 0.05 0.1 ... 23.9 23.95
+          Data variables:
+            value             (days, hours) [('mean', '<f8'), ('err1', '<f8'), ('err2', '<f8')] ...
+
+          <xarray.Dataset>
+          Dimensions:           (days: 1, hours: 480)
+          Coordinates:
+            * days              (days) int32 1690329600
+            * hours             (hours) float64 0.0 0.05 0.1 ... 23.9 23.95
+          Data variables:
+            value             (days, hours) float64 ...
+
+          <xarray.Dataset>
+          Dimensions:           (orbit: 480)
+          Coordinates:
+            * orbit             (orbit) uint32 12345 12346 ... 12823 12824
+          Data variables:
+            value             (orbit) float64 ...
+
+
+        The following Dataset-definitions for housekeeping data are accepted::
+
+         <xarray.Dataset>
+         Dimensions:           (days: 1, hours: 480)
+         Coordinates:
+           * days              (days) int32 1690329600
+           * hours             (hours) float64 0.0 0.05 0.1 ... 23.9 23.95
+         Data variables:
+           TS1_DEM_N_T       (days, hours) [('mean', '<f8'), ('err1', '<f8'), ('err2', '<f8')] ...
+           TS2_HOUSING_N_T   (days, hours) [('mean', '<f8'), ('err1', '<f8'), ('err2', '<f8')] ...
+           TS3_RADIATOR_N_T  (days, hours) [('mean', '<f8'), ('err1', '<f8'), ('err2', '<f8')] ...
+           TS4_DEM_R_T       (days, hours) [('mean', '<f8'), ('err1', '<f8'), ('err2', '<f8')] ...
+           TS5_HOUSING_R_T   (days, hours) [('mean', '<f8'), ('err1', '<f8'), ('err2', '<f8')] ...
+           TS6_RADIATOR_R_T  (days, hours) [('mean', '<f8'), ('err1', '<f8'), ('err2', '<f8')] ...
+
+         <xarray.Dataset>
+         Dimensions:           (orbit: 480)
+         Coordinates:
+           * orbit             (orbit) uint32 12345 12346 ... 12823 12824
+         Data variables:
+           detector_temp     (orbit) [('mean', '<f8'), ('err1', '<f8'), ('err2', '<f8')] ...
+           grating_temp      (orbit) [('mean', '<f8'), ('err1', '<f8'), ('err2', '<f8')] ...
+           imager_temp       (orbit) [('mean', '<f8'), ('err1', '<f8'), ('err2', '<f8')] ...
+           obm_temp          (orbit) [('mean', '<f8'), ('err1', '<f8'), ('err2', '<f8')] ...
+           calib_unit_temp   (orbit) [('mean', '<f8'), ('err1', '<f8'), ('err2', '<f8')] ...
+
+        Where each DataArray's have attributes 'long_name' and 'units'.
         """
         if xds is None and hk_xds is None:
             raise ValueError('both xds and hk_xds are None')
