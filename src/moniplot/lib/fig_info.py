@@ -29,7 +29,9 @@ from typing import Any
 
 # - main function -------------------------
 class FIGinfo:
-    """The figure information consists of [key, value] combinations which are
+    """Define figure information.
+
+    The figure information consists of [key, value] combinations which are
     to be displayed upper-right corner of the figure.
 
     Parameters

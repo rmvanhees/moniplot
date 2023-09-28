@@ -17,8 +17,9 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-This module contains the definitions of color schemes and color set provided
-by `Paul Tol <https://personal.sron.nl/~pault/>`_.
+This module contains definitions of color schemes and color sets.
+
+Provided by `Paul Tol <https://personal.sron.nl/~pault/>`_.
 
 Routines in this module::
 
@@ -271,7 +272,8 @@ class RainbowDiscrete:
 @dataclass
 class Bright:
     """Defines a qualitative colour scheme that is colour-blind safe.
-    The main scheme for lines and their labels.
+
+    The default scheme for lines and their labels.
     """
 
     blue: str = '#4477AA'
@@ -291,10 +293,12 @@ class Bright:
 
 @dataclass
 class HighContrast:
-    """Defines a qualitative colour scheme, an alternative to the bright scheme
-    that is colour-blind safe and optimized for contrast. The samples
-    underneath are shades of grey with the same luminance; this scheme also
-    works well for people with monochrome vision and in a monochrome printout.
+    """Defines a qualitative colour scheme.
+
+    An alternative to the bright scheme that is colour-blind safe
+    and optimized for contrast. The samples underneath are shades of grey
+    with the same luminance; this scheme also works well for people with
+    monochrome vision and in a monochrome printout.
     """
 
     blue: str = '#004488'
@@ -310,12 +314,13 @@ class HighContrast:
 
 @dataclass
 class MediumContrast:
-    """Defines a qualitative colour scheme, an alternative to the high-contrast
-    scheme that is colour-blind safe with more colours. It is also optimized
-    for contrast to work in a monochrome printout, but the differences are
-    inevitably smaller. It is designed for situations needing colour pairs,
-    shown by the three rectangles, with the lower half in the greyscale
-    equivalent.
+    """Defines a qualitative colour scheme.
+
+    An alternative to the high-contrast scheme that is colour-blind safe
+    with more colours. It is also optimized for contrast to work in a
+    monochrome printout, but the differences are inevitably smaller.
+    It is designed for situations needing colour pairs, shown by the three
+    rectangles, with the lower half in the greyscale equivalent.
     """
 
     light_yellow: str = '#EECC66'
@@ -334,10 +339,12 @@ class MediumContrast:
 
 @dataclass
 class Vibrant:
-    """Defines a qualitative colour scheme, an alternative to the bright scheme
-    that is equally colour-blind safe. It has been designed for data
-    visualization framework TensorBoard, built around their signature orange
-    FF7043. That colour has been replaced here to make it print-friendly.
+    """Defines a qualitative colour scheme.
+
+    An alternative to the bright scheme that is equally colour-blind safe.
+    It has been designed for data visualization framework TensorBoard,
+    built around their signature orange FF7043. That colour has been replaced
+    here to make it print-friendly.
     """
 
     blue: str = '#0077BB'
@@ -357,9 +364,11 @@ class Vibrant:
 
 @dataclass
 class Muted:
-    """Defines a qualitative colour scheme, an alternative to the bright scheme
-    that is equally colour-blind safe with more colours, but lacking a clear
-    red or medium blue. Pale grey is meant for bad data in maps.
+    """Defines a qualitative colour scheme.
+
+    An alternative to the bright scheme that is equally colour-blind safe
+    with more colours, but lacking a clear red or medium blue. Pale grey
+    is meant for bad data in maps.
     """
 
     indigo: str = '#332288'
@@ -382,7 +391,9 @@ class Muted:
 
 @dataclass
 class Light:
-    """Defines a qualitative colour scheme that is reasonably distinct in both
+    """Defines a qualitative colour scheme.
+
+    An alternative to the bright scheme that is reasonably distinct in both
     normal and colour-blind vision. It was designed to fill labelled cells with
     more and lighter colours than contained in the bright scheme, using more
     distinct colours than that in the pale scheme, but keeping black labels
@@ -511,7 +522,8 @@ def tol_cset(colorset: str = None) -> dataclass:
 
 
 def tol_rgba(cname: str, lut: int | None = None) -> list[str, ...]:
-    """
+    """Return a colormap as an rgba array.
+
     Parameters
     ----------
     cname :  str

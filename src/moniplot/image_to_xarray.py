@@ -18,6 +18,7 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 This module contains the routines `h5_to_xr` and `data_to_xr`.
+
 These functions store a HDF5 dataset or numpy array in a labeled array
 (class `xarray.DataArray`).
 """

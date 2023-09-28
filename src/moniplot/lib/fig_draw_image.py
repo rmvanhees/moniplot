@@ -17,8 +17,9 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-This module holds `fig_data_to_xarr` and `fig_qdata_to_xarr`
-which are used by resp. `draw_signal` and `draw_quality`.
+This module holds `fig_data_to_xarr` and `fig_qdata_to_xarr`.
+
+These functions are used by resp. `draw_signal` and `draw_quality`.
 """
 from __future__ import annotations
 
@@ -47,9 +48,10 @@ CSET = tol_cset('bright')
 # - local functions --------------------------------
 def adjust_zunit(zunits: str,
                  vmin: float, vmax: float) -> tuple[int, str | None]:
-    """
-    Adjust units: electron to `e` and Volt to `V`
-    and scale data range to <-1000, 1000>.
+    """Adjust data range and its units.
+
+    Units which are renamed: electron to `e` and Volt to `V`
+    Scale data-range between -1000 and 1000.
 
     Parameters
     ----------

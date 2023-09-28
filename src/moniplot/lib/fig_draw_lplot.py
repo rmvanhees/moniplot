@@ -17,8 +17,9 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-This module holds `fig_draw_lplot` and `close_draw_lplot`
-which are used by `draw_lplot`.
+This module holds `fig_draw_lplot` and `close_draw_lplot`.
+
+These functions are used by `draw_lplot`.
 """
 from __future__ import annotations
 

@@ -18,10 +18,11 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
-This module contains the class `MONplot` with the methods:
-`draw_hist`, `draw_lplot`, `draw_multiplot`, `draw_qhist`, `draw_quality`,
-`draw_signal`, `draw_tracks`, `draw_trend`, draw_fov_ckd.
+"""This module contains the class `MONplot`.
+
+The methods of the class `MONplot` are:
+ `draw_hist`, `draw_lplot`, `draw_multiplot`, `draw_qhist`, `draw_quality`,
+ `draw_signal`, `draw_tracks`, `draw_trend`, draw_fov_ckd.
 """
 from __future__ import annotations
 
@@ -43,6 +44,7 @@ else:
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib.dates import DateFormatter
 from matplotlib.gridspec import GridSpec
 
 from .biweight import Biweight
@@ -75,8 +77,7 @@ DEFAULT_CSET = 'bright'
 # - main function ----------------------------------
 class MONplot:
     """
-    Generate PDF reports (or figures) to facilitate instrument calibration
-    or monitoring.
+    Generate PDF reports (or figures) for instrument calibration or monitoring.
 
     Parameters
     ----------
@@ -224,9 +225,7 @@ class MONplot:
 
     # --------------------------------------------------
     def __add_copyright(self: MONplot, axx: Axes) -> None:
-        """Show value of institute as copyright in the lower right corner
-        of the current figure.
-        """
+        """Display copyright statement in the lower right corner."""
         if not self.institute:
             return
 
@@ -262,8 +261,9 @@ class MONplot:
     # -------------------------
     def __draw_image__(self: MONplot, xarr: xr.DataArray, side_panels: str,
                        fig_info: FIGinfo | None, title: str | None) -> None:
-        """Draw of the image data for the public methods `draw_signal`
-        and `draw_quality`.
+        """Display image data.
+
+        Called by the public methods `draw_signal` and `draw_quality`.
         """
         def add_fig_box() -> None:
             """Add a box with meta information in the current figure."""
@@ -396,8 +396,9 @@ class MONplot:
                     fig_info: FIGinfo | None = None,
                     side_panels: str = 'nanmedian',
                     title: str | None = None, **kwargs: int) -> None:
-        """Display 2D array as an image and averaged column/row signal
-        in the side-panels (optional).
+        """Display 2D array as an image.
+
+        Averaged column/row signal are optionally displayed in side-panels.
 
         Parameters
         ----------
@@ -753,20 +754,43 @@ class MONplot:
 
         # add figures with trend data
         ipanel = 0
-        xlabel = 'time'
+        xlabel = None
         if xds is not None:
-            xlabel = 'orbit' if 'orbit' in xds.coords else 'time [hours]'
+            if 'orbit' in xds.coords:
+                xlabel = 'orbit'
+            elif 'hours' in xds.coords:
+                xlabel = 'time [hours]'
+            else:
+                xlabel = 'time'
+                plt.gcf().autofmt_xdate()
+                plt.gca().xaxis.set_major_formatter(DateFormatter('%H:%M:%S'))
             for name in xds.data_vars:
                 add_subplot(axarr[ipanel], xds[name])
                 ipanel += 1
 
+        xlabel_hk = None
         if hk_xds is not None:
-            xlabel = 'orbit' if 'orbit' in hk_xds.coords else 'time [hours]'
+            if 'orbit' in hk_xds.coords:
+                xlabel_hk = 'orbit'
+            elif 'hours' in hk_xds.coords:
+                xlabel_hk = 'time [hours]'
+            else:
+                xlabel_hk = 'time'
+                plt.gcf().autofmt_xdate()
+                plt.gca().xaxis.set_major_formatter(DateFormatter('%H:%M:%S'))
             for name in hk_xds.data_vars:
                 add_hk_subplot(axarr[ipanel], hk_xds[name], **kwargs)
                 ipanel += 1
 
         # finally add a label for the X-coordinate
+        if xlabel is not None and xlabel_hk is not None:
+            if xlabel != xlabel_hk:
+                raise ValueError('measurement and housekeeping data'
+                                 ' have different x-coordinates')
+        elif xlabel is None and xlabel_hk is None:
+            xlabel = 'x-axis'
+        elif xlabel is None:
+            xlabel = xlabel_hk
         axarr[-1].set_xlabel(xlabel)
 
         # add annotation and save the figure
@@ -999,8 +1023,10 @@ class MONplot:
                    fig_info: FIGinfo | None = None,
                    title: str | None = None,
                    kwlegend: dict | None = None, **kwargs: int) -> None:
-        """Plot y versus x lines, maybe called multiple times to add lines.
-        Figure is closed when called with xdata equals None.
+        """Create line-plot of y-data versus x-data.
+
+        Can be called multiple times to add lines. Figure must be closed
+        with y-data equals None.
 
         Parameters
         ----------
@@ -1143,8 +1169,9 @@ class MONplot:
                        gridspec: GridSpec | None = None, *,
                        fig_info: FIGinfo | None = None,
                        title: str | None = None, **kwargs: int) -> None:
-        """Display multiple subplots on one page using
-        `matplotlib.gridspec.GridSpec`.
+        """Display multiple plots on one page.
+
+        The data of each plot is defined in the parameter `data_tuple`.
 
         Parameters
         ----------
@@ -1262,8 +1289,9 @@ class MONplot:
                     saa_region: np.ndarray | None = None,
                     fig_info: FIGinfo | None = None,
                     title: str | None = None) -> None:
-        """Display tracks of satellite on a world map
-        using a Robinson projection.
+        """Display tracks of satellite on a world map.
+
+        This module uses the Robinson projection.
 
         Parameters
         ----------
@@ -1317,8 +1345,9 @@ class MONplot:
                      vp_labels: tuple[str] | None = None,
                      fig_info: FIGinfo | None = None,
                      title: str | None = None, **kwargs: int) -> None:
-        """Display a 2D CKD parameter which consists of data from several
-        viewports.
+        """Display the SPEXone FOV CKD.
+
+        The SPEXone FOV CKD consists of data from several viewports.
 
         Parameters
         ----------

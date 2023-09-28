@@ -24,9 +24,7 @@ __all__ = ['add_subplot', 'add_hk_subplot']
 from numbers import Integral
 from typing import TYPE_CHECKING, Iterable
 
-import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.dates import DateFormatter
 from matplotlib.ticker import AutoMinorLocator, MultipleLocator
 
 from moniplot.tol_colors import tol_cset
@@ -213,6 +211,7 @@ def add_subplot(axx: Axes, xarr: xr.DataArray) -> None:
        Matplotlib Axes object of the current panel
     xarr :  xarray.DataArray
        Object holding measurement data and attributes
+       Dimension must be 'orbit', 'hours' or 'time'.
     """
     ylabel = xarr.attrs['long_name']
     if 'units' in xarr.attrs and xarr.attrs['units'] != '1':
@@ -265,7 +264,7 @@ def add_subplot(axx: Axes, xarr: xr.DataArray) -> None:
         ii = jj + 1
 
     # adjust data X-coordinate
-    if 'time' in xarr.coords:
+    if 'hours' in xarr.coords:
         axx.xaxis.set_major_locator(MultipleLocator(3))
         axx.xaxis.set_minor_locator(MultipleLocator(1))
     else:
@@ -313,9 +312,6 @@ def add_hk_subplot(axx: Axes, xarr: xr.DataArray,
     else:
         xdata = xarr.coords['time'].values
         gap_list = get_gap_list(xdata)
-        plt.gcf().autofmt_xdate()
-        plt.gca().xaxis.set_major_formatter(DateFormatter('%H:%M:%S'))
-
     gap_list += (xdata.size - 1,)
 
     # define avg, err1, err2
