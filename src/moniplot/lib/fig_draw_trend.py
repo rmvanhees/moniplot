@@ -202,7 +202,7 @@ def get_gap_list(xdata: np.ndarray) -> tuple:
 
 
 # - main functions ---------------------------------
-def add_subplot(axx: Axes, xarr: xr.DataArray) -> None:
+def add_subplot(axx: Axes, xarr: xr.DataArray, scatter: bool = False) -> None:
     """Add a subplot for measurement data.
 
     Parameters
@@ -212,6 +212,8 @@ def add_subplot(axx: Axes, xarr: xr.DataArray) -> None:
     xarr :  xarray.DataArray
        Object holding measurement data and attributes
        Dimension must be 'orbit', 'hours' or 'time'.
+    scatter: bool, default=False
+       Make a scatter plot
     """
     ylabel = xarr.attrs['long_name']
     if 'units' in xarr.attrs and xarr.attrs['units'] != '1':
@@ -255,6 +257,9 @@ def add_subplot(axx: Axes, xarr: xr.DataArray) -> None:
             axx.step(np.append(xdata[isel], xdata[jj]),
                      np.append(avg[isel], avg[jj]), where='post',
                      linewidth=1.5, color=lcolor)
+        elif scatter:
+            axx.plot(xdata[isel], avg[isel],
+                     marker='.', linestyle='', color=lcolor)
         else:
             axx.plot(xdata[isel], avg[isel], linewidth=1.5, color=lcolor)
         if 'legend' in xarr.attrs:
@@ -315,17 +320,24 @@ def add_hk_subplot(axx: Axes, xarr: xr.DataArray,
     gap_list += (xdata.size - 1,)
 
     # define avg, err1, err2
-    avg = xarr.values['mean'][isel]
-    err1 = xarr.values['err1'][isel]
-    err2 = xarr.values['err2'][isel]
+    if xarr.values.dtype.names is None:
+        avg = xarr.values[isel]
+        err1 = err2 = None
+    else:
+        avg = xarr.values['mean'][isel]
+        err1 = xarr.values['err1'][isel]
+        err2 = xarr.values['err2'][isel]
 
     # plot data
     ii = 0
     for jj in gap_list:
         isel = np.s_[ii:jj+1]
-        axx.fill_between(xdata[isel], err1[isel], err2[isel],
-                         step='post', linewidth=0, facecolor=fcolor)
-        axx.plot(xdata[isel], avg[isel], linewidth=1.5, color=lcolor)
+        if err1 is not None:
+            axx.fill_between(xdata[isel], err1[isel], err2[isel],
+                             step='post', linewidth=0, facecolor=fcolor)
+            axx.plot(xdata[isel], avg[isel], linewidth=1.5, color=lcolor)
+        else:
+            axx.plot(xdata[isel], avg[isel], linewidth=1.5, color=lcolor)
         ii = jj + 1
 
     # adjust data X-coordinate
