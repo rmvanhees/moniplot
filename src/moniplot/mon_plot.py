@@ -765,7 +765,8 @@ class MONplot:
                 plt.gcf().autofmt_xdate()
                 plt.gca().xaxis.set_major_formatter(DateFormatter('%H:%M:%S'))
             for name in xds.data_vars:
-                add_subplot(axarr[ipanel], xds[name])
+                add_subplot(axarr[ipanel], xds[name],
+                            scatter=kwargs.get('scatter', False))
                 ipanel += 1
 
         xlabel_hk = None
@@ -779,7 +780,10 @@ class MONplot:
                 plt.gcf().autofmt_xdate()
                 plt.gca().xaxis.set_major_formatter(DateFormatter('%H:%M:%S'))
             for name in hk_xds.data_vars:
-                add_hk_subplot(axarr[ipanel], hk_xds[name], **kwargs)
+                add_hk_subplot(axarr[ipanel], hk_xds[name],
+                               vperc=kwargs.get('vperc', None),
+                               vrange_last_orbits=kwargs.get(
+                                   'vrange_last_orbits', -1))
                 ipanel += 1
 
         # finally add a label for the X-coordinate
