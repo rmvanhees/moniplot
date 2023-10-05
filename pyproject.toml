@@ -2,8 +2,8 @@
 [build-system]
 build-backend = "setuptools.build_meta"
 requires = [
-  "setuptools>=58",
-  "setuptools_scm>=6.2",
+  "setuptools>=62",
+  "setuptools_scm>=8.0",
   'tomli>=1; python_version < "3.11"',
   'typing-extensions; python_version < "3.11"',
   "wheel",
