@@ -360,7 +360,7 @@ class GEOplot:
         else:
             data = data_in.values
             if 'units' in data_in.attrs and data_in.attrs['units'] != '1':
-                zlabel = fr'value [{data_in.attrs['units']}]'
+                zlabel = fr'value [{data_in.attrs["units"]}]'
 
         # determine central longitude
         if lons.max() - lons.min() > 180:
@@ -431,7 +431,7 @@ def __test() -> None:
         data_dir = Path('/data/richardh/SPEXone/pace-sds/oci_l1c/5.9/2022/03/21')
 
     plot = GEOplot('test_oci_l1c.pdf')
-    for oci_fl in data_dir.glob('PACE_OCI.20220321T23*.L1C.nc'):
+    for oci_fl in data_dir.glob('PACE_OCI.20220321T*.L1C.nc'):
         plot.set_caption(oci_fl.stem + ' [geolocation]')
         with h5py.File(oci_fl) as fid:
             lats = fid['/geolocation_data/latitude'][:]
@@ -440,13 +440,12 @@ def __test() -> None:
             xarr = h5_to_xr(dset)
             xarr.attrs['long_name'] = dset.attrs['long_name']
             xarr.attrs['units'] = '1'
-            xarr.attrs['_FillValue'] = -32767.
+            xarr.attrs['_FillValue'] = -999.
 
-        xarr.values[xarr.values == -32767] = np.nan
+        xarr.values[xarr.values == -999] = np.nan
         xarr = xarr.max(dim='number_of_views', skipna=True, keep_attrs=True)
         xarr = xarr.mean(dim='intensity_bands_per_view',
                          skipna=True, keep_attrs=True)
-
         i_nadir = lons.shape[1] // 2
         plot.draw_geo_subsat(lons[:, i_nadir], lats[:, i_nadir],
                              title='sub-satellite positions')
