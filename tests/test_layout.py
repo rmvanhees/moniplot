@@ -147,7 +147,8 @@ def test_layout(aspect: int) -> None:
 
     axx = fig.add_subplot(gspec[0, 1])
     rng = np.random.default_rng()
-    pcm = axx.pcolormesh(rng.standard_normal(30, aspect * 30), vmin=-2, vmax=2)
+    pcm = axx.pcolormesh(rng.standard_normal((30, aspect * 30)),
+                         vmin=-2, vmax=2)
     # image panel
     axx.set_title(f'aspect={aspect}')
     axx.grid(True)

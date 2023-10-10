@@ -30,12 +30,12 @@ def test_lplot() -> None:
     from moniplot.mon_plot import MONplot
 
     plot = MONplot('test_lplot.pdf')
-    plot.set_cset(None)
+    plot.set_cset('muted')   # Note the default is 'bright'
     for ii in range(5):
         plot.draw_lplot(np.arange(10), np.arange(10)*(ii+1),
                         label=f'label {ii}')
     plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
-                    title='draw_lplot [cset is None]')
+                    title='draw_lplot [cset="muted"]')
 
     for ii, clr in enumerate('rgbym'):
         plot.draw_lplot(np.arange(10), np.arange(10)*(ii+1), color=clr,
@@ -43,12 +43,12 @@ def test_lplot() -> None:
     plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
                     title='draw_lplot [cset="rgbym"]')
 
-    plot.set_cset('mute')   # Note the default is 'bright'
+    plot.set_cset('high-contrast')   # Note the default is 'bright'
     for ii in range(5):
         plot.draw_lplot(ydata=np.arange(10)*(ii+1),
                         label=f'label {ii}')
     plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
-                    title='draw_lplot [cset="mute"]')
+                    title='draw_lplot [cset="high-contrast"]')
 
     plot.set_cset('rainbow_PuBr', 35)
     for ii in range(35):

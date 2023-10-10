@@ -206,6 +206,8 @@ class MONplot:
         cnum : int, optional
            Number of discrete colors in colormap (*not colorset*).
         """
+        if not isinstance(cname, str):
+            raise ValueError('The name of a color-set should be a string.')
         self.__cset = tol_rgba(cname, cnum)
 
     def unset_cset(self: MONplot) -> None:

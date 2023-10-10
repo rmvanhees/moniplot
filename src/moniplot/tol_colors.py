@@ -538,7 +538,7 @@ def tol_rgba(cname: str, lut: int | None = None) -> np.ndarray:
     elif cname in _cset_dict:
         cclass = _cset_dict.get(cname)
     else:
-        cclass = _cmap_dict.get(cname, 'nightfall')
+        cclass = _cmap_dict.get(cname, NightFall())
 
     if lut is None:
         return to_rgba_array(cclass.colors)

@@ -51,11 +51,11 @@ def test_lplot() -> xr.DataArray:
     print('Run unit tests on MONplot::draw_lplot')
     plot = MONplot('mon_plot_draw_lplot-1.png')
     plot.set_institute('SRON')
-    plot.set_cset(None)
+    plot.set_cset('muted')
     for ii in range(5):
         plot.draw_lplot(np.arange(10), np.arange(10)*(ii+1))
     plot.draw_lplot(xlabel='x-axis', ylabel='y-axis',
-                    title='draw_lplot [cset is None]')
+                    title='draw_lplot [cset="muted"]')
     plot.close()
 
     plot = MONplot('mon_plot_draw_lplot-2.png')
