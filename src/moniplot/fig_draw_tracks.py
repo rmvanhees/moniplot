@@ -35,10 +35,10 @@ else:
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
 
-from moniplot.tol_colors import tol_cset
+from .tol_colors import tol_cset
 
 if TYPE_CHECKING:
-    from matplotlib import Axes
+    from matplotlib.axes import Axes
 
 
 # - main functions ---------------------------------

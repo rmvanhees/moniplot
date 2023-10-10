@@ -27,10 +27,10 @@ from typing import TYPE_CHECKING
 import numpy as np
 from matplotlib.ticker import AutoMinorLocator
 
-from .fig_legend import blank_legend_handle
+from .lib.fig_legend import blank_legend_handle
 
 if TYPE_CHECKING:
-    from matplotlib import Axes
+    from matplotlib.axes import Axes
 
 
 # - main functions ---------------------------------
@@ -53,7 +53,7 @@ def fig_draw_qhist(axx: Axes,
     """
     qdata[np.isnan(qdata)] = 0.
     # draw histogram
-    axx.hist(qdata, bins=10, range=[0, 1], density=density,
+    axx.hist(qdata, bins=10, range=(0, 1), density=density,
              histtype='bar', align='mid', log=True, fill=True,
              edgecolor='#4477AA', facecolor='#77AADD', linewidth=1.5)
     # add label

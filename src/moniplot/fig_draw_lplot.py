@@ -32,7 +32,7 @@ import numpy as np
 from matplotlib.dates import DateFormatter
 
 if TYPE_CHECKING:
-    from matplotlib import Axes
+    from matplotlib.axes import Axes
 
 
 def fig_draw_lplot(axx: Axes,

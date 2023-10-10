@@ -27,13 +27,12 @@ from typing import TYPE_CHECKING, Iterable
 import numpy as np
 from matplotlib.ticker import AutoMinorLocator, MultipleLocator
 
-from moniplot.tol_colors import tol_cset
-
-from .fig_legend import blank_legend_handle
+from .lib.fig_legend import blank_legend_handle
+from .tol_colors import tol_cset
 
 if TYPE_CHECKING:
     import xarray as xr
-    from mathplotlib import Axes
+    from matplotlib.axes import Axes
 
 # - global parameters ------------------------------
 CSET = tol_cset('bright')

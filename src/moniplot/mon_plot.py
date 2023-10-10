@@ -30,7 +30,7 @@ __all__ = ['MONplot']
 
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 
 import numpy as np
 import xarray as xr
@@ -48,30 +48,36 @@ from matplotlib.dates import DateFormatter
 from matplotlib.gridspec import GridSpec
 
 from .biweight import Biweight
-from .lib.fig_draw_image import (
+from .fig_draw_image import (
     adjust_img_ticks,
     fig_data_to_xarr,
     fig_draw_panels,
     fig_qdata_to_xarr,
 )
-from .lib.fig_draw_lplot import close_draw_lplot, fig_draw_lplot
-from .lib.fig_draw_multiplot import draw_subplot, get_xylabels
-from .lib.fig_draw_qhist import fig_draw_qhist
-from .lib.fig_draw_trend import add_hk_subplot, add_subplot
+from .fig_draw_lplot import close_draw_lplot, fig_draw_lplot
+from .fig_draw_multiplot import draw_subplot, get_xylabels
+from .fig_draw_qhist import fig_draw_qhist
+from .fig_draw_trend import add_hk_subplot, add_subplot
 from .lib.fig_info import FIGinfo
 from .tol_colors import tol_rgba
 
 if FOUND_CARTOPY:
-    from .lib.fig_draw_tracks import fig_draw_tracks
+    from .fig_draw_tracks import fig_draw_tracks
 
 if TYPE_CHECKING:
-    from matplotlib import Axes, colormaps
+    from matplotlib import colormaps
+    from matplotlib.axes import Axes
     from matplotlib.figure import Figure
 
 # - global variables -------------------------------
 DEFAULT_CSET = 'bright'
 
+
 # - local functions --------------------------------
+class DictMpl(TypedDict):
+    fig: Figure | None
+    axx: Axes | None
+    time_axis: bool
 
 
 # - main function ----------------------------------
@@ -104,7 +110,7 @@ class MONplot:
         self.__cmap = None
         self.__caption = '' if caption is None else caption
         self.__institute = ''
-        self.__mpl: dict | None = None
+        self.__mpl: DictMpl = {'fig': None, 'axx': None, 'time_axis': False}
         self.__pdf = None
         self.filename = Path(figname)
         if self.filename.suffix.lower() != '.pdf':
@@ -186,7 +192,7 @@ class MONplot:
 
     # --------------------------------------------------
     @property
-    def cset(self: MONplot) -> str:
+    def cset(self: MONplot) -> np.ndarray:
         """Returns name of current color-set."""
         return self.__cset
 
@@ -404,7 +410,7 @@ class MONplot:
         ----------
         data :  numpy.ndarray or xarray.DataArray
            Object holding measurement data and attributes.
-        fig_info :  FIGinfo, default=None
+        fig_info :  FIGinfo, <default=None
            OrderedDict holding meta-data to be displayed in the figure.
         side_panels :  str, default='nanmedian'
            Show image row and column statistics in two side panels.
@@ -1116,7 +1122,7 @@ class MONplot:
         > plot.close()
         """
         if ydata is None:
-            if self.__mpl is None:
+            if self.__mpl['fig'] is None:
                 raise ValueError('No plot defined and no data provided')
             fig = self.__mpl['fig']
             axx = self.__mpl['axx']
@@ -1125,7 +1131,7 @@ class MONplot:
                 fig_info = FIGinfo()
 
             if 'text' in kwargs:
-                axx.text(0.05, 0.985, kwargs.pop('text'),
+                axx.text(0.05, 0.985, f'{kwargs.pop("text")}',
                          transform=axx.transAxes,
                          fontsize='small', verticalalignment='top',
                          bbox={'boxstyle': 'round', 'alpha': 0.5,
@@ -1138,13 +1144,13 @@ class MONplot:
             self.__add_copyright(axx)
             self.__add_fig_box(fig, fig_info)
             self.__close_this_page(fig)
-            self.__mpl = None
+            self.__mpl['fig'] = None
             return
 
         # initialize figure
         if xdata is None:
             xdata = np.arange(ydata.size)
-        if self.__mpl is None:
+        if self.__mpl['fig'] is None:
             if square:
                 figsize = (9, 9)
             else:
@@ -1152,9 +1158,12 @@ class MONplot:
                            1: (10, 7),
                            2: (12, 7)}.get(len(ydata) // 256, (14, 8))
 
-            self.__mpl = dict(zip(('fig', 'axx'),
-                                  plt.subplots(1, figsize=figsize)))
-            self.__mpl['time_axis'] = isinstance(xdata[0], datetime)
+            fig, axx = plt.subplots(1, figsize=figsize)
+            self.__mpl = {
+                'fig': fig,
+                'axx': axx,
+                'time_axis': isinstance(xdata[0], datetime)
+            }
 
             # add a centered subtitle to the figure
             self.__add_caption(self.__mpl['fig'])

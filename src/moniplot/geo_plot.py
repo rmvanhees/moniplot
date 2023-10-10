@@ -41,13 +41,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
 
-from moniplot.image_to_xarray import h5_to_xr
-from moniplot.lib.fig_info import FIGinfo
-from moniplot.tol_colors import tol_cmap
+from .image_to_xarray import h5_to_xr
+from .lib.fig_info import FIGinfo
+from .tol_colors import tol_cmap
 
 if TYPE_CHECKING:
     import xarray as xr
-    from matplotlib import Axes, colormaps
+    from matplotlib import colormaps
+    from matplotlib.axes import Axes
     from matplotlib.figure import Figure
 
 # - constants --------------------------------------
@@ -303,7 +304,7 @@ class GEOplot:
 
     # --------------------------------------------------
     def draw_geo_mesh(self: GEOplot, lons: np.ndarray, lats: np.ndarray,
-                      data_in: np.ndarray  | xr.DataArray, *,
+                      data_in: np.ndarray | xr.DataArray, *,
                       whole_globe: bool = False,
                       vperc: list[float, float] | None = None,
                       vrange: list[float, float] | None = None,

@@ -59,7 +59,7 @@ def __get_attrs(dset: h5py.Dataset, field: str) -> dict:
                       'index': dset.dtype.names.index(field)}
         except Exception as exc:
             raise RuntimeError(
-                f'field {field} not found in dataset {dset.name}') from exc
+                f'field {field} not in dataset {dset.name}') from exc
         # print('_field ', _field)
 
     attrs = {}

@@ -27,13 +27,14 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 if TYPE_CHECKING:
+    import numpy.typing as npt
     import xarray as xr
-    from matplotlib import Axes
+    from matplotlib.axes import Axes
     from matplotlib.gridspec import GridSpec
 
 
 # - local functions --------------------------------
-def get_xylabels(gridspec: GridSpec, data_tuple: tuple) -> np.ndarray:
+def get_xylabels(gridspec: GridSpec, data_tuple: tuple) -> npt.NDArray[str]:
     """Define xlabel and ylabel for each subplot panel.
 
     Parameters
@@ -76,7 +77,7 @@ def get_xylabels(gridspec: GridSpec, data_tuple: tuple) -> np.ndarray:
 # - main functions ---------------------------------
 def draw_subplot(axx: Axes,
                  xarr: xr.DataArray,
-                 xylabels: list[str, str]) -> None:
+                 xylabels: npt.NDArray[str]) -> None:
     """Draw a subplot figure.
 
     Parameters
@@ -85,7 +86,7 @@ def draw_subplot(axx: Axes,
        Matplotlib Axes object of subplot
     xarr :  xarray.DataArray
       Data with attrubutes of subplot
-    xylabels :  list[str]
+    xylabels :  npt.NDArray[str]
       X,Y labels of subplot
     """
     kwargs = xarr.attrs.get('_plot', {'color': '#4477AA'})

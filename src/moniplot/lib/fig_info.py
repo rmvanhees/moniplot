@@ -22,8 +22,8 @@ from __future__ import annotations
 
 __all__ = ['FIGinfo']
 
+import datetime as dt
 from copy import deepcopy
-from datetime import datetime
 from typing import Any
 
 
@@ -106,10 +106,10 @@ class FIGinfo:
         """Return figure information as one long string."""
         info_str = ''
         for key, value in self.fig_info.items():
-            info_str += f'{key} : {value}\n'
+            info_str += f'{key}: {value}\n'
 
         # add timestamp
-        res = datetime.utcnow().isoformat(timespec='seconds')
-        info_str += f'created : {res}'
+        res = dt.datetime.now(dt.timezone.utc).isoformat(timespec='seconds')
+        info_str += f'created: {res}'
 
         return info_str

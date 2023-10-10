@@ -35,11 +35,11 @@ import numpy as np
 import xarray as xr
 from matplotlib.ticker import AutoMinorLocator
 
-from moniplot.image_to_xarray import data_to_xr
-from moniplot.tol_colors import tol_cmap, tol_cset
+from .image_to_xarray import data_to_xr
+from .tol_colors import tol_cmap, tol_cset
 
 if TYPE_CHECKING:
-    from matplotlib import Axes
+    from matplotlib.axis import Axes
 
 # - global parameters ------------------------------
 CSET = tol_cset('bright')
