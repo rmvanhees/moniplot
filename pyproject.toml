@@ -75,7 +75,7 @@ select = [
   "TCH", # flake8-type-checking
   "NPY", # NumPy-specific rules
 ]
-# ignore = ["D205"]
+ignore = ["E501"]
 
 [tool.ruff.pydocstyle]
 convention = "pep257"
