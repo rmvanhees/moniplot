@@ -24,7 +24,7 @@ These functions store a HDF5 dataset or numpy array in a labeled array
 """
 from __future__ import annotations
 
-__all__ = ['h5_to_xr', 'data_to_xr']
+__all__ = ["h5_to_xr", "data_to_xr"]
 
 from pathlib import PurePath
 from typing import TYPE_CHECKING
@@ -54,18 +54,25 @@ def __get_attrs(dset: h5py.Dataset, field: str) -> dict:
     _field = None
     if field is not None:
         try:
-            _field = {'name': field,
-                      'oneof': len(dset.dtype.names),
-                      'index': dset.dtype.names.index(field)}
+            _field = {
+                "name": field,
+                "oneof": len(dset.dtype.names),
+                "index": dset.dtype.names.index(field),
+            }
         except Exception as exc:
-            raise RuntimeError(
-                f'field {field} not in dataset {dset.name}') from exc
+            raise RuntimeError(f"field {field} not in dataset {dset.name}") from exc
         # print('_field ', _field)
 
     attrs = {}
     for key in dset.attrs:
-        if key in ('CLASS', 'DIMENSION_LIST', 'NAME', 'REFERENCE_LIST',
-                   '_Netcdf4Dimid', '_Netcdf4Coordinates'):
+        if key in (
+            "CLASS",
+            "DIMENSION_LIST",
+            "NAME",
+            "REFERENCE_LIST",
+            "_Netcdf4Dimid",
+            "_Netcdf4Coordinates",
+        ):
             continue
 
         attr_value = dset.attrs[key]
@@ -74,13 +81,14 @@ def __get_attrs(dset: h5py.Dataset, field: str) -> dict:
             if len(attr_value) == 1:
                 attr_value = attr_value[0]
                 # print('# ----- ', key, type(attr_value), attr_value)
-            elif _field is not None and len(attr_value) == _field['oneof']:
-                attr_value = attr_value[_field['index']]
+            elif _field is not None and len(attr_value) == _field["oneof"]:
+                attr_value = attr_value[_field["index"]]
                 # elif isinstance(attr_value, np.void):
                 #    attr_value = attr_value[0]
 
-        attrs[key] = (attr_value.decode('ascii')
-                      if isinstance(attr_value, bytes) else attr_value)
+        attrs[key] = (
+            attr_value.decode("ascii") if isinstance(attr_value, bytes) else attr_value
+        )
 
     return attrs
 
@@ -105,15 +113,15 @@ def __get_coords(dset: h5py.Dataset, data_sel: tuple[slice | int]) -> list:
             for ii, dim in enumerate(dset.dims):
                 # get name of dimension
                 name = PurePath(dim[0].name).name
-                if name.startswith('row') or name.startswith('column'):
-                    name = name.split(' ')[0]
+                if name.startswith("row") or name.startswith("column"):
+                    name = name.split(" ")[0]
 
                 # determine coordinate
                 buff = None
                 if dim[0].size > 0 and not np.all(dim[0][()] == 0):
                     buff = dim[0][()]
-                elif name in ('row', 'column'):
-                    d_type = 'u2' if ((dset.shape[ii]-1) >> 16) == 0 else 'u4'
+                elif name in ("row", "column"):
+                    d_type = "u2" if ((dset.shape[ii] - 1) >> 16) == 0 else "u4"
                     buff = np.arange(dset.shape[ii], dtype=d_type)
 
                 if not (buff is None or data_sel is None):
@@ -126,9 +134,11 @@ def __get_coords(dset: h5py.Dataset, data_sel: tuple[slice | int]) -> list:
     return coords
 
 
-def __set_coords(dset: h5py.Dataset | np.ndarray,
-                 data_sel: tuple[slice | int] | None,
-                 dims: list | None) -> list:
+def __set_coords(
+    dset: h5py.Dataset | np.ndarray,
+    data_sel: tuple[slice | int] | None,
+    dims: list | None,
+) -> list:
     r"""Set coordinates of the HDF5 dataset.
 
     Parameters
@@ -147,13 +157,13 @@ def __set_coords(dset: h5py.Dataset | np.ndarray,
     """
     if dims is None:
         if dset.ndim > 3:
-            raise ValueError('not implemented for ndim > 3')
+            raise ValueError("not implemented for ndim > 3")
 
-        dims = ['time', 'row', 'column'][-dset.ndim:]
+        dims = ["time", "row", "column"][-dset.ndim :]
 
     coords = []
     for ii in range(dset.ndim):
-        co_dtype = 'u2' if ((dset.shape[ii]-1) >> 16) == 0 else 'u4'
+        co_dtype = "u2" if ((dset.shape[ii] - 1) >> 16) == 0 else "u4"
         buff = np.arange(dset.shape[ii], dtype=co_dtype)
         if data_sel is not None:
             buff = buff[data_sel[ii]]
@@ -162,8 +172,9 @@ def __set_coords(dset: h5py.Dataset | np.ndarray,
     return coords
 
 
-def __get_data(dset: h5py.Dataset, data_sel: tuple[slice | int] | None,
-               field: str) -> np.ndarray:
+def __get_data(
+    dset: h5py.Dataset, data_sel: tuple[slice | int] | None, field: str
+) -> np.ndarray:
     r"""Return data of the HDF5 dataset.
 
     Parameters
@@ -188,7 +199,7 @@ def __get_data(dset: h5py.Dataset, data_sel: tuple[slice | int] | None,
 
     if np.issubdtype(dset.dtype, np.floating):
         data = dset.astype(float)[data_sel]
-        data[data == float.fromhex('0x1.ep+122')] = np.nan
+        data[data == float.fromhex("0x1.ep+122")] = np.nan
         return data
 
     if field is None:
@@ -197,12 +208,11 @@ def __get_data(dset: h5py.Dataset, data_sel: tuple[slice | int] | None,
     data = dset.fields(field)[data_sel]
     if np.issubdtype(data.dtype, np.floating):
         data = data.astype(float)
-        data[data == float.fromhex('0x1.ep+122')] = np.nan
+        data[data == float.fromhex("0x1.ep+122")] = np.nan
     return data
 
 
-def __check_selection(data_sel: slice | tuple | int,
-                      ndim: int) -> slice | tuple | None:
+def __check_selection(data_sel: slice | tuple | int, ndim: int) -> slice | tuple | None:
     r"""Check and correct user provided data selection.
 
     Notes
@@ -221,7 +231,7 @@ def __check_selection(data_sel: slice | tuple | int,
         return None
 
     if np.isscalar(data_sel):
-        return np.s_[data_sel:data_sel+1]
+        return np.s_[data_sel : data_sel + 1]
 
     buff = ()
     for val in data_sel:
@@ -229,7 +239,7 @@ def __check_selection(data_sel: slice | tuple | int,
             for _ in range(ndim - len(data_sel) + 1):
                 buff += np.index_exp[:]
         elif np.isscalar(val):
-            buff += (np.s_[val:val+1],)
+            buff += (np.s_[val : val + 1],)
         else:
             buff += (val,)
 
@@ -237,9 +247,13 @@ def __check_selection(data_sel: slice | tuple | int,
 
 
 # - main function ----------------------------------
-def h5_to_xr(h5_dset: h5py.Dataset, data_sel: tuple[slice | int] | None = None,
-             *, dims: list[str] | None = None,
-             field: str | None = None) -> xr.DataArray:
+def h5_to_xr(
+    h5_dset: h5py.Dataset,
+    data_sel: tuple[slice | int] | None = None,
+    *,
+    dims: list[str] | None = None,
+    field: str | None = None,
+) -> xr.DataArray:
     r"""Create xarray.DataArray from a HDF5 dataset (with dimension scales).
 
     Implements a lite interface with the xarray.DataArray, should work for all
@@ -335,13 +349,17 @@ def h5_to_xr(h5_dset: h5py.Dataset, data_sel: tuple[slice | int] | None = None,
     # Attributes to assign to the array
     attrs = __get_attrs(h5_dset, field)
 
-    return xr.DataArray(data,
-                        coords=co_dict, dims=dims, name=name, attrs=attrs)
+    return xr.DataArray(data, coords=co_dict, dims=dims, name=name, attrs=attrs)
 
 
-def data_to_xr(data: np.ndarray, *, dims: list[str] | None = None,
-               name: str | None = None, long_name: str | None = None,
-               units: str | None = None) -> xr.DataArray:
+def data_to_xr(
+    data: np.ndarray,
+    *,
+    dims: list[str] | None = None,
+    name: str | None = None,
+    long_name: str | None = None,
+    units: str | None = None,
+) -> xr.DataArray:
     """Create xarray.DataArray from a dataset.
 
     Implements a lite interface with the xarray.DataArray, should work for all
@@ -369,8 +387,9 @@ def data_to_xr(data: np.ndarray, *, dims: list[str] | None = None,
     All floating datasets are converted to Python type 'float'
     """
     coords = __set_coords(data, None, dims)
-    attrs = {'units': '1' if units is None else units,
-             'long_name': '' if long_name is None else long_name}
+    attrs = {
+        "units": "1" if units is None else units,
+        "long_name": "" if long_name is None else long_name,
+    }
 
-    return xr.DataArray(data,
-                        coords=coords, name=name, attrs=attrs)
+    return xr.DataArray(data, coords=coords, name=name, attrs=attrs)

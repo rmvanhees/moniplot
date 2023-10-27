@@ -47,60 +47,75 @@ def add_fig_box(axx_c: Axes, aspect: int, fig_info: FIGinfo) -> None:
         return
 
     # put text above colorbar
-    if fig_info.location == 'above':
+    if fig_info.location == "above":
         if aspect <= 2:
-            halign = 'left' if aspect == 1 else 'center'
-            fontsize = 'x-small'
+            halign = "left" if aspect == 1 else "center"
+            fontsize = "x-small"
         else:
-            halign = 'right'
-            fontsize = 'xx-small' if len(fig_info) > 6 else 'x-small'
+            halign = "right"
+            fontsize = "xx-small" if len(fig_info) > 6 else "x-small"
 
-        axx_c.text(0 if aspect <= 2 else 1,
-                   1.04 + (aspect-1) * 0.0075,
-                   fig_info.as_str(), fontsize=fontsize,
-                   transform=axx_c.transAxes,
-                   multialignment='left',
-                   verticalalignment='bottom',
-                   horizontalalignment=halign,
-                   bbox={'facecolor': 'white', 'pad': 4})
+        axx_c.text(
+            0 if aspect <= 2 else 1,
+            1.04 + (aspect - 1) * 0.0075,
+            fig_info.as_str(),
+            fontsize=fontsize,
+            transform=axx_c.transAxes,
+            multialignment="left",
+            verticalalignment="bottom",
+            horizontalalignment=halign,
+            bbox={"facecolor": "white", "pad": 4},
+        )
         return
 
-    if fig_info.location == 'below':
-        fontsize = 'xx-small' if aspect in (3, 4) else 'x-small'
-        axx_c.text(0.125 + (aspect-1) * 0.2,
-                   -0.03 - (aspect-1) * 0.005,
-                   fig_info.as_str(), fontsize=fontsize,
-                   transform=axx_c.transAxes,
-                   multialignment='left',
-                   verticalalignment='top',
-                   horizontalalignment='left',
-                   bbox={'facecolor': 'white', 'pad': 4})
+    if fig_info.location == "below":
+        fontsize = "xx-small" if aspect in (3, 4) else "x-small"
+        axx_c.text(
+            0.125 + (aspect - 1) * 0.2,
+            -0.03 - (aspect - 1) * 0.005,
+            fig_info.as_str(),
+            fontsize=fontsize,
+            transform=axx_c.transAxes,
+            multialignment="left",
+            verticalalignment="top",
+            horizontalalignment="left",
+            bbox={"facecolor": "white", "pad": 4},
+        )
 
 
 # -------------------------
-@pytest.mark.parametrize(
-    'aspect',
-    [
-        1, 2, 3, 4
-    ])
+@pytest.mark.parametrize("aspect", [1, 2, 3, 4])
 def test_layout(aspect: int) -> None:
     """Show figure with given aspect ratio."""
-    attrs = {1: {'figsize': (10, 8),
-                 'w_ratios': (1., 7., 0.5, 1.5),
-                 'h_ratios': (7., 1.)},                  # 7 x 7
-             2: {'figsize': (13, 6.25),
-                 'w_ratios': (1., 10., 0.5, 1.5),
-                 'h_ratios': (5., 1.)},                  # 10 x 5
-             3: {'figsize': (15, 5.375),
-                 'w_ratios': (1., 12., 0.5, 1.5),
-                 'h_ratios': (4., 1.)},                  # 12 x 4
-             4: {'figsize': (17, 5.125),
-                 'w_ratios': (1., 14., 0.5, 1.5),
-                 'h_ratios': (3.5, 1.)}}.get(aspect)     # 14 x 3.5
+    attrs = {
+        1: {
+            "figsize": (10, 8),
+            "w_ratios": (1.0, 7.0, 0.5, 1.5),
+            "h_ratios": (7.0, 1.0),
+        },  # 7 x 7
+        2: {
+            "figsize": (13, 6.25),
+            "w_ratios": (1.0, 10.0, 0.5, 1.5),
+            "h_ratios": (5.0, 1.0),
+        },  # 10 x 5
+        3: {
+            "figsize": (15, 5.375),
+            "w_ratios": (1.0, 12.0, 0.5, 1.5),
+            "h_ratios": (4.0, 1.0),
+        },  # 12 x 4
+        4: {
+            "figsize": (17, 5.125),
+            "w_ratios": (1.0, 14.0, 0.5, 1.5),
+            "h_ratios": (3.5, 1.0),
+        },
+    }.get(aspect)  # 14 x 3.5
 
-    fig = plt.figure(figsize=attrs['figsize'])
-    fig.suptitle('test of matplotlib gridspec', fontsize='x-large',
-                 position=(0.5, 1 - 0.4 / fig.get_figheight()))
+    fig = plt.figure(figsize=attrs["figsize"])
+    fig.suptitle(
+        "test of matplotlib gridspec",
+        fontsize="x-large",
+        position=(0.5, 1 - 0.4 / fig.get_figheight()),
+    )
     #
     # Define a grid layout to place subplots within the figure.
     #
@@ -130,14 +145,18 @@ def test_layout(aspect: int) -> None:
     #        Defines the relative heights of the rows. Each row gets a
     #        relative height of height_ratios[i] / sum(height_ratios).
     #        If not given, all rows will have the same height.
-    gspec = fig.add_gridspec(2, 4,
-                             wspace=0.1 / max(2, aspect-1), hspace=0.05,
-                             width_ratios=attrs['w_ratios'],
-                             height_ratios=attrs['h_ratios'],
-                             left=.135 + .005 * (aspect-1),
-                             right=.9 - .005 * (aspect-1),
-                             bottom=.115 + .01 * (aspect-1),
-                             top=.865 - .025 * (aspect-1))
+    gspec = fig.add_gridspec(
+        2,
+        4,
+        wspace=0.1 / max(2, aspect - 1),
+        hspace=0.05,
+        width_ratios=attrs["w_ratios"],
+        height_ratios=attrs["h_ratios"],
+        left=0.135 + 0.005 * (aspect - 1),
+        right=0.9 - 0.005 * (aspect - 1),
+        bottom=0.115 + 0.01 * (aspect - 1),
+        top=0.865 - 0.025 * (aspect - 1),
+    )
     # else:
     #    gspec = fig.add_gridspec(2, 4, wspace=0.05 / aspect, hspace=0.025,
     #                             width_ratios=(1., 4. * aspect, .3, .7),
@@ -147,10 +166,9 @@ def test_layout(aspect: int) -> None:
 
     axx = fig.add_subplot(gspec[0, 1])
     rng = np.random.default_rng()
-    pcm = axx.pcolormesh(rng.standard_normal((30, aspect * 30)),
-                         vmin=-2, vmax=2)
+    pcm = axx.pcolormesh(rng.standard_normal((30, aspect * 30)), vmin=-2, vmax=2)
     # image panel
-    axx.set_title(f'aspect={aspect}')
+    axx.set_title(f"aspect={aspect}")
     axx.grid(True)
 
     # side_panels
@@ -159,19 +177,19 @@ def test_layout(aspect: int) -> None:
     for ytl in axx.get_yticklabels():
         ytl.set_visible(False)
     axx_px = fig.add_subplot(gspec[1, 1], sharex=axx)
-    axx_px.set_xlabel('column')
+    axx_px.set_xlabel("column")
     axx_px.grid(True)
     axx_py = fig.add_subplot(gspec[0, 0], sharey=axx)
-    axx_py.set_ylabel('row')
+    axx_py.set_ylabel("row")
     axx_py.grid(True)
 
     # add colorbar
     axx_c = fig.add_subplot(gspec[0, 2])
-    _ = plt.colorbar(pcm, cax=axx_c, label='value')
+    _ = plt.colorbar(pcm, cax=axx_c, label="value")
 
     fig_info = FIGinfo()
     for ii in range(5):
-        fig_info.add(f'text line {ii+1}', 'blah blah blah')
+        fig_info.add(f"text line {ii+1}", "blah blah blah")
     add_fig_box(axx_c, aspect, fig_info)
 
     plt.show()

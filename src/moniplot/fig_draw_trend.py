@@ -19,10 +19,10 @@
 """This module contains the functions: `add_subplot` and `add_hk_subplot`."""
 from __future__ import annotations
 
-__all__ = ['add_subplot', 'add_hk_subplot']
+__all__ = ["add_subplot", "add_hk_subplot"]
 
 from numbers import Integral
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING
 
 import numpy as np
 from matplotlib.ticker import AutoMinorLocator, MultipleLocator
@@ -31,11 +31,13 @@ from .lib.fig_legend import blank_legend_handle
 from .tol_colors import tol_cset
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     import xarray as xr
     from matplotlib.axes import Axes
 
 # - global parameters ------------------------------
-CSET = tol_cset('bright')
+CSET = tol_cset("bright")
 
 
 # - local functions --------------------------------
@@ -51,49 +53,51 @@ def set_labels_colors(xarr: xr.DataArray) -> tuple[str, str, str, str]:
     tuple
        plot parameters: hk_title, hk_label, lcolor, fcolor
     """
-    hk_unit = xarr.attrs['units']
+    hk_unit = xarr.attrs["units"]
     if isinstance(hk_unit, bytes):
         hk_unit = hk_unit.decode()
 
-    hk_title = xarr.attrs['long_name']
+    hk_title = xarr.attrs["long_name"]
     if isinstance(hk_title, bytes):
         hk_title = hk_title.decode()
 
-    if hk_unit == 'K':
-        if (ii := hk_title.find(' temperature')) > 0:
+    if hk_unit == "K":
+        if (ii := hk_title.find(" temperature")) > 0:
             hk_title = hk_title[:ii]
-        hk_label = f'temperature [{hk_unit}]'
+        hk_label = f"temperature [{hk_unit}]"
         lcolor = CSET.blue
-        fcolor = '#BBCCEE'
-    elif hk_unit in ('A', 'mA'):
-        if (ii := hk_title.find(' current')) > 0:
+        fcolor = "#BBCCEE"
+    elif hk_unit in ("A", "mA"):
+        if (ii := hk_title.find(" current")) > 0:
             hk_title = hk_title[:ii]
-        hk_label = f'current [{hk_unit}]'
+        hk_label = f"current [{hk_unit}]"
         lcolor = CSET.green
-        fcolor = '#CCDDAA'
-    elif hk_unit == '%':
-        if (ii := hk_title.find(' duty')) > 0:
+        fcolor = "#CCDDAA"
+    elif hk_unit == "%":
+        if (ii := hk_title.find(" duty")) > 0:
             hk_title = hk_title[:ii]
-        hk_label = f'duty cycle [{hk_unit}]'
+        hk_label = f"duty cycle [{hk_unit}]"
         lcolor = CSET.red
-        fcolor = '#FFCCCC'
+        fcolor = "#FFCCCC"
     else:
-        hk_label = f'value [{hk_unit}]'
+        hk_label = f"value [{hk_unit}]"
         lcolor = CSET.purple
-        fcolor = '#EEBBDD'
+        fcolor = "#EEBBDD"
 
     # overwrite ylabel
-    if '_ylabel' in xarr.attrs:
-        hk_label = xarr.attrs['_ylabel']
+    if "_ylabel" in xarr.attrs:
+        hk_label = xarr.attrs["_ylabel"]
 
     return hk_title, hk_label, lcolor, fcolor
 
 
-def adjust_ylim(data: np.ndarray | Iterable,
-                err1: np.ndarray | Iterable | None,
-                err2: np.ndarray | Iterable | None,
-                vperc: list[int, int],
-                vrange_last_orbits: int) -> tuple[float, float]:
+def adjust_ylim(
+    data: np.ndarray | Iterable,
+    err1: np.ndarray | Iterable | None,
+    err2: np.ndarray | Iterable | None,
+    vperc: list[int, int],
+    vrange_last_orbits: int,
+) -> tuple[float, float]:
     """Set minimum and maximum values of ylim.
 
     Parameters
@@ -117,25 +121,31 @@ def adjust_ylim(data: np.ndarray | Iterable,
     if err1 is not None and err2 is not None:
         indx = np.isfinite(err1) & np.isfinite(err2)
         if np.all(~indx):
-            ylim = [0., 0.]
+            ylim = [0.0, 0.0]
         elif np.sum(indx) > vrange_last_orbits > 0:
             ni = vrange_last_orbits
-            ylim = [min(err1[indx][0:ni].min(), err1[indx][-ni:].min()),
-                    max(err2[indx][0:ni].max(), err2[indx][-ni:].max())]
+            ylim = [
+                min(err1[indx][0:ni].min(), err1[indx][-ni:].min()),
+                max(err2[indx][0:ni].max(), err2[indx][-ni:].max()),
+            ]
         elif isinstance(vperc, list) and len(vperc) == 2:
-            ylim = [np.percentile(err1[indx], vperc[0]),
-                    np.percentile(err2[indx], vperc[1])]
+            ylim = [
+                np.percentile(err1[indx], vperc[0]),
+                np.percentile(err2[indx], vperc[1]),
+            ]
         else:
             ylim = [err1[indx].min(), err2[indx].max()]
         factor = 10
     else:
         indx = np.isfinite(data)
         if np.all(~indx):
-            ylim = [0., 0.]
+            ylim = [0.0, 0.0]
         elif np.sum(indx) > vrange_last_orbits > 0:
             ni = vrange_last_orbits
-            ylim = [min(data[indx][0:ni].min(), data[indx][-ni:].min()),
-                    max(data[indx][0:ni].max(), data[indx][-ni:].max())]
+            ylim = [
+                min(data[indx][0:ni].min(), data[indx][-ni:].min()),
+                max(data[indx][0:ni].max(), data[indx][-ni:].max()),
+            ]
         elif isinstance(vperc, list) and len(vperc) == 2:
             ylim = np.percentile(data[indx], vperc)
         else:
@@ -163,15 +173,15 @@ def adjust_units(zunit: str) -> str:
     str
        Units with consistent abbreviation of electron(s) and Volt
     """
-    if zunit is None or zunit == '1':
-        return '1'
+    if zunit is None or zunit == "1":
+        return "1"
 
-    if zunit.find('electron') >= 0:
-        zunit = zunit.replace('electron', 'e')
-    if zunit.find('Volt') >= 0:
-        zunit = zunit.replace('Volt', 'V')
-    if zunit.find('.s-1') >= 0:
-        zunit = zunit.replace('.s-1', ' s$^{-1}$')
+    if zunit.find("electron") >= 0:
+        zunit = zunit.replace("electron", "e")
+    if zunit.find("Volt") >= 0:
+        zunit = zunit.replace("Volt", "V")
+    if zunit.find(".s-1") >= 0:
+        zunit = zunit.replace(".s-1", " s$^{-1}$")
 
     return zunit
 
@@ -214,23 +224,23 @@ def add_subplot(axx: Axes, xarr: xr.DataArray, scatter: bool = False) -> None:
     scatter: bool, default=False
        Make a scatter plot
     """
-    ylabel = xarr.attrs['long_name']
-    if 'units' in xarr.attrs and xarr.attrs['units'] != '1':
+    ylabel = xarr.attrs["long_name"]
+    if "units" in xarr.attrs and xarr.attrs["units"] != "1":
         ylabel += f' [{adjust_units(xarr.attrs["units"])}]'
-    lcolor = xarr.attrs['_color'] if '_color' in xarr.attrs else CSET.blue
-    fcolor = '#BBCCEE'
+    lcolor = xarr.attrs["_color"] if "_color" in xarr.attrs else CSET.blue
+    fcolor = "#BBCCEE"
 
     # define xdata and determine gap_list (always at least one element!)
     isel = np.s_[:]
-    if 'orbit' in xarr.coords:
-        xdata = xarr.coords['orbit'].values
+    if "orbit" in xarr.coords:
+        xdata = xarr.coords["orbit"].values
         gap_list = get_gap_list(xdata)
-    elif 'hours' in xarr.coords:
-        xdata = xarr.coords['hours'].values
+    elif "hours" in xarr.coords:
+        xdata = xarr.coords["hours"].values
         isel = np.s_[0, :]
         gap_list = get_gap_list(np.round(3600 * xdata).astype(int))
     else:
-        xdata = xarr.coords['time'].values
+        xdata = xarr.coords["time"].values
         gap_list = get_gap_list(xdata)
     gap_list += (xdata.size - 1,)
 
@@ -243,32 +253,42 @@ def add_subplot(axx: Axes, xarr: xr.DataArray, scatter: bool = False) -> None:
         avg = xarr.values[isel]
         err1 = err2 = None
     else:
-        avg = xarr.values['mean'][isel]
-        err1 = xarr.values['err1'][isel]
-        err2 = xarr.values['err2'][isel]
+        avg = xarr.values["mean"][isel]
+        err1 = xarr.values["err1"][isel]
+        err2 = xarr.values["err2"][isel]
 
     ii = 0
     for jj in gap_list:
-        isel = np.s_[ii:jj+1]
+        isel = np.s_[ii : jj + 1]
         if err1 is not None:
-            axx.fill_between(xdata[isel], err1[isel], err2[isel],
-                             step='post', linewidth=0, facecolor=fcolor)
-            axx.step(np.append(xdata[isel], xdata[jj]),
-                     np.append(avg[isel], avg[jj]), where='post',
-                     linewidth=1.5, color=lcolor)
+            axx.fill_between(
+                xdata[isel],
+                err1[isel],
+                err2[isel],
+                step="post",
+                linewidth=0,
+                facecolor=fcolor,
+            )
+            axx.step(
+                np.append(xdata[isel], xdata[jj]),
+                np.append(avg[isel], avg[jj]),
+                where="post",
+                linewidth=1.5,
+                color=lcolor,
+            )
         elif scatter:
-            axx.plot(xdata[isel], avg[isel],
-                     marker='.', linestyle='', color=lcolor)
+            axx.plot(xdata[isel], avg[isel], marker=".", linestyle="", color=lcolor)
         else:
             axx.plot(xdata[isel], avg[isel], linewidth=1.5, color=lcolor)
-        if 'legend' in xarr.attrs:
-            legenda = axx.legend([blank_legend_handle()],
-                                 [xarr.attrs['legend']], loc='upper left')
+        if "legend" in xarr.attrs:
+            legenda = axx.legend(
+                [blank_legend_handle()], [xarr.attrs["legend"]], loc="upper left"
+            )
             legenda.draw_frame(False)
         ii = jj + 1
 
     # adjust data X-coordinate
-    if 'hours' in xarr.coords:
+    if "hours" in xarr.coords:
         axx.xaxis.set_major_locator(MultipleLocator(3))
         axx.xaxis.set_minor_locator(MultipleLocator(1))
     else:
@@ -276,17 +296,20 @@ def add_subplot(axx: Axes, xarr: xr.DataArray, scatter: bool = False) -> None:
     axx.set_xlim([xdata[0], xdata[-1]])
 
     # adjust data X-coordinate
-    axx.locator_params(axis='y', nbins=5)
-    if 'orbit' in xarr.coords:
+    axx.locator_params(axis="y", nbins=5)
+    if "orbit" in xarr.coords:
         axx.set_ylim(adjust_ylim(avg, err1, err2, [], -1))
 
     axx.set_ylabel(ylabel)
     axx.grid(True)
 
 
-def add_hk_subplot(axx: Axes, xarr: xr.DataArray,
-                   vperc: list | None = None,
-                   vrange_last_orbits: int = -1) -> None:
+def add_hk_subplot(
+    axx: Axes,
+    xarr: xr.DataArray,
+    vperc: list | None = None,
+    vrange_last_orbits: int = -1,
+) -> None:
     """Add a subplot for housekeeping data.
 
     Parameters
@@ -306,15 +329,15 @@ def add_hk_subplot(axx: Axes, xarr: xr.DataArray,
 
     # define xdata and determine gap_list (always one element!)
     isel = np.s_[:]
-    if 'orbit' in xarr.coords:
-        xdata = xarr.coords['orbit'].values
+    if "orbit" in xarr.coords:
+        xdata = xarr.coords["orbit"].values
         gap_list = get_gap_list(xdata)
-    elif 'hours' in xarr.coords:
-        xdata = xarr.coords['hours'].values
+    elif "hours" in xarr.coords:
+        xdata = xarr.coords["hours"].values
         isel = np.s_[0, :]
         gap_list = get_gap_list(np.round(3600 * xdata).astype(int))
     else:
-        xdata = xarr.coords['time'].values
+        xdata = xarr.coords["time"].values
         gap_list = get_gap_list(xdata)
     gap_list += (xdata.size - 1,)
 
@@ -323,24 +346,30 @@ def add_hk_subplot(axx: Axes, xarr: xr.DataArray,
         avg = xarr.values[isel]
         err1 = err2 = None
     else:
-        avg = xarr.values['mean'][isel]
-        err1 = xarr.values['err1'][isel]
-        err2 = xarr.values['err2'][isel]
+        avg = xarr.values["mean"][isel]
+        err1 = xarr.values["err1"][isel]
+        err2 = xarr.values["err2"][isel]
 
     # plot data
     ii = 0
     for jj in gap_list:
-        isel = np.s_[ii:jj+1]
+        isel = np.s_[ii : jj + 1]
         if err1 is not None:
-            axx.fill_between(xdata[isel], err1[isel], err2[isel],
-                             step='post', linewidth=0, facecolor=fcolor)
+            axx.fill_between(
+                xdata[isel],
+                err1[isel],
+                err2[isel],
+                step="post",
+                linewidth=0,
+                facecolor=fcolor,
+            )
             axx.plot(xdata[isel], avg[isel], linewidth=1.5, color=lcolor)
         else:
             axx.plot(xdata[isel], avg[isel], linewidth=1.5, color=lcolor)
         ii = jj + 1
 
     # adjust data X-coordinate
-    if 'hours' in xarr.coords:
+    if "hours" in xarr.coords:
         axx.xaxis.set_major_locator(MultipleLocator(3))
         axx.xaxis.set_minor_locator(MultipleLocator(1))
     else:
@@ -348,13 +377,12 @@ def add_hk_subplot(axx: Axes, xarr: xr.DataArray,
     axx.set_xlim([xdata[0], xdata[-1]])
 
     # adjust data Y-coordinate
-    axx.locator_params(axis='y', nbins=4)
-    if 'orbit' in xarr.coords:
+    axx.locator_params(axis="y", nbins=4)
+    if "orbit" in xarr.coords:
         axx.set_ylim(adjust_ylim(avg, err1, err2, vperc, vrange_last_orbits))
     axx.set_ylabel(hk_label)
     axx.grid(True)
 
     # add hk_title inside current subplots
-    legend = axx.legend([blank_legend_handle()],
-                        [hk_title], loc='upper left')
+    legend = axx.legend([blank_legend_handle()], [hk_title], loc="upper left")
     legend.draw_frame(False)

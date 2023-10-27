@@ -20,7 +20,7 @@
 
 from __future__ import annotations
 
-__all__ = ['FIGinfo']
+__all__ = ["FIGinfo"]
 
 import datetime as dt
 from copy import deepcopy
@@ -48,8 +48,9 @@ class FIGinfo:
     color bar. You may try loc='below', which is only available for image plots.
     """
 
-    def __init__(self: FIGinfo, loc: str = 'above',
-                 info_dict: dict | None = None) -> None:
+    def __init__(
+        self: FIGinfo, loc: str = "above", info_dict: dict | None = None
+    ) -> None:
         """Create FIGinfo instance to hold information on the current plot."""
         self.fig_info = {} if info_dict is None else info_dict
         self._location = None
@@ -80,12 +81,12 @@ class FIGinfo:
         loc : str
           Location of the fig_info box
         """
-        if loc not in ('above', 'none'):
+        if loc not in ("above", "none"):
             raise KeyError("location should be: 'above' or 'none'")
 
         self._location = loc
 
-    def add(self: FIGinfo, key: str, value: Any, fmt: str = '{}') -> None:
+    def add(self: FIGinfo, key: str, value: Any, fmt: str = "{}") -> None:
         r"""Extent fig_info by adding a new line.
 
         Parameters
@@ -104,12 +105,12 @@ class FIGinfo:
 
     def as_str(self: FIGinfo) -> str:
         """Return figure information as one long string."""
-        info_str = ''
+        info_str = ""
         for key, value in self.fig_info.items():
-            info_str += f'{key}: {value}\n'
+            info_str += f"{key}: {value}\n"
 
         # add timestamp
-        res = dt.datetime.now(dt.timezone.utc).isoformat(timespec='seconds')
+        res = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
         info_str += f'created: {res.replace('+00:00', 'Z')}'
 
         return info_str

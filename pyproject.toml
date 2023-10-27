@@ -11,7 +11,7 @@ requires = [
 
 [project]
 name = "moniplot"
-description = "moniplot is a Python data visualization library for (satellite) instrument monitoring"
+description = "a Python data visualization library for (satellite) instrument monitoring"
 readme = "README.md"
 license.file = "LICENSE"
 authors = [
@@ -60,12 +60,16 @@ where = ["src"]
 [tool.setuptools_scm]
 
 [tool.ruff]
+line-length = 88
+target-version = "py310"
+
 select = [
+  "F",   # pyflakes
   "D",   # pydocstyle
   "E",   # pycodestyle
   "W",   # pycodestyle
-  "F",   # pyflakes
   "I",   # isort
+  "N",   # pep8-naming
   "UP",  # pyupgrade
   "ANN", # flake8-annotations
   "B",   # flake8-bugbear
@@ -75,10 +79,7 @@ select = [
   "TCH", # flake8-type-checking
   "NPY", # NumPy-specific rules
 ]
-ignore = ["E501"]
+ignore = ["Q000", "Q003"]
 
 [tool.ruff.pydocstyle]
 convention = "pep257"
-
-[tool.ruff.flake8-quotes]
-inline-quotes = "single"

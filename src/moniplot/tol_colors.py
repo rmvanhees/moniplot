@@ -29,7 +29,7 @@ Routines in this module::
 """
 from __future__ import annotations
 
-__all__ = ['tol_cmap', 'tol_cset', 'tol_rgba']
+__all__ = ["tol_cmap", "tol_cset", "tol_rgba"]
 
 from dataclasses import astuple, dataclass, field
 from typing import TYPE_CHECKING
@@ -49,171 +49,338 @@ if TYPE_CHECKING:
 class SunSet:
     """Defines diverging color scheme 'SunSet'."""
 
-    bad_color: str = '#FFFFFF'
+    bad_color: str = "#FFFFFF"
     colors: tuple[str, ...] = field(default_factory=tuple)
 
     def __post_init__(self: SunSet) -> None:
         self.colors += (
-            '#364B9A', '#4A7BB7', '#6EA6CD', '#98CAE1', '#C2E4EF',
-            '#EAECCC', '#FEDA8B', '#FDB366', '#F67E4B', '#DD3D2D', '#A50026')
+            "#364B9A",
+            "#4A7BB7",
+            "#6EA6CD",
+            "#98CAE1",
+            "#C2E4EF",
+            "#EAECCC",
+            "#FEDA8B",
+            "#FDB366",
+            "#F67E4B",
+            "#DD3D2D",
+            "#A50026",
+        )
 
 
 @dataclass
 class NightFall:
     """Defines diverging color scheme 'NightFall'."""
 
-    bad_color: str = '#FFFFFF'
+    bad_color: str = "#FFFFFF"
     colors: tuple[str, ...] = field(default_factory=tuple)
 
     def __post_init__(self: NightFall) -> None:
         self.colors += (
-            '#125A56', '#00767B', '#238F9D', '#42A7C6', '#60BCE9',
-            '#9DCCEF', '#C6DBED', '#DEE6E7', '#ECEADA', '#F0E6B2',
-            '#F9D576', '#FFB954', '#FD9A44', '#F57634', '#E94C1F',
-            '#D11807', '#A01813')
+            "#125A56",
+            "#00767B",
+            "#238F9D",
+            "#42A7C6",
+            "#60BCE9",
+            "#9DCCEF",
+            "#C6DBED",
+            "#DEE6E7",
+            "#ECEADA",
+            "#F0E6B2",
+            "#F9D576",
+            "#FFB954",
+            "#FD9A44",
+            "#F57634",
+            "#E94C1F",
+            "#D11807",
+            "#A01813",
+        )
 
 
 @dataclass
 class BuRd:
     """Defines diverging color scheme 'BuRd'."""
 
-    bad_color: str = '#FFEE99'
+    bad_color: str = "#FFEE99"
     colors: tuple[str, ...] = field(default_factory=tuple)
 
     def __post_init__(self: BuRd) -> None:
         self.colors += (
-            '#2166AC', '#4393C3', '#92C5DE', '#D1E5F0', '#F7F7F7',
-            '#FDDBC7', '#F4A582', '#D6604D', '#B2182B')
+            "#2166AC",
+            "#4393C3",
+            "#92C5DE",
+            "#D1E5F0",
+            "#F7F7F7",
+            "#FDDBC7",
+            "#F4A582",
+            "#D6604D",
+            "#B2182B",
+        )
 
 
 @dataclass
 class PRGn:
     """Defines diverging color scheme 'PRGn'."""
 
-    bad_color: str = '#FFEE99'
+    bad_color: str = "#FFEE99"
     colors: tuple[str, ...] = field(default_factory=tuple)
 
     def __post_init__(self: PRGn) -> None:
         self.colors += (
-            '#762A83', '#9970AB', '#C2A5CF', '#E7D4E8', '#F7F7F7',
-            '#D9F0D3', '#ACD39E', '#5AAE61', '#1B7837')
+            "#762A83",
+            "#9970AB",
+            "#C2A5CF",
+            "#E7D4E8",
+            "#F7F7F7",
+            "#D9F0D3",
+            "#ACD39E",
+            "#5AAE61",
+            "#1B7837",
+        )
 
 
 @dataclass
 class YlOrBr:
     """Defines sequential color scheme 'YlOrBr'."""
 
-    bad_color: str = '#888888'
+    bad_color: str = "#888888"
     colors: tuple[str, ...] = field(default_factory=tuple)
 
     def __post_init__(self: YlOrBr) -> None:
         self.colors += (
-            '#FFFFE5', '#FFF7BC', '#FEE391', '#FEC44F', '#FB9A29',
-            '#EC7014', '#CC4C02', '#993404', '#662506')
+            "#FFFFE5",
+            "#FFF7BC",
+            "#FEE391",
+            "#FEC44F",
+            "#FB9A29",
+            "#EC7014",
+            "#CC4C02",
+            "#993404",
+            "#662506",
+        )
 
 
 @dataclass
 class WhOrBr:
     """Defines sequential color scheme 'WhOrBr'."""
 
-    bad_color: str = '#888888'
+    bad_color: str = "#888888"
     colors: tuple[str, ...] = field(default_factory=tuple)
 
     def __post_init__(self: WhOrBr) -> None:
         self.colors += (
-            '#FFFFFF', '#FFF7BC', '#FEE391', '#FEC44F', '#FB9A29',
-            '#EC7014', '#CC4C02', '#993404', '#662506')
+            "#FFFFFF",
+            "#FFF7BC",
+            "#FEE391",
+            "#FEC44F",
+            "#FB9A29",
+            "#EC7014",
+            "#CC4C02",
+            "#993404",
+            "#662506",
+        )
 
 
 @dataclass
 class IriDescent:
     """Defines sequential color scheme 'IriDescent'."""
 
-    bad_color: str = '#999999'
+    bad_color: str = "#999999"
     colors: tuple[str, ...] = field(default_factory=tuple)
 
     def __post_init__(self: IriDescent) -> None:
         self.colors += (
-            '#FEFBE9', '#FCF7D5', '#F5F3C1', '#EAF0B5', '#DDECBF',
-            '#D0E7CA', '#C2E3D2', '#B5DDD8', '#A8D8DC', '#9BD2E1',
-            '#8DCBE4', '#81C4E7', '#7BBCE7', '#7EB2E4', '#88A5DD',
-            '#9398D2', '#9B8AC4', '#9D7DB2', '#9A709E', '#906388',
-            '#805770', '#684957', '#46353A')
+            "#FEFBE9",
+            "#FCF7D5",
+            "#F5F3C1",
+            "#EAF0B5",
+            "#DDECBF",
+            "#D0E7CA",
+            "#C2E3D2",
+            "#B5DDD8",
+            "#A8D8DC",
+            "#9BD2E1",
+            "#8DCBE4",
+            "#81C4E7",
+            "#7BBCE7",
+            "#7EB2E4",
+            "#88A5DD",
+            "#9398D2",
+            "#9B8AC4",
+            "#9D7DB2",
+            "#9A709E",
+            "#906388",
+            "#805770",
+            "#684957",
+            "#46353A",
+        )
 
 
 @dataclass
 class RainbowPuRd:
     """Defines sequential color scheme 'RainbowPuRd'."""
 
-    bad_color: str = '#FFFFFF'
+    bad_color: str = "#FFFFFF"
     colors: tuple[str, ...] = field(default_factory=tuple)
 
     def __post_init__(self: RainbowPuRd) -> None:
         self.colors += (
-            '#6F4C9B', '#6059A9', '#5568B8', '#4E79C5', '#4D8AC6',
-            '#4E96BC', '#549EB3', '#59A5A9', '#60AB9E', '#69B190',
-            '#77B77D', '#8CBC68', '#A6BE54', '#BEBC48', '#D1B541',
-            '#DDAA3C', '#E49C39', '#E78C35', '#E67932', '#E4632D',
-            '#DF4828', '#DA2222')
+            "#6F4C9B",
+            "#6059A9",
+            "#5568B8",
+            "#4E79C5",
+            "#4D8AC6",
+            "#4E96BC",
+            "#549EB3",
+            "#59A5A9",
+            "#60AB9E",
+            "#69B190",
+            "#77B77D",
+            "#8CBC68",
+            "#A6BE54",
+            "#BEBC48",
+            "#D1B541",
+            "#DDAA3C",
+            "#E49C39",
+            "#E78C35",
+            "#E67932",
+            "#E4632D",
+            "#DF4828",
+            "#DA2222",
+        )
 
 
 @dataclass
 class RainbowPuBr:
     """Defines sequential color scheme 'RainbowPuBr'."""
 
-    bad_color: str = '#FFFFFF'
+    bad_color: str = "#FFFFFF"
     colors: tuple[str, ...] = field(default_factory=tuple)
 
     def __post_init__(self: RainbowPuBr) -> None:
         self.colors += (
-            '#6F4C9B', '#6059A9', '#5568B8', '#4E79C5', '#4D8AC6',
-            '#4E96BC', '#549EB3', '#59A5A9', '#60AB9E', '#69B190',
-            '#77B77D', '#8CBC68', '#A6BE54', '#BEBC48', '#D1B541',
-            '#DDAA3C', '#E49C39', '#E78C35', '#E67932', '#E4632D',
-            '#DF4828', '#DA2222', '#B8221E', '#95211B', '#721E17',
-            '#521A13')
+            "#6F4C9B",
+            "#6059A9",
+            "#5568B8",
+            "#4E79C5",
+            "#4D8AC6",
+            "#4E96BC",
+            "#549EB3",
+            "#59A5A9",
+            "#60AB9E",
+            "#69B190",
+            "#77B77D",
+            "#8CBC68",
+            "#A6BE54",
+            "#BEBC48",
+            "#D1B541",
+            "#DDAA3C",
+            "#E49C39",
+            "#E78C35",
+            "#E67932",
+            "#E4632D",
+            "#DF4828",
+            "#DA2222",
+            "#B8221E",
+            "#95211B",
+            "#721E17",
+            "#521A13",
+        )
 
 
 @dataclass
 class RainbowWhRd:
     """Defines sequential color scheme 'RainbowWhRd'."""
 
-    bad_color: str = '#666666'
+    bad_color: str = "#666666"
     colors: tuple[str, ...] = field(default_factory=tuple)
 
     def __post_init__(self: RainbowWhRd) -> None:
         self.colors += (
-            '#E8ECFB', '#DDD8EF', '#D1C1E1', '#C3A8D1', '#B58FC2',
-            '#A778B4', '#9B62A7', '#8C4E99', '#6F4C9B', '#6059A9',
-            '#5568B8', '#4E79C5', '#4D8AC6', '#4E96BC', '#549EB3',
-            '#59A5A9', '#60AB9E', '#69B190', '#77B77D', '#8CBC68',
-            '#A6BE54', '#BEBC48', '#D1B541', '#DDAA3C', '#E49C39',
-            '#E78C35', '#E67932', '#E4632D', '#DF4828', '#DA2222')
+            "#E8ECFB",
+            "#DDD8EF",
+            "#D1C1E1",
+            "#C3A8D1",
+            "#B58FC2",
+            "#A778B4",
+            "#9B62A7",
+            "#8C4E99",
+            "#6F4C9B",
+            "#6059A9",
+            "#5568B8",
+            "#4E79C5",
+            "#4D8AC6",
+            "#4E96BC",
+            "#549EB3",
+            "#59A5A9",
+            "#60AB9E",
+            "#69B190",
+            "#77B77D",
+            "#8CBC68",
+            "#A6BE54",
+            "#BEBC48",
+            "#D1B541",
+            "#DDAA3C",
+            "#E49C39",
+            "#E78C35",
+            "#E67932",
+            "#E4632D",
+            "#DF4828",
+            "#DA2222",
+        )
 
 
 @dataclass
 class RainbowWhBr:
     """Defines sequential color scheme 'RainbowWhBr'."""
 
-    bad_color: str = '#666666'
+    bad_color: str = "#666666"
     colors: tuple[str, ...] = field(default_factory=tuple)
 
     def __post_init__(self: RainbowWhBr) -> None:
         self.colors += (
-            '#E8ECFB', '#DDD8EF', '#D1C1E1', '#C3A8D1', '#B58FC2',
-            '#A778B4', '#9B62A7', '#8C4E99', '#6F4C9B', '#6059A9',
-            '#5568B8', '#4E79C5', '#4D8AC6', '#4E96BC', '#549EB3',
-            '#59A5A9', '#60AB9E', '#69B190', '#77B77D', '#8CBC68',
-            '#A6BE54', '#BEBC48', '#D1B541', '#DDAA3C', '#E49C39',
-            '#E78C35', '#E67932', '#E4632D', '#DF4828', '#DA2222',
-            '#B8221E', '#95211B', '#721E17', '#521A13')
+            "#E8ECFB",
+            "#DDD8EF",
+            "#D1C1E1",
+            "#C3A8D1",
+            "#B58FC2",
+            "#A778B4",
+            "#9B62A7",
+            "#8C4E99",
+            "#6F4C9B",
+            "#6059A9",
+            "#5568B8",
+            "#4E79C5",
+            "#4D8AC6",
+            "#4E96BC",
+            "#549EB3",
+            "#59A5A9",
+            "#60AB9E",
+            "#69B190",
+            "#77B77D",
+            "#8CBC68",
+            "#A6BE54",
+            "#BEBC48",
+            "#D1B541",
+            "#DDAA3C",
+            "#E49C39",
+            "#E78C35",
+            "#E67932",
+            "#E4632D",
+            "#DF4828",
+            "#DA2222",
+            "#B8221E",
+            "#95211B",
+            "#721E17",
+            "#521A13",
+        )
 
 
 @dataclass
 class RainbowDiscrete:
     """Defines sequential color scheme 'RainbowDiscrete'."""
 
-    bad_color: str = '#777777'
+    bad_color: str = "#777777"
     colors: list[str, ...] = field(default_factory=list)
 
     def __post_init__(self: RainbowDiscrete) -> None:
@@ -222,12 +389,36 @@ class RainbowDiscrete:
     def set_lut(self: RainbowDiscrete, lut: int = 22) -> None:
         """Define list of colors of 'rainbow_discrete'."""
         hexclrs = (
-            '#E8ECFB', '#D9CCE3', '#D1BBD7', '#CAACCB', '#BA8DB4',
-            '#AE76A3', '#AA6F9E', '#994F88', '#882E72', '#1965B0',
-            '#437DBF', '#5289C7', '#6195CF', '#7BAFDE', '#4EB265',
-            '#90C987', '#CAE0AB', '#F7F056', '#F7CB45', '#F6C141',
-            '#F4A736', '#F1932D', '#EE8026', '#E8601C', '#E65518',
-            '#DC050C', '#A5170E', '#72190E', '#42150A')
+            "#E8ECFB",
+            "#D9CCE3",
+            "#D1BBD7",
+            "#CAACCB",
+            "#BA8DB4",
+            "#AE76A3",
+            "#AA6F9E",
+            "#994F88",
+            "#882E72",
+            "#1965B0",
+            "#437DBF",
+            "#5289C7",
+            "#6195CF",
+            "#7BAFDE",
+            "#4EB265",
+            "#90C987",
+            "#CAE0AB",
+            "#F7F056",
+            "#F7CB45",
+            "#F6C141",
+            "#F4A736",
+            "#F1932D",
+            "#EE8026",
+            "#E8601C",
+            "#E65518",
+            "#DC050C",
+            "#A5170E",
+            "#72190E",
+            "#42150A",
+        )
 
         indexes = [
             [9],
@@ -247,25 +438,88 @@ class RainbowDiscrete:
             [2, 5, 8, 9, 11, 13, 14, 15, 16, 17, 19, 21, 23, 25, 27],
             [2, 4, 6, 8, 9, 11, 13, 14, 15, 16, 17, 19, 21, 23, 25, 27],
             [2, 4, 6, 7, 8, 9, 11, 13, 14, 15, 16, 17, 19, 21, 23, 25, 27],
-            [2, 4, 6, 7, 8, 9, 11, 13, 14, 15, 16, 17, 19, 21, 23, 25, 26,
-             27],
-            [1, 3, 4, 6, 7, 8, 9, 11, 13, 14, 15, 16, 17, 19, 21, 23, 25,
-             26, 27],
-            [1, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 19, 21, 23,
-             25, 26, 27],
-            [1, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 20, 22,
-             24, 25, 26, 27],
-            [1, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 20, 22,
-             24, 25, 26, 27, 28],
-            [0, 1, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 20,
-             22, 24, 25, 26, 27, 28]
+            [2, 4, 6, 7, 8, 9, 11, 13, 14, 15, 16, 17, 19, 21, 23, 25, 26, 27],
+            [1, 3, 4, 6, 7, 8, 9, 11, 13, 14, 15, 16, 17, 19, 21, 23, 25, 26, 27],
+            [1, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 19, 21, 23, 25, 26, 27],
+            [
+                1,
+                3,
+                4,
+                6,
+                7,
+                8,
+                9,
+                10,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                20,
+                22,
+                24,
+                25,
+                26,
+                27,
+            ],
+            [
+                1,
+                3,
+                4,
+                6,
+                7,
+                8,
+                9,
+                10,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                20,
+                22,
+                24,
+                25,
+                26,
+                27,
+                28,
+            ],
+            [
+                0,
+                1,
+                3,
+                4,
+                6,
+                7,
+                8,
+                9,
+                10,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                20,
+                22,
+                24,
+                25,
+                26,
+                27,
+                28,
+            ],
         ]
 
         if not 0 < lut <= len(indexes):
             lut = 23
 
-        self.bad_color = '#FFFFFF' if lut < 23 else '#777777'
-        self.colors = [hexclrs[i] for i in indexes[lut-1]]
+        self.bad_color = "#FFFFFF" if lut < 23 else "#777777"
+        self.colors = [hexclrs[i] for i in indexes[lut - 1]]
 
 
 # - Define color sets -------------------------
@@ -276,14 +530,14 @@ class Bright:
     The default scheme for lines and their labels.
     """
 
-    blue: str = '#4477AA'
-    cyan: str = '#66CCEE'
-    green: str = '#228833'
-    yellow: str = '#CCBB44'
-    red: str = '#EE6677'
-    purple: str = '#AA3377'
-    grey: str = '#BBBBBB'
-    black: str = '#000000'
+    blue: str = "#4477AA"
+    cyan: str = "#66CCEE"
+    green: str = "#228833"
+    yellow: str = "#CCBB44"
+    red: str = "#EE6677"
+    purple: str = "#AA3377"
+    grey: str = "#BBBBBB"
+    black: str = "#000000"
 
     @property
     def colors(self: Bright) -> tuple[str, ...]:
@@ -301,10 +555,10 @@ class HighContrast:
     monochrome vision and in a monochrome printout.
     """
 
-    blue: str = '#004488'
-    yellow: str = '#DDAA33'
-    red: str = '#BB5566'
-    black: str = '#000000'
+    blue: str = "#004488"
+    yellow: str = "#DDAA33"
+    red: str = "#BB5566"
+    black: str = "#000000"
 
     @property
     def colors(self: HighContrast) -> tuple[str, ...]:
@@ -323,13 +577,13 @@ class MediumContrast:
     rectangles, with the lower half in the greyscale equivalent.
     """
 
-    light_yellow: str = '#EECC66'
-    light_red: str = '#EE99AA'
-    light_blue: str = '#6699CC'
-    dark_yellow: str = '#997700'
-    dark_red: str = '#994455'
-    dark_blue: str = '#004488'
-    black: str = '#000000'
+    light_yellow: str = "#EECC66"
+    light_red: str = "#EE99AA"
+    light_blue: str = "#6699CC"
+    dark_yellow: str = "#997700"
+    dark_red: str = "#994455"
+    dark_blue: str = "#004488"
+    black: str = "#000000"
 
     @property
     def colors(self: MediumContrast) -> tuple[str, ...]:
@@ -347,14 +601,14 @@ class Vibrant:
     here to make it print-friendly.
     """
 
-    blue: str = '#0077BB'
-    cyan: str = '#33BBEE'
-    teal: str = '#009988'
-    orange: str = '#EE7733'
-    red: str = '#CC3311'
-    magenta: str = '#EE3377'
-    grey: str = '#BBBBBB'
-    black: str = '#000000'
+    blue: str = "#0077BB"
+    cyan: str = "#33BBEE"
+    teal: str = "#009988"
+    orange: str = "#EE7733"
+    red: str = "#CC3311"
+    magenta: str = "#EE3377"
+    grey: str = "#BBBBBB"
+    black: str = "#000000"
 
     @property
     def colors(self: Vibrant) -> tuple[str, ...]:
@@ -371,17 +625,17 @@ class Muted:
     is meant for bad data in maps.
     """
 
-    indigo: str = '#332288'
-    cyan: str = '#88CCEE'
-    teal: str = '#44AA99'
-    green: str = '#117733'
-    olive: str = '#999933'
-    sand: str = '#DDCC77'
-    rose: str = '#CC6677'
-    wine: str = '#882255'
-    purple: str = '#AA4499'
-    pale_grey: str = '#DDDDDD'
-    black: str = '#000000'
+    indigo: str = "#332288"
+    cyan: str = "#88CCEE"
+    teal: str = "#44AA99"
+    green: str = "#117733"
+    olive: str = "#999933"
+    sand: str = "#DDCC77"
+    rose: str = "#CC6677"
+    wine: str = "#882255"
+    purple: str = "#AA4499"
+    pale_grey: str = "#DDDDDD"
+    black: str = "#000000"
 
     @property
     def colors(self: Muted) -> tuple[str, ...]:
@@ -401,16 +655,16 @@ class Light:
     maps.
     """
 
-    light_blue: str = '#77AADD'
-    light_cyan: str = '#99DDFF'
-    mint: str = '#44BB99'
-    pear: str = '#BBCC33'
-    olive: str = '#AAAA00'
-    light_yellow: str = '#EEDD88'
-    orange: str = '#EE8866'
-    pink: str = '#FFAABB'
-    pale_grey: str = '#DDDDDD'
-    black: str = '#000000'
+    light_blue: str = "#77AADD"
+    light_cyan: str = "#99DDFF"
+    mint: str = "#44BB99"
+    pear: str = "#BBCC33"
+    olive: str = "#AAAA00"
+    light_yellow: str = "#EEDD88"
+    orange: str = "#EE8866"
+    pink: str = "#FFAABB"
+    pale_grey: str = "#DDDDDD"
+    black: str = "#000000"
 
     @property
     def colors(self: Light) -> tuple[str, ...]:
@@ -419,26 +673,26 @@ class Light:
 
 
 _cset_dict = {
-    'bright': Bright(),
-    'high-contrast': HighContrast(),
-    'medium-contrast': MediumContrast(),
-    'vibrant': Vibrant(),
-    'muted': Muted(),
-    'light': Light()
+    "bright": Bright(),
+    "high-contrast": HighContrast(),
+    "medium-contrast": MediumContrast(),
+    "vibrant": Vibrant(),
+    "muted": Muted(),
+    "light": Light(),
 }
 
 _cmap_dict = {
-    'sunset': SunSet(),
-    'nightfall': NightFall(),
-    'BuRd': BuRd(),
-    'PRGn': PRGn(),
-    'YlOrBr': YlOrBr(),
-    'WhOrBr': WhOrBr(),
-    'iridescent': IriDescent(),
-    'rainbow_PuRd': RainbowPuRd(),
-    'rainbow_PuBr': RainbowPuBr(),
-    'rainbow_WhRd': RainbowWhRd(),
-    'rainbow_WhBr': RainbowWhBr()
+    "sunset": SunSet(),
+    "nightfall": NightFall(),
+    "BuRd": BuRd(),
+    "PRGn": PRGn(),
+    "YlOrBr": YlOrBr(),
+    "WhOrBr": WhOrBr(),
+    "iridescent": IriDescent(),
+    "rainbow_PuRd": RainbowPuRd(),
+    "rainbow_PuBr": RainbowPuBr(),
+    "rainbow_WhRd": RainbowWhRd(),
+    "rainbow_WhBr": RainbowWhBr(),
 }
 
 
@@ -472,22 +726,23 @@ def tol_cmap(colormap: str = None, lut: int = 0) -> colormaps:
     if colormap is None:
         return _cmap_dict.keys()
 
-    if colormap == 'rainbow_discrete':
+    if colormap == "rainbow_discrete":
         cclass = RainbowDiscrete()
         cclass.set_lut(lut)
         clrs = to_rgba_array(cclass.colors)
         clrs = np.vstack([clrs[0], clrs, clrs[-1]])
         cdict = {}
-        for ii, key in enumerate(('red', 'green', 'blue', 'alpha')):
-            cdict[key] = [(jj / (len(clrs)-2.), float(clrs[jj, ii]),
-                           float(clrs[jj+1, ii]))
-                          for jj in range(len(clrs)-1)]
+        for ii, key in enumerate(("red", "green", "blue", "alpha")):
+            cdict[key] = [
+                (jj / (len(clrs) - 2.0), float(clrs[jj, ii]), float(clrs[jj + 1, ii]))
+                for jj in range(len(clrs) - 1)
+            ]
 
-        cmap = LinearSegmentedColormap('rainbow_discrete', cdict)
+        cmap = LinearSegmentedColormap("rainbow_discrete", cdict)
         cmap.set_bad(cclass.bad_color)
         return cmap
 
-    cclass = _cmap_dict.get(colormap, 'nightfall')
+    cclass = _cmap_dict.get(colormap, "nightfall")
     cmap = LinearSegmentedColormap.from_list(colormap, cclass.colors)
     cmap.set_bad(cclass.bad_color)
     return cmap
@@ -532,7 +787,7 @@ def tol_rgba(cname: str, lut: int | None = None) -> np.ndarray:
     lut : int, default=0
        Number of discrete colors in colormap (*not colorset*).
     """
-    if cname == 'rainbow_discrete':
+    if cname == "rainbow_discrete":
         cclass = RainbowDiscrete()
         cclass.set_lut(lut)
     elif cname in _cset_dict:
@@ -544,7 +799,7 @@ def tol_rgba(cname: str, lut: int | None = None) -> np.ndarray:
         return to_rgba_array(cclass.colors)
 
     cmap = tol_cmap(cname)
-    cnorm = Normalize(vmin=0, vmax=lut-1)
+    cnorm = Normalize(vmin=0, vmax=lut - 1)
     scalar_map = ScalarMappable(norm=cnorm, cmap=cmap)
     return scalar_map.to_rgba(np.arange(lut))
 
@@ -555,7 +810,7 @@ def __show_cset() -> None:
     schemes = tol_cset()
     fig, axes = plt.subplots(ncols=len(schemes), figsize=(9, 3))
     fig.subplots_adjust(top=0.9, bottom=0.02, left=0.02, right=0.92)
-    for axx, scheme in zip(axes, schemes):
+    for axx, scheme in zip(axes, schemes, strict=True):
         cset = tol_cset(scheme)
         for name, color in cset.__dict__.items():
             axx.scatter([], [], c=color, s=80, label=name)
@@ -572,12 +827,18 @@ def __show_cmap() -> None:
     gradient = np.vstack((gradient, gradient))
     fig, axes = plt.subplots(nrows=len(schemes))
     fig.subplots_adjust(top=0.98, bottom=0.02, left=0.29, right=0.99)
-    for axx, scheme in zip(axes, schemes):
+    for axx, scheme in zip(axes, schemes, strict=True):
         pos = list(axx.get_position().bounds)
         axx.set_axis_off()
         axx.imshow(gradient, aspect=4, cmap=tol_cmap(scheme))
-        fig.text(pos[0] - 0.01, pos[1] + pos[3]/2.,
-                 scheme, va='center', ha='right', fontsize=10)
+        fig.text(
+            pos[0] - 0.01,
+            pos[1] + pos[3] / 2.0,
+            scheme,
+            va="center",
+            ha="right",
+            fontsize=10,
+        )
     plt.show()
 
 
@@ -590,45 +851,50 @@ def __show_discrete() -> None:
     for lut, axx in enumerate(axes, start=1):
         pos = list(axx.get_position().bounds)
         axx.set_axis_off()
-        axx.imshow(gradient, aspect=4, cmap=tol_cmap('rainbow_discrete', lut))
-        fig.text(pos[0] - 0.01, pos[1] + pos[3]/2.,
-                 f'rainbow_discrete, {lut}',
-                 va='center', ha='right', fontsize=10)
+        axx.imshow(gradient, aspect=4, cmap=tol_cmap("rainbow_discrete", lut))
+        fig.text(
+            pos[0] - 0.01,
+            pos[1] + pos[3] / 2.0,
+            f"rainbow_discrete, {lut}",
+            va="center",
+            ha="right",
+            fontsize=10,
+        )
     plt.show()
 
 
 def __show_rgba() -> None:
     """Show usage of tol_rgba()."""
-    cname = 'sunset'
+    cname = "sunset"
     print(cname, clrs := tol_rgba(cname, 16))
     fig = plt.figure()
     axx = fig.add_subplot(111)
     axx.set_prop_cycle(color=clrs)
     for ii in range(len(clrs)):
-        axx.plot(np.arange(10)*(ii+1))
+        axx.plot(np.arange(10) * (ii + 1))
     plt.show()
 
-    cname = 'muted'
+    cname = "muted"
     print(cname, clrs := tol_rgba(cname))
     fig = plt.figure()
     axx = fig.add_subplot(111)
     axx.set_prop_cycle(color=clrs)
     for ii in range(len(clrs)):
-        axx.plot(np.arange(10)*(ii+1))
+        axx.plot(np.arange(10) * (ii + 1))
     plt.show()
 
-    cname = 'rainbow_discrete'
+    cname = "rainbow_discrete"
     print(cname, clrs := tol_rgba(cname, 17))
     if clrs is not None:
         fig = plt.figure()
         axx = fig.add_subplot(111)
         axx.set_prop_cycle(color=clrs)
         for ii in range(len(clrs)):
-            axx.plot(np.arange(10)*(ii+1))
+            axx.plot(np.arange(10) * (ii + 1))
         plt.show()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     __show_cset()
     __show_cmap()
     __show_discrete()

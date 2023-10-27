@@ -20,7 +20,7 @@
 
 from __future__ import annotations
 
-__all__ = ['fig_draw_tracks']
+__all__ = ["fig_draw_tracks"]
 
 from typing import TYPE_CHECKING
 
@@ -43,11 +43,14 @@ if TYPE_CHECKING:
 
 # - main functions ---------------------------------
 if FOUND_CARTOPY:
-    def fig_draw_tracks(axx: Axes,
-                        lons: np.ndarray,
-                        lats: np.ndarray,
-                        icids: np.ndarray,
-                        saa_region: list[tuple[float, float], ...]) -> None:
+
+    def fig_draw_tracks(
+        axx: Axes,
+        lons: np.ndarray,
+        lats: np.ndarray,
+        icids: np.ndarray,
+        saa_region: list[tuple[float, float], ...],
+    ) -> None:
         """Draw satellite tracks projected on the Earth surface.
 
         Parameters
@@ -65,22 +68,32 @@ if FOUND_CARTOPY:
         """
         # draw coastlines and gridlines
         axx.set_global()
-        axx.coastlines(resolution='110m')
+        axx.coastlines(resolution="110m")
         axx.gridlines()
 
         # draw satellite position(s)
         for val in np.unique(icids):
             mask = icids == val
             # pylint: disable=abstract-class-instantiated
-            plt.plot(lons[mask], lats[mask], linestyle='',
-                     marker='s', markersize=2, label=f'ICID: {val}',
-                     transform=ccrs.PlateCarree())
-        axx.legend(loc='lower left')
+            plt.plot(
+                lons[mask],
+                lats[mask],
+                linestyle="",
+                marker="s",
+                markersize=2,
+                label=f"ICID: {val}",
+                transform=ccrs.PlateCarree(),
+            )
+        axx.legend(loc="lower left")
 
         # draw SAA region
         if saa_region is not None:
             # pylint: disable=abstract-class-instantiated
-            saa_poly = Polygon(xy=saa_region, closed=True, alpha=1.0,
-                               facecolor=tol_cset('bright').grey,
-                               transform=ccrs.PlateCarree())
+            saa_poly = Polygon(
+                xy=saa_region,
+                closed=True,
+                alpha=1.0,
+                facecolor=tol_cset("bright").grey,
+                transform=ccrs.PlateCarree(),
+            )
             axx.add_patch(saa_poly)

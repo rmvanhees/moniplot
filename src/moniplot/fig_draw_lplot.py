@@ -23,7 +23,7 @@ These functions are used by `draw_lplot`.
 """
 from __future__ import annotations
 
-__all__ = ['fig_draw_lplot', 'close_draw_lplot']
+__all__ = ["fig_draw_lplot", "close_draw_lplot"]
 
 from typing import TYPE_CHECKING
 
@@ -35,11 +35,13 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
 
-def fig_draw_lplot(axx: Axes,
-                   xdata: np.ndarray,
-                   ydata: np.ndarray, use_steps:
-                   bool = False,
-                   **kwargs: int) -> None:
+def fig_draw_lplot(
+    axx: Axes,
+    xdata: np.ndarray,
+    ydata: np.ndarray,
+    use_steps: bool = False,
+    **kwargs: int,
+) -> None:
     """Add line plot to figure.
 
     Parameters
@@ -67,11 +69,9 @@ def fig_draw_lplot(axx: Axes,
         axx.plot(xdata, ydata, **kwargs)
 
 
-def close_draw_lplot(axx: Axes,
-                     time_axis: bool,
-                     title: str | None,
-                     kwlegend: dict | None,
-                     **kwargs: int) -> None:
+def close_draw_lplot(
+    axx: Axes, time_axis: bool, title: str | None, kwlegend: dict | None, **kwargs: int
+) -> None:
     """Close the figure created with MONplot::draw_lplot().
 
     Parameters
@@ -90,33 +90,33 @@ def close_draw_lplot(axx: Axes,
     """
     # add title to image panel
     if title is not None:
-        axx.set_title(title, fontsize='large')
+        axx.set_title(title, fontsize="large")
     # add grid lines (default settings)
     axx.grid(True)
     # add X & Y label
-    if 'xlabel' in kwargs:
-        axx.set_xlabel(kwargs['xlabel'])
-    if 'ylabel' in kwargs:
-        axx.set_ylabel(kwargs['ylabel'])
+    if "xlabel" in kwargs:
+        axx.set_xlabel(kwargs["xlabel"])
+    if "ylabel" in kwargs:
+        axx.set_ylabel(kwargs["ylabel"])
     # set the limits of the X-axis & Y-axis
-    if 'xlim' in kwargs:
-        axx.set_xlim(kwargs['xlim'])
-    if 'ylim' in kwargs:
-        axx.set_ylim(kwargs['ylim'])
+    if "xlim" in kwargs:
+        axx.set_xlim(kwargs["xlim"])
+    if "ylim" in kwargs:
+        axx.set_ylim(kwargs["ylim"])
     # set the scale of the X & Y axis {"linear", "log", "symlog", ...}
-    if 'xscale' in kwargs:
-        axx.set_xscale(kwargs['xscale'])
-    if 'yscale' in kwargs:
-        axx.set_ylabel(kwargs['yscale'])
+    if "xscale" in kwargs:
+        axx.set_xscale(kwargs["xscale"])
+    if "yscale" in kwargs:
+        axx.set_ylabel(kwargs["yscale"])
 
     # format the X-axis when it is a time-axis
     if time_axis:
         plt.gcf().autofmt_xdate()
-        plt.gca().xaxis.set_major_formatter(DateFormatter('%H:%M:%S'))
+        plt.gca().xaxis.set_major_formatter(DateFormatter("%H:%M:%S"))
 
     # draw legenda in figure
     if axx.get_legend_handles_labels()[1]:
         if kwlegend is None:
-            axx.legend(fontsize='small', loc='best')
+            axx.legend(fontsize="small", loc="best")
         else:
             axx.legend(**kwlegend)

@@ -20,7 +20,7 @@
 
 from __future__ import annotations
 
-__all__ = ['blank_legend_handle']
+__all__ = ["blank_legend_handle"]
 
 from matplotlib.patches import Rectangle
 
@@ -32,7 +32,4 @@ def blank_legend_handle() -> Rectangle:
     --------
     matplotlib.pyplot.legend : Place a legend on the Axes.
     """
-    return Rectangle((0, 0), 0, 0,
-                     fill=False,
-                     edgecolor='none',
-                     visible=False)
+    return Rectangle((0, 0), 0, 0, fill=False, edgecolor="none", visible=False)

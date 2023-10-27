@@ -45,7 +45,7 @@ The methods of the class `GEOplot` are:
 """
 from __future__ import annotations
 
-__all__ = ['GEOplot']
+__all__ = ["GEOplot"]
 
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -55,7 +55,7 @@ try:
     import cartopy.feature as cfeature
     from cartopy.mpl.gridliner import LATITUDE_FORMATTER, LONGITUDE_FORMATTER
 except Exception as exc:
-    raise RuntimeError('This module require module Cartopy') from exc
+    raise RuntimeError("This module require module Cartopy") from exc
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
@@ -78,13 +78,15 @@ SPHERE_RADIUS = 6370997.0
 # - helper function --------------------------------
 def set_proj_parms(lon_0: float = 0.0, lat_0: float = 0.0) -> dict:
     """Return settings for the ObliqueMercator projection."""
-    return {'central_longitude': lon_0,
-            'central_latitude': lat_0,
-            'false_easting': 0.0,
-            'false_northing': 0.0,
-            'scale_factor': 1.0,
-            'azimuth': 0.0,
-            'globe': ccrs.Globe(ellipse='sphere')}
+    return {
+        "central_longitude": lon_0,
+        "central_latitude": lat_0,
+        "false_easting": 0.0,
+        "false_northing": 0.0,
+        "scale_factor": 1.0,
+        "azimuth": 0.0,
+        "globe": ccrs.Globe(ellipse="sphere"),
+    }
 
 
 # - main function ----------------------------------
@@ -99,22 +101,24 @@ class GEOplot:
         Caption repeated on each page of the PDF
     """
 
-    def __init__(self: GEOplot, figname: Path | str,
-                 caption: str | None = None) -> None:
+    def __init__(
+        self: GEOplot, figname: Path | str, caption: str | None = None
+    ) -> None:
         """Initialize multi-page PDF document or a single-page PNG."""
-        self.__caption = '' if caption is None else caption
-        self.__institute = ''
+        self.__caption = "" if caption is None else caption
+        self.__institute = ""
         # define colors
         self.__cset = {
-            'water': '#ddeeff',
-            'land': '#e1c999',
-            'grid': '#bbbbbb',
-            'satellite': '#ee6677'}
-        self.__cmap = tol_cmap('rainbow_PuRd')
+            "water": "#ddeeff",
+            "land": "#e1c999",
+            "grid": "#bbbbbb",
+            "satellite": "#ee6677",
+        }
+        self.__cmap = tol_cmap("rainbow_PuRd")
         self.__zunit = None
 
         self.filename = Path(figname)
-        if self.filename.suffix.lower() == '.pdf':
+        if self.filename.suffix.lower() == ".pdf":
             self.__pdf = PdfPages(self.filename)
         else:
             self.__pdf = None
@@ -134,7 +138,7 @@ class GEOplot:
             return
 
         self.__pdf.close()
-        plt.close('all')
+        plt.close("all")
 
     # --------------------------------------------------
     @property
@@ -157,8 +161,11 @@ class GEOplot:
         if not self.caption:
             return
 
-        fig.suptitle(self.caption, fontsize='x-large',
-                     position=(0.5, 1 - 0.3 / fig.get_figheight()))
+        fig.suptitle(
+            self.caption,
+            fontsize="x-large",
+            position=(0.5, 1 - 0.3 / fig.get_figheight()),
+        )
 
     # --------------------------------------------------
     @property
@@ -209,11 +216,16 @@ class GEOplot:
         if not self.institute:
             return
 
-        axx.text(1, 0, rf' $\copyright$ {self.institute}',
-                 horizontalalignment='right',
-                 verticalalignment='bottom',
-                 rotation='vertical', fontsize='xx-small',
-                 transform=axx.transAxes)
+        axx.text(
+            1,
+            0,
+            rf" $\copyright$ {self.institute}",
+            horizontalalignment="right",
+            verticalalignment="bottom",
+            rotation="vertical",
+            fontsize="xx-small",
+            transform=axx.transAxes,
+        )
 
     @staticmethod
     def __add_fig_box(fig: Figure, fig_info: FIGinfo) -> None:
@@ -226,21 +238,25 @@ class GEOplot:
         fig_info :  FIGinfo
            instance of moniplot.lib.FIGinfo to be displayed
         """
-        if fig_info is None or fig_info.location == 'none':
+        if fig_info is None or fig_info.location == "none":
             return
 
         xpos = 1 - 0.4 / fig.get_figwidth()
         ypos = 1 - 0.25 / fig.get_figheight()
 
-        fig.text(xpos, ypos, fig_info.as_str(),
-                 fontsize='small', style='normal',
-                 verticalalignment='top',
-                 horizontalalignment='right',
-                 multialignment='left',
-                 bbox={'facecolor': 'white', 'pad': 5})
+        fig.text(
+            xpos,
+            ypos,
+            fig_info.as_str(),
+            fontsize="small",
+            style="normal",
+            verticalalignment="top",
+            horizontalalignment="right",
+            multialignment="left",
+            bbox={"facecolor": "white", "pad": 5},
+        )
 
-    def __draw_worldmap(self: GEOplot, axx: Axes,
-                        whole_globe: bool = True) -> None:
+    def __draw_worldmap(self: GEOplot, axx: Axes, whole_globe: bool = True) -> None:
         """Draw worldmap."""
         if whole_globe:
             parallel_half = 0.883 * SPHERE_RADIUS
@@ -248,22 +264,25 @@ class GEOplot:
             axx.set_xlim(-parallel_half, parallel_half)
             axx.set_ylim(-meridian_half, meridian_half)
 
-        axx.spines['geo'].set_visible(False)
-        axx.patch.set_facecolor(self.__cset['water'])
-        axx.add_feature(cfeature.LAND, edgecolor='none',
-                        facecolor=self.__cset['land'])
-        glx = axx.gridlines(linestyle='-', linewidth=0.5,
-                            color=self.__cset['grid'])
+        axx.spines["geo"].set_visible(False)
+        axx.patch.set_facecolor(self.__cset["water"])
+        axx.add_feature(cfeature.LAND, edgecolor="none", facecolor=self.__cset["land"])
+        glx = axx.gridlines(linestyle="-", linewidth=0.5, color=self.__cset["grid"])
         glx.xlocator = mpl.ticker.FixedLocator(np.linspace(-180, 180, 13))
         glx.ylocator = mpl.ticker.FixedLocator(np.linspace(-90, 90, 13))
         glx.xformatter = LONGITUDE_FORMATTER
         glx.yformatter = LATITUDE_FORMATTER
 
     # --------------------------------------------------
-    def draw_geo_subsat(self: GEOplot, lons: np.ndarray, lats: np.ndarray, *,
-                        whole_globe: bool = False,
-                        title: str | None = None,
-                        fig_info: FIGinfo | None = None) -> None:
+    def draw_geo_subsat(
+        self: GEOplot,
+        lons: np.ndarray,
+        lats: np.ndarray,
+        *,
+        whole_globe: bool = False,
+        title: str | None = None,
+        fig_info: FIGinfo | None = None,
+    ) -> None:
         """Display sub-satellite coordinates projected with TransverseMercator.
 
         Parameters
@@ -293,43 +312,54 @@ class GEOplot:
             else:
                 lons[lons > 0] -= 360
         lon_0 = np.around(np.mean(lons), decimals=0)
-        print('lon_0: ', lon_0)
+        print("lon_0: ", lon_0)
 
         # determine central latitude
-        lat_0 = 0. if whole_globe else np.around(np.mean(lats), decimals=0)
-        print('lat_0: ', lat_0)
+        lat_0 = 0.0 if whole_globe else np.around(np.mean(lats), decimals=0)
+        print("lat_0: ", lat_0)
 
         # inititalize figure
         # pylint: disable=abstract-class-instantiated
-        myproj = {'projection': ccrs.ObliqueMercator(
-            **set_proj_parms(lon_0, lat_0))}
+        myproj = {"projection": ccrs.ObliqueMercator(**set_proj_parms(lon_0, lat_0))}
         fig, axx = plt.subplots(figsize=(12, 9), subplot_kw=myproj)
 
         # add a centered subtitle to the figure
         self.__add_caption(fig)
         if title is not None:
-            axx.set_title(title, fontsize='large')
+            axx.set_title(title, fontsize="large")
 
         # draw worldmap
         self.__draw_worldmap(axx, whole_globe=whole_globe)
 
         # draw sub-satellite spot(s)
-        axx.scatter(lons, lats, 4, transform=ccrs.PlateCarree(),
-                    marker='o', linewidth=0, color=self.__cset['satellite'])
+        axx.scatter(
+            lons,
+            lats,
+            4,
+            transform=ccrs.PlateCarree(),
+            marker="o",
+            linewidth=0,
+            color=self.__cset["satellite"],
+        )
 
         self.__add_copyright(axx)
-        fig_info.add('lon0, lat0', [lon_0, lat_0])
+        fig_info.add("lon0, lat0", [lon_0, lat_0])
         self.__add_fig_box(fig, fig_info)
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_geo_mesh(self: GEOplot, lons: np.ndarray, lats: np.ndarray,
-                      data_in: np.ndarray | xr.DataArray, *,
-                      whole_globe: bool = False,
-                      vperc: list[float, float] | None = None,
-                      vrange: list[float, float] | None = None,
-                      title: str | None = None,
-                      fig_info: FIGinfo | None = None) -> None:
+    def draw_geo_mesh(
+        self: GEOplot,
+        lons: np.ndarray,
+        lats: np.ndarray,
+        data_in: np.ndarray | xr.DataArray,
+        *,
+        whole_globe: bool = False,
+        vperc: list[float, float] | None = None,
+        vrange: list[float, float] | None = None,
+        title: str | None = None,
+        fig_info: FIGinfo | None = None,
+    ) -> None:
         """Display sub-satellite coordinates projected with TransverseMercator.
 
         Parameters
@@ -357,31 +387,30 @@ class GEOplot:
         The information provided in the parameter 'fig_info' will be displayed
         in a small box.
         """
+
         def extent_arr(aa: np.ndarray) -> np.ndarray:
             res = aa - ((aa[:, 1] - aa[:, 0]) / 2).reshape(-1, 1)
-            return np.append(res,
-                             (2 * res[:, -1] - res[:, -2]).reshape(-1, 1),
-                             axis=1)
+            return np.append(res, (2 * res[:, -1] - res[:, -2]).reshape(-1, 1), axis=1)
 
         if fig_info is None:
             fig_info = FIGinfo()
 
         if vrange is None and vperc is None:
-            vperc = (1., 99.)
+            vperc = (1.0, 99.0)
         elif vrange is None:
             if len(vperc) != 2:
-                raise TypeError('keyword vperc requires two values')
+                raise TypeError("keyword vperc requires two values")
         else:
             if len(vrange) != 2:
-                raise TypeError('keyword vrange requires two values')
+                raise TypeError("keyword vrange requires two values")
 
-        zlabel = 'value'
+        zlabel = "value"
         if isinstance(data_in, np.ndarray):
             data = data_in
         else:
             data = data_in.values
-            if 'units' in data_in.attrs and data_in.attrs['units'] != '1':
-                zlabel = fr'value [{data_in.attrs["units"]}]'
+            if "units" in data_in.attrs and data_in.attrs["units"] != "1":
+                zlabel = rf'value [{data_in.attrs["units"]}]'
 
         # determine central longitude
         if lons.max() - lons.min() > 180:
@@ -392,7 +421,7 @@ class GEOplot:
         lon_0 = np.around(np.mean(lons), decimals=0)
 
         # determine central latitude
-        lat_0 = 0. if whole_globe else np.around(np.mean(lats), decimals=0)
+        lat_0 = 0.0 if whole_globe else np.around(np.mean(lats), decimals=0)
 
         if lons.shape == data.shape:
             lons = extent_arr(lons)
@@ -406,15 +435,14 @@ class GEOplot:
 
         # inititalize figure
         # pylint: disable=abstract-class-instantiated
-        myproj = {'projection': ccrs.ObliqueMercator(
-            **set_proj_parms(lon_0, lat_0))}
+        myproj = {"projection": ccrs.ObliqueMercator(**set_proj_parms(lon_0, lat_0))}
         fig, axx = plt.subplots(1, 1, figsize=(12.5, 9), subplot_kw=myproj)
         # add a centered subtitle to the figure
         self.__add_caption(fig)
 
         # add title to image panel
         if title is not None:
-            axx.set_title(title, fontsize='large')
+            axx.set_title(title, fontsize="large")
 
         # Add the colorbar axes anywhere in the figure.
         # Its position will be re-calculated at each figure resize.
@@ -425,19 +453,24 @@ class GEOplot:
         self.__draw_worldmap(axx, whole_globe=whole_globe)
 
         # draw sub-satellite spot(s)
-        img = axx.pcolormesh(lons, lats, data,
-                             vmin=vmin, vmax=vmax,
-                             cmap=self.__cmap, rasterized=False,
-                             transform=ccrs.PlateCarree())
+        img = axx.pcolormesh(
+            lons,
+            lats,
+            data,
+            vmin=vmin,
+            vmax=vmax,
+            cmap=self.__cmap,
+            rasterized=False,
+            transform=ccrs.PlateCarree(),
+        )
         plt.draw()
         posn = axx.get_position()
-        cax.set_position([posn.x0 + posn.width + 0.01,
-                          posn.y0, 0.04, posn.height])
+        cax.set_position([posn.x0 + posn.width + 0.01, posn.y0, 0.04, posn.height])
 
         plt.colorbar(img, cax=cax, label=zlabel)
 
         self.__add_copyright(axx)
-        fig_info.add('lon0, lat0', [lon_0, lat_0])
+        fig_info.add("lon0, lat0", [lon_0, lat_0])
         self.__add_fig_box(fig, fig_info)
         self.__close_this_page(fig)
 
@@ -447,38 +480,41 @@ def __test() -> None:
     """Test module for GEOplot."""
     import h5py
 
-    data_dir = Path('/nfs/SPEXone/ocal/pace-sds')
+    data_dir = Path("/nfs/SPEXone/ocal/pace-sds")
     if not data_dir.is_dir():
-        data_dir = Path('/data/richardh/SPEXone/pace-sds')
-    data_dir = data_dir / 'oci_l1c' / '5.17' / '2022' / '03' / '21'
+        data_dir = Path("/data/richardh/SPEXone/pace-sds")
+    data_dir = data_dir / "oci_l1c" / "5.17" / "2022" / "03" / "21"
 
-    plot = GEOplot('test_oci_l1c.pdf')
-    for oci_fl in data_dir.glob('PACE_OCI.20220321T*.L1C.nc'):
-        plot.set_caption(oci_fl.stem + ' [geolocation]')
+    plot = GEOplot("test_oci_l1c.pdf")
+    for oci_fl in data_dir.glob("PACE_OCI.20220321T*.L1C.nc"):
+        plot.set_caption(oci_fl.stem + " [geolocation]")
         with h5py.File(oci_fl) as fid:
-            lats = fid['/geolocation_data/latitude'][:]
-            lons = fid['/geolocation_data/longitude'][:]
-            dset = fid['/observation_data/I']
+            lats = fid["/geolocation_data/latitude"][:]
+            lons = fid["/geolocation_data/longitude"][:]
+            dset = fid["/observation_data/I"]
             xarr = h5_to_xr(dset)
-            xarr.attrs['long_name'] = dset.attrs['long_name']
-            xarr.attrs['units'] = '1'
-            xarr.attrs['_FillValue'] = -32767.
+            xarr.attrs["long_name"] = dset.attrs["long_name"]
+            xarr.attrs["units"] = "1"
+            xarr.attrs["_FillValue"] = -32767.0
 
         xarr.values[xarr.values == -32767] = np.nan
-        xarr = xarr.max(dim='number_of_views', skipna=True, keep_attrs=True)
-        xarr = xarr.mean(dim='intensity_bands_per_view',
-                         skipna=True, keep_attrs=True)
+        xarr = xarr.max(dim="number_of_views", skipna=True, keep_attrs=True)
+        xarr = xarr.mean(dim="intensity_bands_per_view", skipna=True, keep_attrs=True)
         i_nadir = lons.shape[1] // 2
-        plot.draw_geo_subsat(lons[:, i_nadir], lats[:, i_nadir],
-                             title='sub-satellite positions')
-        plot.draw_geo_subsat(lons[:, i_nadir], lats[:, i_nadir],
-                             whole_globe=True, title='sub-satellite positions')
-        plot.draw_geo_mesh(lons, lats, xarr,
-                           title=xarr.attrs['long_name'].decode())
+        plot.draw_geo_subsat(
+            lons[:, i_nadir], lats[:, i_nadir], title="sub-satellite positions"
+        )
+        plot.draw_geo_subsat(
+            lons[:, i_nadir],
+            lats[:, i_nadir],
+            whole_globe=True,
+            title="sub-satellite positions",
+        )
+        plot.draw_geo_mesh(lons, lats, xarr, title=xarr.attrs["long_name"].decode())
         break
 
     plot.close()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     __test()

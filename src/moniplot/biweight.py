@@ -20,14 +20,16 @@
 
 from __future__ import annotations
 
-__all__ = ['Biweight', 'biweight']
+__all__ = ["Biweight", "biweight"]
 
 import warnings
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from numpy import ndarray
 
 
@@ -68,9 +70,9 @@ class Biweight:
        0.6131156500926488
     """
 
-    def __init__(self: Biweight,
-                 data: ndarray | Iterable,
-                 axis: int | None = None) -> None:
+    def __init__(
+        self: Biweight, data: ndarray | Iterable, axis: int | None = None
+    ) -> None:
         """Initialize a Biweight object."""
         data = np.asarray(data)
 
@@ -84,8 +86,8 @@ class Biweight:
                 self.__med_delta = np.median(np.abs(self.__delta))
             elif self.nr_valid == 0:
                 self.__med_data = np.nan
-                self.__delta = 0.
-                self.__med_delta = 0.
+                self.__delta = 0.0
+                self.__med_delta = 0.0
             else:
                 self.__med_data = np.nanmedian(data)
                 self.__delta = data - self.__med_data
@@ -94,22 +96,24 @@ class Biweight:
             if np.isnan(data).any():
                 all_nan = self.nr_valid == 0
                 with warnings.catch_warnings():
-                    warnings.filterwarnings('ignore',
-                                            r'All-NaN (slice|axis) encountered')
-                    self.__med_data = np.nanmedian(data,
-                                                   axis=axis, keepdims=True)
+                    warnings.filterwarnings(
+                        "ignore", r"All-NaN (slice|axis) encountered"
+                    )
+                    self.__med_data = np.nanmedian(data, axis=axis, keepdims=True)
                     self.__delta = data - self.__med_data
-                    self.__med_delta = np.nanmedian(np.abs(self.__delta),
-                                                    axis=axis, keepdims=True)
-                _mm = self.__med_delta != 0.
+                    self.__med_delta = np.nanmedian(
+                        np.abs(self.__delta), axis=axis, keepdims=True
+                    )
+                _mm = self.__med_delta != 0.0
                 self.__med_delta[~_mm] = np.nan
                 _mm = np.squeeze(_mm) & ~all_nan
             else:
                 self.__med_data = np.median(data, axis=axis, keepdims=True)
                 self.__delta = data - self.__med_data
-                self.__med_delta = np.median(np.abs(self.__delta),
-                                             axis=axis, keepdims=True)
-                _mm = self.__med_delta != 0.
+                self.__med_delta = np.median(
+                    np.abs(self.__delta), axis=axis, keepdims=True
+                )
+                _mm = self.__med_delta != 0.0
                 self.__med_delta[~_mm] = np.nan
                 _mm = np.squeeze(_mm)
 
@@ -123,15 +127,18 @@ class Biweight:
             if self.__med_delta == 0:
                 return self.__med_data
 
-            wmx = np.clip(1 - (self.__delta / (6 * self.__med_delta)) ** 2,
-                          0, None) ** 2
+            wmx = (
+                np.clip(1 - (self.__delta / (6 * self.__med_delta)) ** 2, 0, None) ** 2
+            )
             self.__med_data += np.nansum(wmx * self.__delta) / np.nansum(wmx)
         else:
-            wmx = np.clip(1 - (self.__delta / (6 * self.__med_delta)) ** 2,
-                          0, None) ** 2
+            wmx = (
+                np.clip(1 - (self.__delta / (6 * self.__med_delta)) ** 2, 0, None) ** 2
+            )
             self.__med_data[self.__mask] += (
                 np.nansum(wmx * self.__delta, axis=self.axis)[self.__mask]
-                / np.nansum(wmx, axis=self.axis)[self.__mask])
+                / np.nansum(wmx, axis=self.axis)[self.__mask]
+            )
 
         return self.__med_data
 
@@ -140,22 +147,20 @@ class Biweight:
         """Return biweight spread."""
         if self.axis is None:
             if self.__med_delta == 0:
-                return 0.
+                return 0.0
 
             # calculate biweight variance
-            umn = np.clip((self.__delta / (9 * self.__med_delta)) ** 2,
-                          None, 1)
-            biweight_var = np.nansum(self.__delta ** 2 * (1 - umn) ** 4)
+            umn = np.clip((self.__delta / (9 * self.__med_delta)) ** 2, None, 1)
+            biweight_var = np.nansum(self.__delta**2 * (1 - umn) ** 4)
             biweight_var /= np.nansum((1 - umn) * (1 - 5 * umn)) ** 2
             biweight_var *= self.nr_valid
         else:
-            umn = np.clip((self.__delta / (9 * self.__med_delta)) ** 2,
-                          None, 1)
-            biweight_var = np.nansum(self.__delta ** 2 * (1 - umn) ** 4,
-                                     axis=self.axis)
+            umn = np.clip((self.__delta / (9 * self.__med_delta)) ** 2, None, 1)
+            biweight_var = np.nansum(self.__delta**2 * (1 - umn) ** 4, axis=self.axis)
             _mm = self.__mask
             biweight_var[_mm] /= (
-                np.nansum((1 - umn) * (1 - 5 * umn), axis=self.axis)[_mm] ** 2)
+                np.nansum((1 - umn) * (1 - 5 * umn), axis=self.axis)[_mm] ** 2
+            )
             biweight_var[_mm] *= self.nr_valid[_mm]
 
         return np.sqrt(biweight_var)
@@ -185,8 +190,9 @@ class Biweight:
 
 
 # ----- main function -------------------------
-def biweight(data: ndarray | Iterable, axis: int | None = None,
-             spread: bool = False) -> ndarray | tuple[ndarray, ndarray]:
+def biweight(
+    data: ndarray | Iterable, axis: int | None = None, spread: bool = False
+) -> ndarray | tuple[ndarray, ndarray]:
     """Python implementation of the Tukey's biweight algorithm.
 
     Parameters

@@ -20,7 +20,7 @@
 
 from __future__ import annotations
 
-__all__ = ['unbiased_std']
+__all__ = ["unbiased_std"]
 
 from math import pi, sqrt
 

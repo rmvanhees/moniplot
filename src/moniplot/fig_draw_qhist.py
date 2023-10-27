@@ -20,7 +20,7 @@
 
 from __future__ import annotations
 
-__all__ = ['fig_draw_qhist']
+__all__ = ["fig_draw_qhist"]
 
 from typing import TYPE_CHECKING
 
@@ -34,10 +34,7 @@ if TYPE_CHECKING:
 
 
 # - main functions ---------------------------------
-def fig_draw_qhist(axx: Axes,
-                   qdata: np.ndarray,
-                   label: str,
-                   density: bool) -> None:
+def fig_draw_qhist(axx: Axes, qdata: np.ndarray, label: str, density: bool) -> None:
     """Add a subplot showing pixel-quality data as a histogram.
 
     Parameters
@@ -51,19 +48,28 @@ def fig_draw_qhist(axx: Axes,
     density :  bool
        See method MONplot::draw_qhist for a description
     """
-    qdata[np.isnan(qdata)] = 0.
+    qdata[np.isnan(qdata)] = 0.0
     # draw histogram
-    axx.hist(qdata, bins=10, range=(0, 1), density=density,
-             histtype='bar', align='mid', log=True, fill=True,
-             edgecolor='#4477AA', facecolor='#77AADD', linewidth=1.5)
+    axx.hist(
+        qdata,
+        bins=10,
+        range=(0, 1),
+        density=density,
+        histtype="bar",
+        align="mid",
+        log=True,
+        fill=True,
+        edgecolor="#4477AA",
+        facecolor="#77AADD",
+        linewidth=1.5,
+    )
     # add label
-    legend = axx.legend([blank_legend_handle()],
-                        [label], loc='upper left')
+    legend = axx.legend([blank_legend_handle()], [label], loc="upper left")
     legend.draw_frame(False)
     # add decoration
-    axx.grid(which='major', axis='y', color='#AAAAAA', ls='--')
+    axx.grid(which="major", axis="y", color="#AAAAAA", ls="--")
     axx.set_xlim([0, 1])
     axx.xaxis.set_minor_locator(AutoMinorLocator(2))
-    axx.set_ylabel('density' if density else 'count')
+    axx.set_ylabel("density" if density else "count")
     axx.set_ylim([1e-4, 10])
     axx.set_yticks([1e-4, 1e-3, 1e-2, 1e-1, 1])

@@ -26,7 +26,7 @@ The methods of the class `MONplot` are:
 """
 from __future__ import annotations
 
-__all__ = ['MONplot']
+__all__ = ["MONplot"]
 
 from datetime import datetime
 from pathlib import Path
@@ -70,7 +70,7 @@ if TYPE_CHECKING:
     from matplotlib.figure import Figure
 
 # - global variables -------------------------------
-DEFAULT_CSET = 'bright'
+DEFAULT_CSET = "bright"
 
 
 # - local functions --------------------------------
@@ -102,24 +102,24 @@ class MONplot:
     data attributes, such as `long_name` and `units`.
     """
 
-    def __init__(self: MONplot,
-                 figname: Path | str,
-                 caption: str | None = None) -> None:
+    def __init__(
+        self: MONplot, figname: Path | str, caption: str | None = None
+    ) -> None:
         """Initialize multi-page PDF document or a single-page PNG."""
         self.__cset = tol_rgba(DEFAULT_CSET)
         self.__cmap = None
-        self.__caption = '' if caption is None else caption
-        self.__institute = ''
-        self.__mpl: DictMpl = {'fig': None, 'axx': None, 'time_axis': False}
+        self.__caption = "" if caption is None else caption
+        self.__institute = ""
+        self.__mpl: DictMpl = {"fig": None, "axx": None, "time_axis": False}
         self.__pdf = None
         self.filename = Path(figname)
-        if self.filename.suffix.lower() != '.pdf':
+        if self.filename.suffix.lower() != ".pdf":
             return
 
         self.__pdf = PdfPages(self.filename)
 
         # turn-off the automatic offset notation of Matplotlib
-        mpl.rcParams['axes.formatter.useoffset'] = False
+        mpl.rcParams["axes.formatter.useoffset"] = False
 
     def __close_this_page(self: MONplot, fig: Figure) -> None:
         """Save the current figure and close the MONplot instance."""
@@ -138,15 +138,14 @@ class MONplot:
         # add PDF annotations
         doc = self.__pdf.infodict()
         if self.__caption is not None:
-            doc['Title'] = self.__caption
-        doc['Subject'] = \
-            'Generated using https://github.com/rmvanhees/moniplot.git'
-        if self.__institute == 'SRON':
-            doc['Author'] = '(c) SRON Netherlands Institute for Space Research'
+            doc["Title"] = self.__caption
+        doc["Subject"] = "Generated using https://github.com/rmvanhees/moniplot.git"
+        if self.__institute == "SRON":
+            doc["Author"] = "(c) SRON Netherlands Institute for Space Research"
         elif self.__institute:
-            doc['Author'] = f'(c) {self.__institute}'
+            doc["Author"] = f"(c) {self.__institute}"
         self.__pdf.close()
-        plt.close('all')
+        plt.close("all")
 
     @property
     def caption(self: MONplot) -> str:
@@ -168,8 +167,11 @@ class MONplot:
         if not self.caption:
             return
 
-        fig.suptitle(self.caption, fontsize='x-large',
-                     position=(0.5, 1 - 0.3 / fig.get_figheight()))
+        fig.suptitle(
+            self.caption,
+            fontsize="x-large",
+            position=(0.5, 1 - 0.3 / fig.get_figheight()),
+        )
 
     # --------------------------------------------------
     @property
@@ -207,7 +209,7 @@ class MONplot:
            Number of discrete colors in colormap (*not colorset*).
         """
         if not isinstance(cname, str):
-            raise ValueError('The name of a color-set should be a string.')
+            raise ValueError("The name of a color-set should be a string.")
         self.__cset = tol_rgba(cname, cnum)
 
     def unset_cset(self: MONplot) -> None:
@@ -237,11 +239,16 @@ class MONplot:
         if not self.institute:
             return
 
-        axx.text(1, 0, rf' $\copyright$ {self.institute}',
-                 horizontalalignment='right',
-                 verticalalignment='bottom',
-                 rotation='vertical', fontsize='xx-small',
-                 transform=axx.transAxes)
+        axx.text(
+            1,
+            0,
+            rf" $\copyright$ {self.institute}",
+            horizontalalignment="right",
+            verticalalignment="bottom",
+            rotation="vertical",
+            fontsize="xx-small",
+            transform=axx.transAxes,
+        )
 
     @staticmethod
     def __add_fig_box(fig: Figure, fig_info: FIGinfo) -> None:
@@ -253,82 +260,112 @@ class MONplot:
         fig_info :  FIGinfo
            instance of pys5p.lib.plotlib.FIGinfo to be displayed
         """
-        if fig_info is None or fig_info.location != 'above':
+        if fig_info is None or fig_info.location != "above":
             return
 
         xpos = 1 - 0.4 / fig.get_figwidth()
         ypos = 1 - 0.25 / fig.get_figheight()
 
-        fig.text(xpos, ypos, fig_info.as_str(),
-                 fontsize='x-small', style='normal',
-                 verticalalignment='top',
-                 horizontalalignment='right',
-                 multialignment='left',
-                 bbox={'facecolor': 'white', 'pad': 5})
+        fig.text(
+            xpos,
+            ypos,
+            fig_info.as_str(),
+            fontsize="x-small",
+            style="normal",
+            verticalalignment="top",
+            horizontalalignment="right",
+            multialignment="left",
+            bbox={"facecolor": "white", "pad": 5},
+        )
 
     # -------------------------
-    def __draw_image__(self: MONplot, xarr: xr.DataArray, side_panels: str,
-                       fig_info: FIGinfo | None, title: str | None) -> None:
+    def __draw_image__(
+        self: MONplot,
+        xarr: xr.DataArray,
+        side_panels: str,
+        fig_info: FIGinfo | None,
+        title: str | None,
+    ) -> None:
         """Display image data.
 
         Called by the public methods `draw_signal` and `draw_quality`.
         """
+
         def add_fig_box() -> None:
             """Add a box with meta information in the current figure."""
             if fig_info is None:
                 return
 
-            if fig_info.location == 'above':
+            if fig_info.location == "above":
                 if aspect <= 2:
-                    halign = 'left' if aspect == 1 else 'center'
-                    fontsize = 'x-small'
+                    halign = "left" if aspect == 1 else "center"
+                    fontsize = "x-small"
                 else:
-                    halign = 'right'
-                    fontsize = 'xx-small' if len(fig_info) > 6 else 'x-small'
+                    halign = "right"
+                    fontsize = "xx-small" if len(fig_info) > 6 else "x-small"
 
-                axx_c.text(0 if aspect <= 2 else 1,
-                           1.04 + (aspect-1) * 0.0075,
-                           fig_info.as_str(), fontsize=fontsize,
-                           transform=axx_c.transAxes,
-                           multialignment='left',
-                           verticalalignment='bottom',
-                           horizontalalignment=halign,
-                           bbox={'facecolor': 'white', 'pad': 4})
+                axx_c.text(
+                    0 if aspect <= 2 else 1,
+                    1.04 + (aspect - 1) * 0.0075,
+                    fig_info.as_str(),
+                    fontsize=fontsize,
+                    transform=axx_c.transAxes,
+                    multialignment="left",
+                    verticalalignment="bottom",
+                    horizontalalignment=halign,
+                    bbox={"facecolor": "white", "pad": 4},
+                )
                 return
 
-            if fig_info.location == 'below':
-                fontsize = 'xx-small' if aspect in (3, 4) else 'x-small'
-                axx_c.text(0.125 + (aspect-1) * 0.2,
-                           -0.03 - (aspect-1) * 0.005,
-                           fig_info.as_str(), fontsize=fontsize,
-                           transform=axx_c.transAxes,
-                           multialignment='left',
-                           verticalalignment='top',
-                           horizontalalignment='left',
-                           bbox={'facecolor': 'white', 'pad': 4})
+            if fig_info.location == "below":
+                fontsize = "xx-small" if aspect in (3, 4) else "x-small"
+                axx_c.text(
+                    0.125 + (aspect - 1) * 0.2,
+                    -0.03 - (aspect - 1) * 0.005,
+                    fig_info.as_str(),
+                    fontsize=fontsize,
+                    transform=axx_c.transAxes,
+                    multialignment="left",
+                    verticalalignment="top",
+                    horizontalalignment="left",
+                    bbox={"facecolor": "white", "pad": 4},
+                )
 
         # aspect of image data
         aspect = min(4, max(1, int(round(xarr.shape[1] / xarr.shape[0]))))
 
         # select figure attributes
-        attrs = {1: {'figsize': (10, 8),
-                     'w_ratios': (1., 7., 0.5, 1.5),
-                     'h_ratios': (7., 1.)},                  # 7 x 7
-                 2: {'figsize': (13, 6.25),
-                     'w_ratios': (1., 10., 0.5, 1.5),
-                     'h_ratios': (5., 1.)},                  # 10 x 5
-                 3: {'figsize': (15, 5.375),
-                     'w_ratios': (1., 12., 0.5, 1.5),
-                     'h_ratios': (4., 1.)},                  # 12 x 4
-                 4: {'figsize': (17, 5.125),
-                     'w_ratios': (1., 14., 0.5, 1.5),
-                     'h_ratios': (3.5, 1.)}}.get(aspect)     # 14 x 3.5
+        attrs = {
+            1: {
+                "figsize": (10, 8),
+                "w_ratios": (1.0, 7.0, 0.5, 1.5),
+                "h_ratios": (7.0, 1.0),
+            },  # 7 x 7
+            2: {
+                "figsize": (13, 6.25),
+                "w_ratios": (1.0, 10.0, 0.5, 1.5),
+                "h_ratios": (5.0, 1.0),
+            },  # 10 x 5
+            3: {
+                "figsize": (15, 5.375),
+                "w_ratios": (1.0, 12.0, 0.5, 1.5),
+                "h_ratios": (4.0, 1.0),
+            },  # 12 x 4
+            4: {
+                "figsize": (17, 5.125),
+                "w_ratios": (1.0, 14.0, 0.5, 1.5),
+                "h_ratios": (3.5, 1.0),
+            },
+        }.get(aspect)  # 14 x 3.5
 
         # define matplotlib figure
-        fig = plt.figure(figsize=attrs['figsize'])
+        fig = plt.figure(figsize=attrs["figsize"])
         if self.caption:
-            fig.suptitle(self.caption, fontsize='x-large',
-                         position=(0.5, 1 - 0.4 / fig.get_figheight()))
+            fig.suptitle(
+                self.caption,
+                fontsize="x-large",
+                position=(0.5, 1 - 0.4 / fig.get_figheight()),
+            )
 
         # Define a grid layout to place subplots within the figure.
         # - gspec[0, 1] is reserved for the image
@@ -336,38 +373,51 @@ class MONplot:
         # - gspec[0, 0] is reserved for the y-panel
         # - gspec[0, 2] is reserved for the colorbar
         # - gspec[1, 2] is used to pace the small fig_info box (max 6/7 lines)
-        gspec = fig.add_gridspec(2, 4,
-                                 left=.135 + .005 * (aspect-1),
-                                 right=.9 - .005 * (aspect-1),
-                                 top=.865 - .025 * (aspect-1),
-                                 bottom=.115 + .01 * (aspect-1),
-                                 wspace=0.1 / max(2, aspect-1),
-                                 hspace=0.05,
-                                 width_ratios=attrs['w_ratios'],
-                                 height_ratios=attrs['h_ratios'])
+        gspec = fig.add_gridspec(
+            2,
+            4,
+            left=0.135 + 0.005 * (aspect - 1),
+            right=0.9 - 0.005 * (aspect - 1),
+            top=0.865 - 0.025 * (aspect - 1),
+            bottom=0.115 + 0.01 * (aspect - 1),
+            wspace=0.1 / max(2, aspect - 1),
+            hspace=0.05,
+            width_ratios=attrs["w_ratios"],
+            height_ratios=attrs["h_ratios"],
+        )
 
         # add image panel and draw image
         axx = fig.add_subplot(gspec[0, 1])
-        if xarr.attrs['_zscale'] == 'quality':
-            img = axx.imshow(xarr.values, norm=xarr.attrs['_znorm'],
-                             aspect='auto', cmap=xarr.attrs['_cmap'],
-                             interpolation='none', origin='lower')
+        if xarr.attrs["_zscale"] == "quality":
+            img = axx.imshow(
+                xarr.values,
+                norm=xarr.attrs["_znorm"],
+                aspect="auto",
+                cmap=xarr.attrs["_cmap"],
+                interpolation="none",
+                origin="lower",
+            )
         else:
-            cmap = self.cmap if self.cmap else xarr.attrs['_cmap']
-            img = axx.imshow(xarr.values, norm=xarr.attrs['_znorm'],
-                             aspect='auto', cmap=cmap,
-                             interpolation='none', origin='lower')
+            cmap = self.cmap if self.cmap else xarr.attrs["_cmap"]
+            img = axx.imshow(
+                xarr.values,
+                norm=xarr.attrs["_znorm"],
+                aspect="auto",
+                cmap=cmap,
+                interpolation="none",
+                origin="lower",
+            )
 
         # add title to image panel
         if title is not None:
             axx.set_title(title)
-        elif 'long_name' in xarr.attrs:
-            axx.set_title(xarr.attrs['long_name'])
+        elif "long_name" in xarr.attrs:
+            axx.set_title(xarr.attrs["long_name"])
         self.__add_copyright(axx)
         # axx.grid(True)
 
         # add side panels
-        if side_panels == 'none':
+        if side_panels == "none":
             adjust_img_ticks(axx, xarr)
             axx.set_xlabel(xarr.dims[1])
             axx.set_ylabel(xarr.dims[0])
@@ -376,34 +426,42 @@ class MONplot:
                 xtl.set_visible(False)
             for ytl in axx.get_yticklabels():
                 ytl.set_visible(False)
-            axx_p = {'X': fig.add_subplot(gspec[1, 1], sharex=axx),
-                     'Y': fig.add_subplot(gspec[0, 0], sharey=axx)}
+            axx_p = {
+                "X": fig.add_subplot(gspec[1, 1], sharex=axx),
+                "Y": fig.add_subplot(gspec[0, 0], sharey=axx),
+            }
             fig_draw_panels(axx_p, xarr, side_panels)
-            axx_p['X'].set_xlabel(xarr.dims[1])
-            axx_p['Y'].set_ylabel(xarr.dims[0])
+            axx_p["X"].set_xlabel(xarr.dims[1])
+            axx_p["Y"].set_ylabel(xarr.dims[0])
 
         # add colorbar
-        if xarr.attrs['_zscale'] == 'quality':
+        if xarr.attrs["_zscale"] == "quality":
             axx_c = fig.add_subplot(gspec[0, 2])
-            bounds = xarr.attrs['flag_values']
-            mbounds = [(bounds[ii+1] + bounds[ii]) / 2
-                       for ii in range(len(bounds)-1)]
+            bounds = xarr.attrs["flag_values"]
+            mbounds = [
+                (bounds[ii + 1] + bounds[ii]) / 2 for ii in range(len(bounds) - 1)
+            ]
             _ = plt.colorbar(img, cax=axx_c, ticks=mbounds, boundaries=bounds)
-            axx_c.tick_params(axis='y', which='both', length=0)
-            axx_c.set_yticklabels(xarr.attrs['flag_meanings'])
+            axx_c.tick_params(axis="y", which="both", length=0)
+            axx_c.set_yticklabels(xarr.attrs["flag_meanings"])
         else:
             axx_c = fig.add_subplot(gspec[0, 2])
-            _ = plt.colorbar(img, cax=axx_c, label=xarr.attrs['_zlabel'])
+            _ = plt.colorbar(img, cax=axx_c, label=xarr.attrs["_zlabel"])
 
         # add annotation and save the figure
         add_fig_box()
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_signal(self: MONplot, data: xr.DataArray | np.ndarray, *,
-                    fig_info: FIGinfo | None = None,
-                    side_panels: str = 'nanmedian',
-                    title: str | None = None, **kwargs: int) -> None:
+    def draw_signal(
+        self: MONplot,
+        data: xr.DataArray | np.ndarray,
+        *,
+        fig_info: FIGinfo | None = None,
+        side_panels: str = "nanmedian",
+        title: str | None = None,
+        **kwargs: int,
+    ) -> None:
         """Display 2D array as an image.
 
         Averaged column/row signal are optionally displayed in side-panels.
@@ -481,7 +539,7 @@ class MONplot:
         > plot.close()
         """
         # convert, if necessary, input data to xarray.DataArray
-        if isinstance(data, xr.DataArray) and '_zscale' in data.attrs:
+        if isinstance(data, xr.DataArray) and "_zscale" in data.attrs:
             xarr = data.copy()
         else:
             xarr = fig_data_to_xarr(data, **kwargs)
@@ -491,24 +549,27 @@ class MONplot:
             fig_info = FIGinfo()
 
         biwght = Biweight(xarr.values)
-        if xarr.attrs['_zunits'] is None or xarr.attrs['_zunits'] == '1':
-            fig_info.add('median', biwght.median, '{:.5g}')
-            fig_info.add('spread', biwght.spread, '{:.5g}')
+        if xarr.attrs["_zunits"] is None or xarr.attrs["_zunits"] == "1":
+            fig_info.add("median", biwght.median, "{:.5g}")
+            fig_info.add("spread", biwght.spread, "{:.5g}")
         else:
-            fig_info.add('median', (biwght.median, xarr.attrs['_zunits']),
-                         '{:.5g} {}')
-            fig_info.add('spread', (biwght.spread, xarr.attrs['_zunits']),
-                         '{:.5g} {}')
+            fig_info.add("median", (biwght.median, xarr.attrs["_zunits"]), "{:.5g} {}")
+            fig_info.add("spread", (biwght.spread, xarr.attrs["_zunits"]), "{:.5g} {}")
 
         # draw actual image
         self.__draw_image__(xarr, side_panels, fig_info, title)
 
     # --------------------------------------------------
-    def draw_quality(self: MONplot, data: xr.DataArray | np.ndarray,
-                     ref_data: np.ndarray | None = None, *,
-                     side_panels: str = 'quality',
-                     fig_info: FIGinfo | None = None,
-                     title: str | None = None, **kwargs: int) -> None:
+    def draw_quality(
+        self: MONplot,
+        data: xr.DataArray | np.ndarray,
+        ref_data: np.ndarray | None = None,
+        *,
+        side_panels: str = "quality",
+        fig_info: FIGinfo | None = None,
+        title: str | None = None,
+        **kwargs: int,
+    ) -> None:
         """Display pixel-quality 2D array as image with column/row statistics.
 
         Parameters
@@ -592,7 +653,7 @@ class MONplot:
         > plot.close()
         """
         # convert, if necessary, input data to xarray.DataArray
-        if isinstance(data, xr.DataArray) and '_zscale' in data.attrs:
+        if isinstance(data, xr.DataArray) and "_zscale" in data.attrs:
             xarr = data
         else:
             xarr = fig_qdata_to_xarr(data, ref_data, **kwargs)
@@ -605,27 +666,31 @@ class MONplot:
             fig_info.add(
                 f'{xarr.attrs["flag_meanings"][2]}'
                 f' (quality < {xarr.attrs["thres_bad"]})',
-                np.sum((xarr.values == 1) | (xarr.values == 2)))
+                np.sum((xarr.values == 1) | (xarr.values == 2)),
+            )
             fig_info.add(
                 f'{xarr.attrs["flag_meanings"][1]}'
                 f' (quality < {xarr.attrs["thres_worst"]})',
-                np.sum(xarr.values == 1))
+                np.sum(xarr.values == 1),
+            )
         else:
-            fig_info.add(xarr.attrs['flag_meanings'][3],
-                         np.sum(xarr.values == 4))
-            fig_info.add(xarr.attrs['flag_meanings'][2],
-                         np.sum(xarr.values == 2))
-            fig_info.add(xarr.attrs['flag_meanings'][1],
-                         np.sum(xarr.values == 1))
+            fig_info.add(xarr.attrs["flag_meanings"][3], np.sum(xarr.values == 4))
+            fig_info.add(xarr.attrs["flag_meanings"][2], np.sum(xarr.values == 2))
+            fig_info.add(xarr.attrs["flag_meanings"][1], np.sum(xarr.values == 1))
 
         # draw actual image
         self.__draw_image__(xarr, side_panels, fig_info, title)
 
     # --------------------------------------------------
-    def draw_trend(self: MONplot, xds: xr.Dataset | None = None,
-                   hk_xds: xr.Dataset | None = None, *,
-                   fig_info: FIGinfo | None = None,
-                   title: str | None = None, **kwargs: int) -> None:
+    def draw_trend(
+        self: MONplot,
+        xds: xr.Dataset | None = None,
+        hk_xds: xr.Dataset | None = None,
+        *,
+        fig_info: FIGinfo | None = None,
+        title: str | None = None,
+        **kwargs: int,
+    ) -> None:
         """
         Display trends of measurement data and/or housekeeping data.
 
@@ -730,13 +795,13 @@ class MONplot:
            calib_unit_temp   (orbit) [('mean', '<f8'), ('err1', '<f8'), ('err2', '<f8')] ...
 
         Where each DataArray's have attributes 'long_name' and 'units'.
-        """
+        """  # noqa: E501
         if xds is None and hk_xds is None:
-            raise ValueError('both xds and hk_xds are None')
+            raise ValueError("both xds and hk_xds are None")
         if xds is not None and not isinstance(xds, xr.Dataset):
-            raise ValueError('xds should be and xarray Dataset object')
+            raise ValueError("xds should be and xarray Dataset object")
         if hk_xds is not None and not isinstance(hk_xds, xr.Dataset):
-            raise ValueError('hk_xds should be and xarray Dataset object')
+            raise ValueError("hk_xds should be and xarray Dataset object")
 
         if fig_info is None:
             fig_info = FIGinfo()
@@ -746,12 +811,12 @@ class MONplot:
         npanels += len(hk_xds.data_vars) if hk_xds is not None else 0
 
         # initialize matplotlib using 'subplots'
-        figsize = (10., 1 + (npanels + 1) * 1.5)
-        fig, axarr = plt.subplots(npanels, sharex='all', figsize=figsize)
+        figsize = (10.0, 1 + (npanels + 1) * 1.5)
+        fig, axarr = plt.subplots(npanels, sharex="all", figsize=figsize)
         if npanels == 1:
             axarr = [axarr]
-        margin = min(1. / (1.65 * (npanels + 1)), .25)
-        fig.subplots_adjust(bottom=margin, top=1-margin, hspace=0.05)
+        margin = min(1.0 / (1.65 * (npanels + 1)), 0.25)
+        fig.subplots_adjust(bottom=margin, top=1 - margin, hspace=0.05)
 
         # add a centered subtitle to the figure
         self.__add_caption(fig)
@@ -764,43 +829,47 @@ class MONplot:
         ipanel = 0
         xlabel = None
         if xds is not None:
-            if 'orbit' in xds.coords:
-                xlabel = 'orbit'
-            elif 'hours' in xds.coords:
-                xlabel = 'time [hours]'
+            if "orbit" in xds.coords:
+                xlabel = "orbit"
+            elif "hours" in xds.coords:
+                xlabel = "time [hours]"
             else:
-                xlabel = 'time'
+                xlabel = "time"
                 plt.gcf().autofmt_xdate()
-                plt.gca().xaxis.set_major_formatter(DateFormatter('%H:%M:%S'))
+                plt.gca().xaxis.set_major_formatter(DateFormatter("%H:%M:%S"))
             for name in xds.data_vars:
-                add_subplot(axarr[ipanel], xds[name],
-                            scatter=kwargs.get('scatter', False))
+                add_subplot(
+                    axarr[ipanel], xds[name], scatter=kwargs.get("scatter", False)
+                )
                 ipanel += 1
 
         xlabel_hk = None
         if hk_xds is not None:
-            if 'orbit' in hk_xds.coords:
-                xlabel_hk = 'orbit'
-            elif 'hours' in hk_xds.coords:
-                xlabel_hk = 'time [hours]'
+            if "orbit" in hk_xds.coords:
+                xlabel_hk = "orbit"
+            elif "hours" in hk_xds.coords:
+                xlabel_hk = "time [hours]"
             else:
-                xlabel_hk = 'time'
+                xlabel_hk = "time"
                 plt.gcf().autofmt_xdate()
-                plt.gca().xaxis.set_major_formatter(DateFormatter('%H:%M:%S'))
+                plt.gca().xaxis.set_major_formatter(DateFormatter("%H:%M:%S"))
             for name in hk_xds.data_vars:
-                add_hk_subplot(axarr[ipanel], hk_xds[name],
-                               vperc=kwargs.get('vperc', None),
-                               vrange_last_orbits=kwargs.get(
-                                   'vrange_last_orbits', -1))
+                add_hk_subplot(
+                    axarr[ipanel],
+                    hk_xds[name],
+                    vperc=kwargs.get("vperc", None),
+                    vrange_last_orbits=kwargs.get("vrange_last_orbits", -1),
+                )
                 ipanel += 1
 
         # finally add a label for the X-coordinate
         if xlabel is not None and xlabel_hk is not None:
             if xlabel != xlabel_hk:
-                raise ValueError('measurement and housekeeping data'
-                                 ' have different x-coordinates')
+                raise ValueError(
+                    "measurement and housekeeping data" " have different x-coordinates"
+                )
         elif xlabel is None and xlabel_hk is None:
-            xlabel = 'x-axis'
+            xlabel = "x-axis"
         elif xlabel is None:
             xlabel = xlabel_hk
         axarr[-1].set_xlabel(xlabel)
@@ -811,11 +880,15 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_hist(self: MONplot, data: xr.DataArray | np.ndarray,
-                  data_sel: tuple[slice | int] | None = None,
-                  vrange: list[float, float] | None = None,
-                  fig_info: FIGinfo | None = None,
-                  title: str | None = None, **kwargs: int) -> None:
+    def draw_hist(
+        self: MONplot,
+        data: xr.DataArray | np.ndarray,
+        data_sel: tuple[slice | int] | None = None,
+        vrange: list[float, float] | None = None,
+        fig_info: FIGinfo | None = None,
+        title: str | None = None,
+        **kwargs: int,
+    ) -> None:
         r"""Display data as histograms.
 
         Parameters
@@ -866,17 +939,17 @@ class MONplot:
         > plot.draw_hist(xarr)
         > plot.close()
         """
-        long_name = ''
-        zunits = '1'
+        long_name = ""
+        zunits = "1"
         if isinstance(data, xr.DataArray):
             if data_sel is None:
                 values = data.values.reshape(-1)
             else:
                 values = data.values[data_sel].reshape(-1)
-            if 'units' in data.attrs:
-                zunits = data.attrs['units']
-            if 'long_name' in data.attrs:
-                long_name = data.attrs['long_name']
+            if "units" in data.attrs:
+                zunits = data.attrs["units"]
+            if "long_name" in data.attrs:
+                long_name = data.attrs["long_name"]
         else:
             if data_sel is None:
                 values = data.reshape(-1)
@@ -888,12 +961,12 @@ class MONplot:
             fig_info = FIGinfo()
 
         biwght = Biweight(values)
-        if zunits == '1':
-            fig_info.add('median', biwght.median, '{:.5g}')
-            fig_info.add('spread', biwght.spread, '{:.5g}')
+        if zunits == "1":
+            fig_info.add("median", biwght.median, "{:.5g}")
+            fig_info.add("spread", biwght.spread, "{:.5g}")
         else:
-            fig_info.add('median', (biwght.median, zunits), '{:.5g} {}')
-            fig_info.add('spread', (biwght.spread, zunits), '{:.5g} {}')
+            fig_info.add("median", (biwght.median, zunits), "{:.5g} {}")
+            fig_info.add("spread", (biwght.spread, zunits), "{:.5g} {}")
 
         # create figure
         fig, axx = plt.subplots(1, figsize=(9, 8))
@@ -902,35 +975,48 @@ class MONplot:
         self.__add_caption(fig)
 
         # add title to image panel and set xlabel
-        xlabel = 'value' if zunits == '1' else f'value [{zunits}]'
+        xlabel = "value" if zunits == "1" else f"value [{zunits}]"
         if title is None:
-            title = f'Histogram of {long_name}'
+            title = f"Histogram of {long_name}"
         elif long_name:
-            xlabel = long_name if zunits == '1' else f'{long_name} [{zunits}]'
+            xlabel = long_name if zunits == "1" else f"{long_name} [{zunits}]"
         axx.set_title(title)
 
         # add histogram
         if vrange is not None:
             values = np.clip(values, vrange[0], vrange[1])
         # Edgecolor is tol_cset('bright').blue
-        if 'bins' in kwargs and kwargs['bins'] > 24:
-            axx.hist(values, range=vrange, histtype='step',
-                     edgecolor='#4477AA', facecolor='#77AADD',
-                     fill=True, linewidth=1.5, **kwargs)
-            axx.grid(which='major', color='#AAAAAA', linestyle='--')
+        if "bins" in kwargs and kwargs["bins"] > 24:
+            axx.hist(
+                values,
+                range=vrange,
+                histtype="step",
+                edgecolor="#4477AA",
+                facecolor="#77AADD",
+                fill=True,
+                linewidth=1.5,
+                **kwargs,
+            )
+            axx.grid(which="major", color="#AAAAAA", linestyle="--")
         else:
-            axx.hist(values, range=vrange, histtype='bar',
-                     edgecolor='#4477AA', facecolor='#77AADD',
-                     linewidth=1.5, **kwargs)
-            axx.grid(which='major', axis='y', color='#AAAAAA', linestyle='--')
+            axx.hist(
+                values,
+                range=vrange,
+                histtype="bar",
+                edgecolor="#4477AA",
+                facecolor="#77AADD",
+                linewidth=1.5,
+                **kwargs,
+            )
+            axx.grid(which="major", axis="y", color="#AAAAAA", linestyle="--")
         axx.set_xlabel(xlabel)
-        if 'density' in kwargs and kwargs['density']:
-            axx.set_ylabel('density')
+        if "density" in kwargs and kwargs["density"]:
+            axx.set_ylabel("density")
         else:
-            axx.set_ylabel('number')
+            axx.set_ylabel("number")
 
         if len(fig_info) > 3:
-            plt.subplots_adjust(top=.875)
+            plt.subplots_adjust(top=0.875)
 
         # add annotation and save the figure
         self.__add_copyright(axx)
@@ -938,11 +1024,14 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_qhist(self: MONplot, xds: xr.DataArray,
-                   data_sel: tuple[slice, int] | None = None,
-                   density: bool = True,
-                   fig_info: FIGinfo | None = None,
-                   title: str | None = None) -> None:
+    def draw_qhist(
+        self: MONplot,
+        xds: xr.DataArray,
+        data_sel: tuple[slice, int] | None = None,
+        density: bool = True,
+        fig_info: FIGinfo | None = None,
+        title: str | None = None,
+    ) -> None:
         r"""Display pixel-quality data as histograms.
 
         Parameters
@@ -987,7 +1076,7 @@ class MONplot:
 
         """
         if not isinstance(xds, xr.Dataset):
-            raise ValueError('xds should be and xarray Dataset object')
+            raise ValueError("xds should be and xarray Dataset object")
 
         if fig_info is None:
             fig_info = FIGinfo()
@@ -996,19 +1085,19 @@ class MONplot:
         npanels = len(xds.data_vars)
 
         # initialize matplotlib using 'subplots'
-        figsize = (10., 1 + (npanels + 1) * 1.65)
-        fig, axarr = plt.subplots(npanels, sharex='all', figsize=figsize)
+        figsize = (10.0, 1 + (npanels + 1) * 1.65)
+        fig, axarr = plt.subplots(npanels, sharex="all", figsize=figsize)
         if npanels == 1:
             axarr = [axarr]
-        margin = min(1. / (1.8 * (npanels + 1)), .25)
-        fig.subplots_adjust(bottom=margin, top=1-margin, hspace=0.02)
+        margin = min(1.0 / (1.8 * (npanels + 1)), 0.25)
+        fig.subplots_adjust(bottom=margin, top=1 - margin, hspace=0.02)
 
         # add a centered subtitle to the figure
         self.__add_caption(fig)
 
         # add title to image panel
         if title is None:
-            title = 'Histograms of pixel-quality'
+            title = "Histograms of pixel-quality"
         axarr[0].set_title(title)
 
         # add figures with histograms
@@ -1017,11 +1106,11 @@ class MONplot:
                 qdata = xda.values.reshape(-1)
             else:
                 qdata = xda.values[data_sel].reshape(-1)
-            label = xda.attrs['long_name'] if 'long_name' in xda.attrs else key
+            label = xda.attrs["long_name"] if "long_name" in xda.attrs else key
             fig_draw_qhist(axarr[ii], qdata, label, density)
 
         # finally add a label for the X-coordinate
-        axarr[-1].set_xlabel('pixel quality')
+        axarr[-1].set_xlabel("pixel quality")
 
         # add annotation and save the figure
         self.__add_copyright(axarr[-1])
@@ -1029,12 +1118,17 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_lplot(self: MONplot, xdata: np.ndarray | None = None,
-                   ydata: np.ndarray | None = None, *,
-                   square: bool = False,
-                   fig_info: FIGinfo | None = None,
-                   title: str | None = None,
-                   kwlegend: dict | None = None, **kwargs: int) -> None:
+    def draw_lplot(
+        self: MONplot,
+        xdata: np.ndarray | None = None,
+        ydata: np.ndarray | None = None,
+        *,
+        square: bool = False,
+        fig_info: FIGinfo | None = None,
+        title: str | None = None,
+        kwlegend: dict | None = None,
+        **kwargs: int,
+    ) -> None:
         """Create line-plot of y-data versus x-data.
 
         Can be called multiple times to add lines. Figure must be closed
@@ -1124,66 +1218,79 @@ class MONplot:
         > plot.close()
         """
         if ydata is None:
-            if self.__mpl['fig'] is None:
-                raise ValueError('No plot defined and no data provided')
-            fig = self.__mpl['fig']
-            axx = self.__mpl['axx']
+            if self.__mpl["fig"] is None:
+                raise ValueError("No plot defined and no data provided")
+            fig = self.__mpl["fig"]
+            axx = self.__mpl["axx"]
 
             if fig_info is None:
                 fig_info = FIGinfo()
 
-            if 'text' in kwargs:
-                axx.text(0.05, 0.985, f'{kwargs.pop("text")}',
-                         transform=axx.transAxes,
-                         fontsize='small', verticalalignment='top',
-                         bbox={'boxstyle': 'round', 'alpha': 0.5,
-                               'facecolor': '#FFFFFF', 'edgecolor': '#BBBBBB'})
+            if "text" in kwargs:
+                axx.text(
+                    0.05,
+                    0.985,
+                    f'{kwargs.pop("text")}',
+                    transform=axx.transAxes,
+                    fontsize="small",
+                    verticalalignment="top",
+                    bbox={
+                        "boxstyle": "round",
+                        "alpha": 0.5,
+                        "facecolor": "#FFFFFF",
+                        "edgecolor": "#BBBBBB",
+                    },
+                )
 
-            close_draw_lplot(axx, self.__mpl['time_axis'],
-                             title, kwlegend, **kwargs)
+            close_draw_lplot(axx, self.__mpl["time_axis"], title, kwlegend, **kwargs)
 
             # add annotation and save the figure
             self.__add_copyright(axx)
             self.__add_fig_box(fig, fig_info)
             self.__close_this_page(fig)
-            self.__mpl['fig'] = None
+            self.__mpl["fig"] = None
             return
 
         # initialize figure
         if xdata is None:
             xdata = np.arange(ydata.size)
-        if self.__mpl['fig'] is None:
+        if self.__mpl["fig"] is None:
             if square:
                 figsize = (9, 9)
             else:
-                figsize = {0: (10, 7),
-                           1: (10, 7),
-                           2: (12, 7)}.get(len(ydata) // 256, (14, 8))
+                figsize = {0: (10, 7), 1: (10, 7), 2: (12, 7)}.get(
+                    len(ydata) // 256, (14, 8)
+                )
 
             fig, axx = plt.subplots(1, figsize=figsize)
             self.__mpl = {
-                'fig': fig,
-                'axx': axx,
-                'time_axis': isinstance(xdata[0], datetime)
+                "fig": fig,
+                "axx": axx,
+                "time_axis": isinstance(xdata[0], datetime),
             }
 
             # add a centered subtitle to the figure
-            self.__add_caption(self.__mpl['fig'])
+            self.__add_caption(self.__mpl["fig"])
 
             # set color cycle
             if self.cset is None:
-                self.__mpl['axx'].set_prop_cycle(None)
+                self.__mpl["axx"].set_prop_cycle(None)
             else:
-                self.__mpl['axx'].set_prop_cycle(color=self.cset)
+                self.__mpl["axx"].set_prop_cycle(color=self.cset)
 
         # draw line in figure
-        fig_draw_lplot(self.__mpl['axx'], xdata, ydata, **kwargs)
+        fig_draw_lplot(self.__mpl["axx"], xdata, ydata, **kwargs)
 
     # --------------------------------------------------
-    def draw_multiplot(self: MONplot, data_tuple: tuple,
-                       gridspec: GridSpec | None = None, *,
-                       fig_info: FIGinfo | None = None,
-                       title: str | None = None, **kwargs: int) -> None:
+    def draw_multiplot(
+        self: MONplot,
+        data_tuple: tuple,
+        gridspec: GridSpec | None = None,
+        *,
+        fig_info: FIGinfo | None = None,
+        title: str | None = None,
+        **kwargs: int,
+    ) -> None:
         """Display multiple plots on one page.
 
         The data of each plot is defined in the parameter `data_tuple`.
@@ -1257,14 +1364,11 @@ class MONplot:
 
         # define grid layout to place subplots within a figure
         if gridspec is None:
-            geometry = {1: (1, 1),
-                        2: (2, 1),
-                        3: (3, 1),
-                        4: (2, 2)}.get(len(data_tuple))
+            geometry = {1: (1, 1), 2: (2, 1), 3: (3, 1), 4: (2, 2)}.get(len(data_tuple))
             gridspec = GridSpec(*geometry, figure=fig)
         else:
             if len(data_tuple) > gridspec.nrows * gridspec.ncols:
-                raise RuntimeError('grid too small for number of datasets')
+                raise RuntimeError("grid too small for number of datasets")
 
         # determine xylabels
         xylabels = get_xylabels(gridspec, data_tuple)
@@ -1299,11 +1403,16 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_tracks(self: MONplot, lons: np.ndarray, lats: np.ndarray,
-                    icids: np.ndarray, *,
-                    saa_region: np.ndarray | None = None,
-                    fig_info: FIGinfo | None = None,
-                    title: str | None = None) -> None:
+    def draw_tracks(
+        self: MONplot,
+        lons: np.ndarray,
+        lats: np.ndarray,
+        icids: np.ndarray,
+        *,
+        saa_region: np.ndarray | None = None,
+        fig_info: FIGinfo | None = None,
+        title: str | None = None,
+    ) -> None:
         """Display tracks of satellite on a world map.
 
         This module uses the Robinson projection.
@@ -1328,14 +1437,14 @@ class MONplot:
         in a small box.
         """
         if not FOUND_CARTOPY:
-            raise RuntimeError('You need Cartopy to use this method')
+            raise RuntimeError("You need Cartopy to use this method")
 
         if fig_info is None:
             fig_info = FIGinfo()
 
         # define plot layout
         # pylint: disable=abstract-class-instantiated
-        myproj = {'projection': ccrs.Robinson(central_longitude=11.5)}
+        myproj = {"projection": ccrs.Robinson(central_longitude=11.5)}
         fig, axx = plt.subplots(figsize=(12.85, 6), subplot_kw=myproj)
 
         # add a centered subtitle of the Figure
@@ -1354,12 +1463,16 @@ class MONplot:
         self.__close_this_page(fig)
 
     # --------------------------------------------------
-    def draw_fov_ckd(self: MONplot,
-                     data: xr.DataArray | np.ndarray, *,
-                     vp_blocks: tuple,
-                     vp_labels: tuple[str] | None = None,
-                     fig_info: FIGinfo | None = None,
-                     title: str | None = None, **kwargs: int) -> None:
+    def draw_fov_ckd(
+        self: MONplot,
+        data: xr.DataArray | np.ndarray,
+        *,
+        vp_blocks: tuple,
+        vp_labels: tuple[str] | None = None,
+        fig_info: FIGinfo | None = None,
+        title: str | None = None,
+        **kwargs: int,
+    ) -> None:
         """Display the SPEXone FOV CKD.
 
         The SPEXone FOV CKD consists of data from several viewports.
@@ -1420,27 +1533,31 @@ class MONplot:
         > plot.close()
         """
         if vp_labels is None:
-            vp_labels = ('+50', '+20', '0', '-20', '-50')
+            vp_labels = ("+50", "+20", "0", "-20", "-50")
         if fig_info is None:
             fig_info = FIGinfo()
 
         # convert, if necessary, input data to xarray.DataArray
-        if isinstance(data, xr.DataArray) and '_zscale' in data.attrs:
+        if isinstance(data, xr.DataArray) and "_zscale" in data.attrs:
             xarr = data.copy()
         else:
             xarr = fig_data_to_xarr(data, **kwargs)
 
         # get dimensions needed to draw the data of the viewports
         nview = len(vp_labels)
-        ncol = xarr.sizes['spectral_detector_pixels']
+        ncol = xarr.sizes["spectral_detector_pixels"]
 
         # define plot layout
-        figsize = (1.75 * (xarr.sizes['spectral_detector_pixels']
-                           // xarr.sizes['spatial_samples_per_image']), 4.5)
-        fig, axs = plt.subplots(nview, 1, figsize=figsize, sharex='all')
-        fig.subplots_adjust(hspace=0, wspace=0,
-                            left=0.075, right=1.05,
-                            top=0.8)
+        figsize = (
+            1.75
+            * (
+                xarr.sizes["spectral_detector_pixels"]
+                // xarr.sizes["spatial_samples_per_image"]
+            ),
+            4.5,
+        )
+        fig, axs = plt.subplots(nview, 1, figsize=figsize, sharex="all")
+        fig.subplots_adjust(hspace=0, wspace=0, left=0.075, right=1.05, top=0.8)
 
         # add a centered subtitle of the Figure
         self.__add_caption(fig)
@@ -1448,22 +1565,27 @@ class MONplot:
         # add title to image panel
         if title is not None:
             axs[0].set_title(title)
-        elif 'long_name' in xarr.attrs:
-            axs[0].set_title(xarr.attrs['long_name'])
+        elif "long_name" in xarr.attrs:
+            axs[0].set_title(xarr.attrs["long_name"])
 
         ax_img = None
-        cmap = self.cmap if self.cmap else xarr.attrs['_cmap']
+        cmap = self.cmap if self.cmap else xarr.attrs["_cmap"]
         for ii in range(nview):
-            axs[ii].set_anchor((.5, (nview - ii - 1) * 0.25))
+            axs[ii].set_anchor((0.5, (nview - ii - 1) * 0.25))
             ibgn, iend = vp_blocks[ii]
             extent = (0, ncol, ibgn, iend)
-            ax_img = axs[ii].imshow(xarr.values[ibgn:iend, :],
-                                    norm=xarr.attrs['_znorm'], cmap=cmap,
-                                    extent=extent, aspect=2,
-                                    interpolation='none', origin='lower')
+            ax_img = axs[ii].imshow(
+                xarr.values[ibgn:iend, :],
+                norm=xarr.attrs["_znorm"],
+                cmap=cmap,
+                extent=extent,
+                aspect=2,
+                interpolation="none",
+                origin="lower",
+            )
             axs[ii].set_xticks([x * ncol // 8 for x in range(9)])
             axs[ii].set_yticks([ibgn, (iend + ibgn) // 2])
-            yax2 = axs[ii].secondary_yaxis(-.05)
+            yax2 = axs[ii].secondary_yaxis(-0.05)
             yax2.tick_params(left=False, labelleft=False)
             yax2.set_ylabel(vp_labels[ii])
             if ii == nview // 2:
@@ -1474,8 +1596,7 @@ class MONplot:
                 axs[ii].tick_params(labelbottom=False)
 
         # defaults: pad=0.05, aspect=20
-        fig.colorbar(ax_img, ax=axs, pad=0.01, aspect=10,
-                     label=xarr.attrs['_zlabel'])
+        fig.colorbar(ax_img, ax=axs, pad=0.01, aspect=10, label=xarr.attrs["_zlabel"])
 
         # finalize figure
         self.__add_copyright(axs[-1])
