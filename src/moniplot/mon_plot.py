@@ -75,6 +75,7 @@ DEFAULT_CSET = "bright"
 
 # - local functions --------------------------------
 class DictMpl(TypedDict):
+    """Dataclass to hold matplotlib Figure and Axes for method `draw_lplot`."""
     fig: Figure | None
     axx: Axes | None
     time_axis: bool
@@ -866,7 +867,7 @@ class MONplot:
         if xlabel is not None and xlabel_hk is not None:
             if xlabel != xlabel_hk:
                 raise ValueError(
-                    "measurement and housekeeping data" " have different x-coordinates"
+                    "measurement and housekeeping data have different x-coordinates"
                 )
         elif xlabel is None and xlabel_hk is None:
             xlabel = "x-axis"

@@ -61,7 +61,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
 
-from .image_to_xarray import h5_to_xr
 from .lib.fig_info import FIGinfo
 from .tol_colors import tol_cmap
 
@@ -473,48 +472,3 @@ class GEOplot:
         fig_info.add("lon0, lat0", [lon_0, lat_0])
         self.__add_fig_box(fig, fig_info)
         self.__close_this_page(fig)
-
-
-# --------------------------------------------------
-def __test() -> None:
-    """Test module for GEOplot."""
-    import h5py
-
-    data_dir = Path("/nfs/SPEXone/ocal/pace-sds")
-    if not data_dir.is_dir():
-        data_dir = Path("/data/richardh/SPEXone/pace-sds")
-    data_dir = data_dir / "oci_l1c" / "5.17" / "2022" / "03" / "21"
-
-    plot = GEOplot("test_oci_l1c.pdf")
-    for oci_fl in data_dir.glob("PACE_OCI.20220321T*.L1C.nc"):
-        plot.set_caption(oci_fl.stem + " [geolocation]")
-        with h5py.File(oci_fl) as fid:
-            lats = fid["/geolocation_data/latitude"][:]
-            lons = fid["/geolocation_data/longitude"][:]
-            dset = fid["/observation_data/I"]
-            xarr = h5_to_xr(dset)
-            xarr.attrs["long_name"] = dset.attrs["long_name"]
-            xarr.attrs["units"] = "1"
-            xarr.attrs["_FillValue"] = -32767.0
-
-        xarr.values[xarr.values == -32767] = np.nan
-        xarr = xarr.max(dim="number_of_views", skipna=True, keep_attrs=True)
-        xarr = xarr.mean(dim="intensity_bands_per_view", skipna=True, keep_attrs=True)
-        i_nadir = lons.shape[1] // 2
-        plot.draw_geo_subsat(
-            lons[:, i_nadir], lats[:, i_nadir], title="sub-satellite positions"
-        )
-        plot.draw_geo_subsat(
-            lons[:, i_nadir],
-            lats[:, i_nadir],
-            whole_globe=True,
-            title="sub-satellite positions",
-        )
-        plot.draw_geo_mesh(lons, lats, xarr, title=xarr.attrs["long_name"].decode())
-        break
-
-    plot.close()
-
-
-if __name__ == "__main__":
-    __test()
