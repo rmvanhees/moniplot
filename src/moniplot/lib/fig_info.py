@@ -111,6 +111,6 @@ class FIGinfo:
 
         # add timestamp
         res = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
-        info_str += f'created: {res.replace('+00:00', 'Z')}'
+        info_str += f"created: {res.replace('+00:00', 'Z')}"
 
         return info_str
