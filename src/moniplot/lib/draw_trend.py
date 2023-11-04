@@ -41,7 +41,6 @@ if TYPE_CHECKING:
     from matplotlib.figure import Figure
 
 # - global variables -------------------------------
-DEFAULT_CSET = "bright"
 
 
 # - class definition -------------------------------
@@ -77,10 +76,6 @@ class DrawTrend:
     >>> report.close_this_page(fig, None)
     >>> report.close()
     """
-
-    def __init__(self: DrawTrend) -> None:
-        """..."""
-        self._cset = tol_cset(DEFAULT_CSET)
 
     def subplots(self: DrawTrend, npanels: int) -> tuple[Figure, list[Axes, ...]]:
         """Create a figure and a set of subplots for trend-plots."""
@@ -224,44 +219,45 @@ class DrawTrend:
 
     def decoration(self: DrawTrend, xarr: xr.DataArray) -> dataclass:
         """Return decoration parameters for trend-plots."""
-        mytitle = xarr.attrs["long_name"] if "long_name" in xarr else "unknown"
+        mytitle = xarr.attrs["long_name"] if "long_name" in xarr.attrs else "unknown"
         if isinstance(mytitle, bytes):
             mytitle = mytitle.decode()
 
-        units = xarr.attrs["units"] if "units" in xarr else "1"
+        units = xarr.attrs["units"] if "units" in xarr.attrs else "1"
         if isinstance(units, bytes):
             units = units.decode()
 
-        # Shouldn't I use color scheme Light for fcolor?
+        line_cset = tol_cset("bright")
+        fill_cset = tol_cset("light")
         match units:
             case "K":
                 if (ii := mytitle.find(" temperature")) > 0:
                     mytitle = mytitle[:ii]
                 mylabel = f"temperature [{units}]"
-                l_color = self._cset.blue
-                f_color = "#BBCCEE"
-            case "V" | "?V" | "Volt":
+                l_color = line_cset.cyan
+                f_color = fill_cset.light_cyan
+            case "V" | "?V" | "\u03bcV" | "Volt":
                 if (ii := mytitle.find(" voltage")) > 0:
                     mytitle = mytitle[:ii]
                 mylabel = f"voltage [{units}]"
-                l_color = self._cset.cyan
-                f_color = "#99DDFF"
-            case "A" | "?A":
+                l_color = line_cset.yellow
+                f_color = fill_cset.light_yellow
+            case "A" | "?A" | "\u03bcA":
                 if (ii := mytitle.find(" current")) > 0:
                     mytitle = mytitle[:ii]
                 mylabel = f"current [{units}]"
-                l_color = self._cset.green
-                f_color = "#CCDDAA"
+                l_color = line_cset.green
+                f_color = fill_cset.pear
             case "%":
                 if (ii := mytitle.find(" duty")) > 0:
                     mytitle = mytitle[:ii]
                 mylabel = f"duty cycle [{units}]"
-                l_color = self._cset.red
-                f_color = "#FFCCCC"
+                l_color = line_cset.red
+                f_color = fill_cset.orange
             case _:
                 mylabel = "value" if units == "1" else f"value [{units}]"
-                l_color = self._cset.purple
-                f_color = "#EEBBDD"
+                l_color = line_cset.blue
+                f_color = fill_cset.light_blue
 
         @dataclass(frozen=True)
         class DecoFig:
