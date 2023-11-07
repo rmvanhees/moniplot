@@ -53,7 +53,7 @@ class DrawImage:
         2D-data array
     zscale :  str, default='linear'
         Scaling of the data values. Recognized values are: 'linear', 'log',
-        'diff' or 'ratio'.
+        'diff', 'ratio' or 'quality'.
     vperc :  list, default=[1, 99]
         Range to normalize luminance data between percentiles min and max of
         array data.
@@ -91,6 +91,20 @@ class DrawImage:
         self._xlabel: str | None = None
         self._ylabel: str | None = None
         self._zlabel: str = "value"
+        self._qref: np.ndarray | None = None
+
+        if zscale == "quality":
+            # 'arr' should be a xr.DataArray with attributes
+            # - long_name -> self.attrs
+            # - thres_bad -> self.attrs
+            # - thres_worst -> self.attrs
+            # - flag_meanings -> self.attrs
+            # - flag_values -> self.attrs
+            # - _cmap -> self._cmap
+            # - _znorm -> self._znorm
+            # set self._qref
+            # set self._zlabel
+            return
 
         # check parameter 'zscale'
         if zscale is None:
@@ -158,10 +172,10 @@ class DrawImage:
         match self.aspect:
             case 1:
                 width_ratios = (8, 0.5, 0.5)
-                height_ratios = (0.125, 8)
+                height_ratios = (0.2, 8)
             case 2:
                 width_ratios = (12, 0.5, 0.5)
-                height_ratios = (0.2, 6)
+                height_ratios = (0.25, 6)
             case 3:
                 width_ratios = (15, 0.5, 0.5)
                 height_ratios = (0.35, 5)
@@ -172,10 +186,10 @@ class DrawImage:
                 raise ValueError("unknown aspect-ratio")
 
         if side_panels == "none":
-            mosaic = [[".", ".", "info"], ["image", "colorbar", "."]]
+            mosaic = [["caption", ".", "info"], ["image", "colorbar", "."]]
         else:
             mosaic = [
-                [".", ".", ".", "info"],
+                [".", "caption", ".", "info"],
                 ["y-panel", "image", "colorbar", "."],
                 [".", "x-panel", ".", "."],
             ]
@@ -195,6 +209,7 @@ class DrawImage:
 
         # adjust axes
         axx["info"].set_axis_off()
+        axx["caption"].set_axis_off()
         axx["colorbar"].tick_params(
             axis="x",
             bottom=False,
@@ -365,7 +380,7 @@ class DrawImage:
             axx["image"].set_yticks(np.linspace(0, self._image.shape[0], 5, dtype=int))
 
         if self._zscale == "quality":
-            bounds = []  # self._image.attrs["flag_values"]
+            bounds = self.attrs["flag_values"]
             mbounds = [
                 (bounds[ii + 1] + bounds[ii]) / 2 for ii in range(len(bounds) - 1)
             ]
@@ -373,7 +388,7 @@ class DrawImage:
                 cm_img, cax=axx["colorbar"], ticks=mbounds, boundaries=bounds
             )
             axx["colorbar"].tick_params(axis="y", which="both", length=0)
-            axx["colorbar"].set_yticklabels("")  # self._image.attrs["flag_meanings"])
+            axx["colorbar"].set_yticklabels(self.attrs["flag_meanings"])
         else:
             _ = plt.colorbar(cm_img, cax=axx["colorbar"], label=self._zlabel)
 
@@ -542,6 +557,24 @@ class DrawImage:
         # add data statistics to fig_info
         if fig_info is None:
             fig_info = FIGinfo()
+
+        if self._zscale == "quality":
+            if self.reference is None:
+                fig_info.add(
+                    f'{self.attrs["flag_meanings"][2]}'
+                    f' (quality < {self.attrs["thres_bad"]})',
+                    np.sum((self._image == 1) | (self._image == 2)),
+                )
+                fig_info.add(
+                    f'{self.attrs["flag_meanings"][1]}'
+                    f' (quality < {self.attrs["thres_worst"]})',
+                    np.sum(self._image == 1),
+                )
+            else:
+                fig_info.add(self.attrs["flag_meanings"][3], np.sum(self._image == 4))
+                fig_info.add(self.attrs["flag_meanings"][2], np.sum(self._image == 2))
+                fig_info.add(self.attrs["flag_meanings"][1], np.sum(self._image == 1))
+            return
 
         biwght = Biweight(self._image)
         if self.attrs["units"] == "1":
