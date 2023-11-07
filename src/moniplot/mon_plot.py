@@ -76,6 +76,7 @@ DEFAULT_CSET = "bright"
 # - local functions --------------------------------
 class DictMpl(TypedDict):
     """Dataclass to hold matplotlib Figure and Axes for method `draw_lplot`."""
+
     fig: Figure | None
     axx: Axes | None
     time_axis: bool
