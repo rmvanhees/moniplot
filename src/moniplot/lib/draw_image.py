@@ -91,28 +91,29 @@ class DrawImage:
         self._xlabel: str | None = None
         self._ylabel: str | None = None
         self._zlabel: str = "value"
-        self._qref: np.ndarray | None = None
-
-        if zscale == "quality":
-            # 'arr' should be a xr.DataArray with attributes
-            # - long_name -> self.attrs
-            # - thres_bad -> self.attrs
-            # - thres_worst -> self.attrs
-            # - flag_meanings -> self.attrs
-            # - flag_values -> self.attrs
-            # - _cmap -> self._cmap
-            # - _znorm -> self._znorm
-            # set self._qref
-            # set self._zlabel
-            return
 
         # check parameter 'zscale'
         if zscale is None:
             self._zscale = "linear"
-        elif zscale not in ("diff", "linear", "log", "ratio"):
+        elif zscale not in ("diff", "linear", "log", "ratio", "quality"):
             raise RuntimeError(f"unknown zscale: {zscale}")
         else:
             self._zscale = zscale
+
+        if self._zscale == "quality":
+            # check DataArray
+            if not isinstance(arr, xr.DataArray):
+                raise ValueError("Pixel-Quality data must be a xr.DataArray")
+            # check attributes
+            for key in ["long_name", "thres_bad", "thres_worst", "flag_meanings", "flag_values"]:
+                if key not in arr.attrs:
+                    raise KeyError(f"attribute {key} not present in Pixel-Quality data")
+                self.attrs[key] = arr.attrs[key]
+
+            self._zlabel = "quality"
+            self._cmap = mcolors.ListedColormap(arr.attrs["colors"])
+            self._znorm = mcolors.BoundaryNorm(arr.attrs["flag_values"], self._cmap.N)
+            return
 
         # obtain image-data range
         if vrange is None and vperc is None:
@@ -400,70 +401,74 @@ class DrawImage:
 
     def __draw_side_panels(self: DrawImage, axx: dict, side_panels: str) -> None:
         """..."""
+        if self._zscale == "quality":
+            # draw panel below the image panel
+            xdata = np.arange(self._image.shape[1])
+            ydata = np.sum(((self._image == 1) | (self._image == 2)), axis=0)
+            axx["x-panel"].step(xdata, ydata, linewidth=0.75, color=self._cset.yellow)
+            ydata = np.sum((self._image == 1), axis=0)  # worst
+            axx["x-panel"].step(xdata, ydata, linewidth=0.75, color=self._cset.red)
+            if len(self.attrs["flag_values"]) == 6:
+                ydata = np.sum((self._image == 4), axis=0)  # to_good
+                axx["x-panel"].step(
+                    xdata, ydata, linewidth=0.75, color=self._cset.green
+                )
+            axx["x-panel"].grid()
+
+            # draw panel left of the image panel
+            ydata = np.arange(self._image.shape[0])
+            xdata = np.sum(((self._image == 1) | (self._image == 2)), axis=1)
+            axx["y-panel"].step(xdata, ydata, linewidth=0.75, color=self._cset.yellow)
+            xdata = np.sum(self._image == 1, axis=1)  # worst
+            axx["y-panel"].step(xdata, ydata, linewidth=0.75, color=self._cset.red)
+            if len(self.attrs["flag_values"]) == 6:
+                xdata = np.sum(self._image == 4, axis=1)  # to_good
+                axx["y-panel"].step(
+                    xdata, ydata, linewidth=0.75, color=self._cset.green
+                )
+            axx["y-panel"].grid()
+            return
+        
         match side_panels:
             case "none":
                 return
-            case "median" | "default":
-                func_panels = np.median
-            case "nanmedian":
+            case "nanmedian" | "default":
                 func_panels = np.nanmedian
-            case "mean":
-                func_panels = np.mean
             case "nanmean":
                 func_panels = np.nanmean
-            case "quality":
-                func_panels = None
-            case "std":
-                func_panels = np.std
             case "nanstd":
                 func_panels = np.nanstd
+            case "median":
+                func_panels = np.median
+            case "mean":
+                func_panels = np.mean
+            case "std":
+                func_panels = np.std
             case _:
                 raise ValueError(f"unknown function for side_panels: {side_panels}")
 
         # draw panel below the image panel
         xdata = np.arange(self._image.shape[1])
-        if side_panels == "quality":
-            ydata = np.sum(((self._image == 1) | (self._image == 2)), axis=0)
-            axx["x-panel"].step(xdata, ydata, linewidth=0.75, color=self._cset.yellow)
-            ydata = np.sum((self._image == 1), axis=0)  # worst
-            axx["x-panel"].step(xdata, ydata, linewidth=0.75, color=self._cset.red)
-            if len(self._image.attrs["flag_values"]) == 6:
-                ydata = np.sum((self._image == 4), axis=0)  # to_good
-                axx["x-panel"].step(
-                    xdata, ydata, linewidth=0.75, color=self._cset.green
-                )
-        else:
-            with warnings.catch_warnings():
-                warnings.filterwarnings("ignore", r"All-NaN (slice|axis) encountered")
-                axx["x-panel"].plot(
-                    xdata,
-                    func_panels(self._image, axis=0),
-                    linewidth=0.75,
-                    color=self._cset.blue,
-                )
-        axx["x-panel"].grid()
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", r"All-NaN (slice|axis) encountered")
+            axx["x-panel"].plot(
+                xdata,
+                func_panels(self._image, axis=0),
+                linewidth=0.75,
+                color=self._cset.blue,
+            )
+            axx["x-panel"].grid()
 
         # draw panel left of the image panel
         ydata = np.arange(self._image.shape[0])
-        if side_panels == "quality":
-            xdata = np.sum(((self._image == 1) | (self._image == 2)), axis=1)
-            axx["y-panel"].step(xdata, ydata, linewidth=0.75, color=self._cset.yellow)
-            xdata = np.sum(self._image == 1, axis=1)  # worst
-            axx["y-panel"].step(xdata, ydata, linewidth=0.75, color=self._cset.red)
-            if len(self._image.attrs["flag_values"]) == 6:
-                xdata = np.sum(self._image == 4, axis=1)  # to_good
-                axx["y-panel"].step(
-                    xdata, ydata, linewidth=0.75, color=self._cset.green
-                )
-        else:
-            with warnings.catch_warnings():
-                warnings.filterwarnings("ignore", r"All-NaN (slice|axis) encountered")
-                axx["y-panel"].plot(
-                    func_panels(self._image, axis=1),
-                    ydata,
-                    linewidth=0.75,
-                    color=self._cset.blue,
-                )
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", r"All-NaN (slice|axis) encountered")
+            axx["y-panel"].plot(
+                func_panels(self._image, axis=1),
+                ydata,
+                linewidth=0.75,
+                color=self._cset.blue,
+            )
         axx["y-panel"].grid()
 
     @staticmethod
@@ -493,10 +498,10 @@ class DrawImage:
 
     def draw(
         self: DrawImage,
-        axx: Axes,
+        axx: dict[str, Axes],
         *,
         fig_info: FIGinfo | None = None,
-        side_panels: str = "nanmedian",
+        side_panels: str = "default",
         title: str | None = None,
     ) -> None:
         """Display 2D array as an image.
@@ -505,6 +510,7 @@ class DrawImage:
 
         Parameters
         ----------
+        axx :  dict[str, Axes]
         fig_info :  FIGinfo, <default=None
            OrderedDict holding meta-data to be displayed in the figure.
         side_panels :  str, default='nanmedian'
@@ -530,36 +536,18 @@ class DrawImage:
         Create a PDF document 'test.pdf' and add figure of dataset img
         (`numpy.ndarray` or `xarray.DataArray`) with side-panels and title::
 
-        > plot = MONplot('test.pdf', caption='my caption')
-        > plot.set_institute('SRON')
-        > plot.draw_signal(img, title='my title')
-
-        Add the same figure without side-panels::
-
-        > plot.draw_signal(img, side_panels='none', title='my title')
-
-        Add a figure using a fixed data-range that the colormap covers::
-
-        > plot.draw_signal(img1, title='my title', vrange=[zmin, zmax])
-
-        Add a figure where img2 = img - img_ref::
-
-        > plot.draw_signal(img2, title='my title', zscale='diff')
-
-        Add a figure where img2 = img / img_ref::
-
-        > plot.draw_signal(img2, title='my title', zscale='ratio')
-
-        Finalize the PDF file::
-
-        > plot.close()
+        ...
         """
         # add data statistics to fig_info
         if fig_info is None:
             fig_info = FIGinfo()
 
         if self._zscale == "quality":
-            if self.reference is None:
+            if "unchanged" in self.attrs["flag_meanings"]:
+                fig_info.add(self.attrs["flag_meanings"][3], np.sum(self._image == 4))
+                fig_info.add(self.attrs["flag_meanings"][2], np.sum(self._image == 2))
+                fig_info.add(self.attrs["flag_meanings"][1], np.sum(self._image == 1))
+            else:
                 fig_info.add(
                     f'{self.attrs["flag_meanings"][2]}'
                     f' (quality < {self.attrs["thres_bad"]})',
@@ -570,19 +558,14 @@ class DrawImage:
                     f' (quality < {self.attrs["thres_worst"]})',
                     np.sum(self._image == 1),
                 )
-            else:
-                fig_info.add(self.attrs["flag_meanings"][3], np.sum(self._image == 4))
-                fig_info.add(self.attrs["flag_meanings"][2], np.sum(self._image == 2))
-                fig_info.add(self.attrs["flag_meanings"][1], np.sum(self._image == 1))
-            return
-
-        biwght = Biweight(self._image)
-        if self.attrs["units"] == "1":
-            fig_info.add("median", biwght.median, "{:.5g}")
-            fig_info.add("spread", biwght.spread, "{:.5g}")
         else:
-            fig_info.add("median", (biwght.median, self.attrs["units"]), "{:.5g} {}")
-            fig_info.add("spread", (biwght.spread, self.attrs["units"]), "{:.5g} {}")
+            biwght = Biweight(self._image)
+            if self.attrs["units"] == "1":
+                fig_info.add("median", biwght.median, "{:.5g}")
+                fig_info.add("spread", biwght.spread, "{:.5g}")
+            else:
+                fig_info.add("median", (biwght.median, self.attrs["units"]), "{:.5g} {}")
+                fig_info.add("spread", (biwght.spread, self.attrs["units"]), "{:.5g} {}")
 
         # draw actual image
         self.__draw_image(axx, title)
