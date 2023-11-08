@@ -143,7 +143,7 @@ class DrawTrend:
                 ]
             else:
                 ylim = [err1[indx].min(), err2[indx].max()]
-                factor = 10
+            factor = 10
         else:
             indx = np.isfinite(data)
             if np.all(~indx):
@@ -158,7 +158,7 @@ class DrawTrend:
                 ylim = np.percentile(data[indx], vperc)
             else:
                 ylim = [data[indx].min(), data[indx].max()]
-                factor = 5
+            factor = 5
 
         if ylim[0] == ylim[1]:
             delta = 0.01 if ylim[0] == 0 else ylim[0] / 20
@@ -255,9 +255,15 @@ class DrawTrend:
                 l_color = line_cset.red
                 f_color = fill_cset.orange
             case _:
-                mylabel = "value" if units == "1" else f"value [{units}]"
-                l_color = line_cset.blue
+                mylabel = "count" if units == "1" else f"value [{units}]"
+                l_color = (
+                    xarr.attrs["_color"] if "_color" in xarr.attrs else line_cset.blue
+                )
                 f_color = fill_cset.light_blue
+
+        # overwrite ylabel
+        if "_ylabel" in xarr.attrs:
+            mylabel = xarr.attrs["_ylabel"]
 
         @dataclass(frozen=True)
         class DecoFig:
