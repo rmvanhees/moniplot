@@ -35,6 +35,8 @@ from matplotlib.patches import Polygon
 
 from moniplot.tol_colors import tol_cmap, tol_cset
 
+from .saa_region import saa_region
+
 if TYPE_CHECKING:
     import xarray as xr
     from matplotlib.figure import Figure
@@ -72,7 +74,7 @@ class DrawGeo:
         }
         self._saa = None
 
-    def set_saa(self: DrawGeo, saa_region: np.ndarray | None = None) -> Polygon:
+    def set_saa(self: DrawGeo) -> Polygon:
         """Define SAA region.
 
         Parameters
@@ -81,7 +83,7 @@ class DrawGeo:
            The coordinates of the vertices. When defined, then show SAA region
            as a matplotlib polygon patch
         """
-        self._saa = saa_region
+        self._saa = saa_region()
 
     def __draw_worldmap(self: DrawGeo, axx: Axes, whole_globe: bool = True) -> None:
         """Draw worldmap."""
@@ -101,19 +103,13 @@ class DrawGeo:
         glx.yformatter = LATITUDE_FORMATTER
 
     # --------------------------------------------------
-    def figure(self: DrawGeo) -> Figure:
-        """Define plot layout."""
-        # pylint: disable=abstract-class-instantiated
-        return plt.figure(figsize=(12.85, 6))
-
     def tracks(
         self: DrawGeo,
-        fig: Figure,
         lons: np.ndarray,
         lats: np.ndarray,
         icids: np.ndarray,
         title: str | None = None,
-    ) -> Axes:
+    ) -> tuple[Figure, Axes]:
         """Display tracks of satellite on a world map.
 
         This module uses the Robinson projection.
@@ -135,7 +131,7 @@ class DrawGeo:
            Title of this figure using `Axis.set_title`
         """
         myproj = {"projection": ccrs.Robinson(central_longitude=11.5)}
-        axx = fig.add_subplot(projection=myproj)
+        fig, axx = plt.subplots(figsize=(12.85, 6), subplot_kw=myproj)
 
         # add title to image panel
         if title is not None:
@@ -172,17 +168,17 @@ class DrawGeo:
                 transform=ccrs.PlateCarree(),
             )
             axx.add_patch(saa_poly)
-        return Axes
+        return fig, axx
 
+    # --------------------------------------------------
     def subsat(
         self: DrawGeo,
-        fig: Figure,
         lons: np.ndarray,
         lats: np.ndarray,
         *,
         whole_globe: bool = False,
         title: str | None = None,
-    ) -> Axes:
+    ) -> tuple[Figure, Axes]:
         """Display sub-satellite coordinates projected with TransverseMercator.
 
         Parameters
@@ -213,7 +209,7 @@ class DrawGeo:
         # inititalize figure
         # pylint: disable=abstract-class-instantiated
         myproj = {"projection": ccrs.ObliqueMercator(**set_proj_parms(lon_0, lat_0))}
-        axx = fig.add_subplot(projection=myproj)
+        fig, axx = plt.subplots(figsize=(12, 9), subplot_kw=myproj)
 
         # add title to image panel
         if title is not None:
@@ -234,9 +230,9 @@ class DrawGeo:
         )
         return axx
 
+    # --------------------------------------------------
     def mash(
         self: DrawGeo,
-        fig: Figure,
         lons: np.ndarray,
         lats: np.ndarray,
         data_in: np.ndarray | xr.DataArray,
@@ -245,7 +241,7 @@ class DrawGeo:
         vperc: list[float, float] | None = None,
         vrange: list[float, float] | None = None,
         title: str | None = None,
-    ) -> Axes:
+    ) -> tuple[Figure, Axes]:
         """Display sub-satellite coordinates projected with TransverseMercator.
 
         Parameters
@@ -314,7 +310,7 @@ class DrawGeo:
         # inititalize figure
         # pylint: disable=abstract-class-instantiated
         myproj = {"projection": ccrs.ObliqueMercator(**set_proj_parms(lon_0, lat_0))}
-        axx = fig.add_subplot(projection=myproj)
+        fig, axx = plt.subplots(figsize=(12, 9), subplot_kw=myproj)
 
         # add title to image panel
         if title is not None:

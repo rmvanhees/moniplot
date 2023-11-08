@@ -82,12 +82,12 @@ class DrawQhist:
         return fig, axarr
 
     def draw(
-            self: DrawQhist,
-            axarr: list[Axes],
-            qxds: xr.Dataset,
-            *,
-            density: bool = True,
-            title: str | None = None
+        self: DrawQhist,
+        axarr: list[Axes],
+        qxds: xr.Dataset,
+        *,
+        density: bool = True,
+        title: str | None = None,
     ) -> None:
         """Add a subplot showing pixel-quality data as a histogram.
 
@@ -108,7 +108,7 @@ class DrawQhist:
         axarr[0].set_title(title)
 
         for axx, key in zip(axarr, qxds.data_vars, strict=True):
-            qdata = np.flatten(qxds[key].values)
+            qdata = qxds[key].values.flatten()
             qdata[np.isnan(qdata)] = 0.0
 
             # draw histogram

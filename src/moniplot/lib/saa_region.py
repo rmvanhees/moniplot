@@ -27,4 +27,4 @@ def saa_region() -> tuple[tuple[float, float], ...]:
         except yaml.YAMLError as exc:
             raise RuntimeError("failed to read YAML file") from exc
 
-    return tuple(zip(res[0]['saa_lon'], res[1]['saa_lat']))
+    return tuple(zip(res[0]["saa_lon"], res[1]["saa_lat"], strict=True))

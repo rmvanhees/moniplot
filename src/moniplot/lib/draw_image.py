@@ -105,7 +105,13 @@ class DrawImage:
             if not isinstance(arr, xr.DataArray):
                 raise ValueError("Pixel-Quality data must be a xr.DataArray")
             # check attributes
-            for key in ["long_name", "thres_bad", "thres_worst", "flag_meanings", "flag_values"]:
+            for key in [
+                "long_name",
+                "thres_bad",
+                "thres_worst",
+                "flag_meanings",
+                "flag_values",
+            ]:
                 if key not in arr.attrs:
                     raise KeyError(f"attribute {key} not present in Pixel-Quality data")
                 self.attrs[key] = arr.attrs[key]
@@ -428,7 +434,7 @@ class DrawImage:
                 )
             axx["y-panel"].grid()
             return
-        
+
         match side_panels:
             case "none":
                 return
@@ -564,8 +570,12 @@ class DrawImage:
                 fig_info.add("median", biwght.median, "{:.5g}")
                 fig_info.add("spread", biwght.spread, "{:.5g}")
             else:
-                fig_info.add("median", (biwght.median, self.attrs["units"]), "{:.5g} {}")
-                fig_info.add("spread", (biwght.spread, self.attrs["units"]), "{:.5g} {}")
+                fig_info.add(
+                    "median", (biwght.median, self.attrs["units"]), "{:.5g} {}"
+                )
+                fig_info.add(
+                    "spread", (biwght.spread, self.attrs["units"]), "{:.5g} {}"
+                )
 
         # draw actual image
         self.__draw_image(axx, title)
