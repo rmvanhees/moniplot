@@ -228,7 +228,7 @@ class DrawGeo:
             linewidth=0,
             color=self._cset["satellite"],
         )
-        return axx
+        return fig, axx
 
     # --------------------------------------------------
     def mash(
@@ -342,4 +342,4 @@ class DrawGeo:
         # add color-bar
         plt.colorbar(img, cax=cax, label=zlabel)
 
-        return Axes
+        return fig, Axes

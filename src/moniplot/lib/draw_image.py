@@ -64,7 +64,9 @@ class DrawImage:
     --------
     Generate a figure with an detector image
 
-    >>>plot = DrawImage(arr2d)
+    >>> report = MONplot("test_monplot.pdf", "This is an example figure")
+    >>> report.set_institute("SRON")
+    >>> plot = DrawImage(arr2d)
     >>> fig, axx = plot.subplots()
     >>> plot.draw(axx, fig_info=fig_info, title="Dit is een ruis plaatje")
     >>> report.add_copyright(axx["image"])
