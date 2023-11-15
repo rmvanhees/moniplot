@@ -26,7 +26,8 @@ from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.dates import DateFormatter
+from matplotlib.dates import (AutoDateLocator, ConciseDateFormatter,
+                              DateFormatter, DayLocator)
 
 from moniplot.tol_colors import tol_rgba
 
@@ -46,7 +47,8 @@ class DrawLines:
     Generate a figure with four line-plots.
 
     >>> report = MONplot("test_monplot.pdf", "This is an example figure")
-    >>> report.set_institute("SRON")plot = DrawLines()
+    >>> report.set_institute("SRON")
+    >>> plot = DrawLines()
     >>> fig, axx = plt.subplots(2, 2, sharex="all", figsize=(10, 10))
     >>> plot.add_line(axx[0, 0], ydata1, xdata=xdata, marker=".", ls="-", label="1")
     >>> plot.add_line(axx[0, 0], ydata2, xdata=xdata, marker=".", ls="-", label="2")
@@ -69,11 +71,12 @@ class DrawLines:
         self: DrawLines,
         *,
         square: bool = False,
+        time_axis: bool = False
     ) -> None:
         """Create DrawLines object."""
         self._cset = tol_rgba(DEFAULT_CSET)
         self.square = square
-        self.time_axis = False
+        self.time_axis = time_axis
 
     def set_cset(self: DrawLines, cname: str, cnum: int | None = None) -> None:
         """Use alternative color-set through which `draw_lplot` will cycle.
@@ -188,8 +191,13 @@ class DrawLines:
 
         # format the X-axis when it is a time-axis
         if self.time_axis:
-            plt.gcf().autofmt_xdate()
-            plt.gca().xaxis.set_major_formatter(DateFormatter("%H:%M:%S"))
+            print("Use AutoDateLocator & ConciseDateFormatter")
+            locator = AutoDateLocator()
+            axx.xaxis.set_major_locator(locator)
+            axx.xaxis.set_major_formatter(ConciseDateFormatter(locator))
+            # date_fmt = DateFormatter("%H:%M:%S")
+            # plt.gca().xaxis.set_major_formatter(date_fmt)
+            # plt.gca().xaxis.set_major_locator(DayLocator(interval=7))
 
         # draw legenda in figure
         if axx.get_legend_handles_labels()[1]:
