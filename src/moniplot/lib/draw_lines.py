@@ -22,12 +22,16 @@ from __future__ import annotations
 
 __all__ = ["DrawLines"]
 
+import datetime as dt
 from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.dates import (AutoDateLocator, ConciseDateFormatter,
-                              DateFormatter, DayLocator)
+from matplotlib.dates import (
+    AutoDateLocator,
+    ConciseDateFormatter,
+    DateFormatter,
+)
 
 from moniplot.tol_colors import tol_rgba
 
@@ -71,12 +75,12 @@ class DrawLines:
         self: DrawLines,
         *,
         square: bool = False,
-        time_axis: bool = False
     ) -> None:
         """Create DrawLines object."""
         self._cset = tol_rgba(DEFAULT_CSET)
         self.square = square
-        self.time_axis = time_axis
+        self.xdata = None
+        self.time_axis = False
 
     def set_cset(self: DrawLines, cname: str, cnum: int | None = None) -> None:
         """Use alternative color-set through which `draw_lplot` will cycle.
@@ -97,7 +101,8 @@ class DrawLines:
         self._cset = tol_rgba(DEFAULT_CSET)
 
     def figsize(
-        self: DrawLines, ydata: np.ndarray | None = None
+        self: DrawLines,
+        ydata: np.ndarray | tuple | list | None = None,
     ) -> tuple[float, float]:
         """Create a figure and a set of subplots for line-plots."""
         if self.square:
@@ -113,9 +118,9 @@ class DrawLines:
     def add_line(
         self: DrawLines,
         axx: Axes,
-        ydata: np.ndarray,
+        ydata: np.ndarray | tuple | list,
         *,
-        xdata: np.ndarray | None = None,
+        xdata: np.ndarray | tuple | list | None = None,
         use_steps: bool = False,
         **kwargs: int,
     ) -> None:
@@ -125,10 +130,10 @@ class DrawLines:
         ----------
         axx :  matplotlib.Axes
             Matplotlib Axes object of plot window.
-        xdata :  array_like
-            X data.
-        ydata :  array_like
+        ydata :  np.ndarray | tuple | list
             Y data.
+        xdata :  np.ndarray | tuple | list, optional
+            X data.
         use_steps :  bool, default=False
             Use `matplotlib.pyplot.stairs` instead of matplotlib.pyplot..plot.
         **kwargs : keyword arguments
@@ -138,6 +143,18 @@ class DrawLines:
         --------
         matplotlib.pyplot.plot, matplotlib.pyplot.stairs
         """
+        if xdata is None:
+            xdata = np.arange(len(ydata)) if self.xdata is None else self.xdata
+        else:
+            if isinstance(xdata[0], dt.date | dt.time | dt.datetime):
+                xdata = np.asarray(xdata, dtype="datetime64")
+
+        if np.issubdtype(xdata.dtype, np.datetime64):
+            self.time_axis = True
+
+        if self.xdata is None:
+            self.xdata = xdata
+
         if not (axx.dataLim.mutatedx() or axx.dataLim.mutatedy()):
             axx.set_prop_cycle(color=self._cset)
 
@@ -191,13 +208,13 @@ class DrawLines:
 
         # format the X-axis when it is a time-axis
         if self.time_axis:
-            print("Use AutoDateLocator & ConciseDateFormatter")
-            locator = AutoDateLocator()
-            axx.xaxis.set_major_locator(locator)
-            axx.xaxis.set_major_formatter(ConciseDateFormatter(locator))
-            # date_fmt = DateFormatter("%H:%M:%S")
-            # plt.gca().xaxis.set_major_formatter(date_fmt)
-            # plt.gca().xaxis.set_major_locator(DayLocator(interval=7))
+            if abs(self.xdata[-1] - self.xdata[0]) <= np.timedelta64(1, "D"):
+                plt.gcf().autofmt_xdate()
+                axx.xaxis.set_major_formatter(DateFormatter("%H:%M:%S"))
+            else:
+                locator = AutoDateLocator()
+                axx.xaxis.set_major_locator(locator)
+                axx.xaxis.set_major_formatter(ConciseDateFormatter(locator))
 
         # draw legenda in figure
         if axx.get_legend_handles_labels()[1]:
