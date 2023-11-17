@@ -33,7 +33,7 @@ from matplotlib.dates import (
     DateFormatter,
 )
 
-from moniplot.tol_colors import tol_rgba
+from .tol_colors import tol_rgba
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -135,7 +135,7 @@ class DrawLines:
         xdata :  np.ndarray | tuple | list, optional
             X data.
         use_steps :  bool, default=False
-            Use `matplotlib.pyplot.stairs` instead of matplotlib.pyplot..plot.
+            Use `matplotlib.pyplot.stairs` instead of matplotlib.pyplot.plot.
         **kwargs : keyword arguments
             Keywords passed to matplotlib.pyplot.plot
 

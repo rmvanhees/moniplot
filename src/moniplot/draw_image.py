@@ -32,9 +32,9 @@ import numpy as np
 import xarray as xr
 from matplotlib.ticker import AutoMinorLocator
 
-from moniplot.biweight import Biweight
-from moniplot.lib.fig_info import FIGinfo
-from moniplot.tol_colors import tol_cmap, tol_cset
+from .biweight import Biweight
+from .lib.fig_info import FIGinfo
+from .tol_colors import tol_cmap, tol_cset
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -62,7 +62,7 @@ class DrawImage:
 
     Examples
     --------
-    Generate a figure with an detector image
+    Generate a figure with a detector image
 
     >>> report = MONplot("test_monplot.pdf", "This is an example figure")
     >>> report.set_institute("SRON")
@@ -331,15 +331,13 @@ class DrawImage:
             scale = max(1, abs(round((vmin + vmax) / 2)))
             vmin -= 1e-3 * scale
             vmax += 1e-3 * scale
+            vcntr = (vmin + vmax) / 2
+            if self._zscale == "diff" and vmin < 0 < vmax:
+                vcntr = 0.0
+                tmp1, tmp2 = (vmin, vmax)
+                vmin = -max(-tmp1, tmp2)
+                vmax = max(-tmp1, tmp2)
 
-            if self._zscale == "diff":
-                if vmin < 0 < vmax:
-                    vcntr = 0.0
-                    tmp1, tmp2 = (vmin, vmax)
-                    vmin = -max(-tmp1, tmp2)
-                    vmax = max(-tmp1, tmp2)
-                else:
-                    vcntr = (vmin + vmax) / 2
             return mcolors.TwoSlopeNorm(vcntr, vmin=vmin, vmax=vmax)
 
         if self._zscale == "ratio":
@@ -389,7 +387,7 @@ class DrawImage:
             axx["image"].set_yticks(np.linspace(0, self._image.shape[0], 5, dtype=int))
 
         if self._zscale == "quality":
-            bounds = self.attrs["flag_values"]
+            bounds = [int(i) for i in self.attrs["flag_values"]]
             mbounds = [
                 (bounds[ii + 1] + bounds[ii]) / 2 for ii in range(len(bounds) - 1)
             ]
@@ -485,7 +483,7 @@ class DrawImage:
 
         Parameters
         ----------
-        fig :  matplotlib.axes.Axes
+        axx :  matplotlib.axes.Axes
         fig_info :  FIGinfo
             Instance of pys5p.lib.plotlib.FIGinfo to be displayed
         """

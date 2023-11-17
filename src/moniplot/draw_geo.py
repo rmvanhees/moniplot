@@ -33,9 +33,8 @@ from cartopy.mpl.gridliner import LATITUDE_FORMATTER, LONGITUDE_FORMATTER
 from matplotlib.axes import Axes
 from matplotlib.patches import Polygon
 
-from moniplot.tol_colors import tol_cmap, tol_cset
-
-from .saa_region import saa_region
+from .lib.saa_region import saa_region
+from .tol_colors import tol_cmap, tol_cset
 
 if TYPE_CHECKING:
     import xarray as xr
@@ -74,15 +73,8 @@ class DrawGeo:
         }
         self._saa = None
 
-    def set_saa(self: DrawGeo) -> Polygon:
-        """Define SAA region.
-
-        Parameters
-        ----------
-        saa_region :  (N, 2) array-like, optional
-           The coordinates of the vertices. When defined, then show SAA region
-           as a matplotlib polygon patch
-        """
+    def set_saa(self: DrawGeo) -> None:
+        """Define SAA region."""
         self._saa = saa_region()
 
     def __draw_worldmap(self: DrawGeo, axx: Axes, whole_globe: bool = True) -> None:
@@ -122,11 +114,6 @@ class DrawGeo:
            Latitude coordinates at start and end of measurement
         icids :  (N) array-like
            ICID of measurements per (lon, lat)
-        saa_region :  (N, 2) array-like, optional
-           The coordinates of the vertices. When defined, then show SAA region
-           as a matplotlib polygon patch
-        fig_info :  FIGinfo, optional
-           OrderedDict holding meta-data to be displayed in the figure
         title :  str, optional
            Title of this figure using `Axis.set_title`
         """
@@ -241,7 +228,7 @@ class DrawGeo:
         vperc: list[float, float] | None = None,
         vrange: list[float, float] | None = None,
         title: str | None = None,
-    ) -> tuple[Figure, Axes]:
+    ) -> tuple[Figure, type[Axes]]:
         """Display sub-satellite coordinates projected with TransverseMercator.
 
         Parameters

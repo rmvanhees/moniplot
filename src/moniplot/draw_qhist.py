@@ -54,7 +54,7 @@ class DrawQhist:
     >>> report = MONplot("test_monplot.pdf", "This is an example figure")
     >>> report.set_institute("SRON")
     >>> plot = DrawQhist()
-    >>> fig, axarr = plot.subplot(len(xds.data_vars))
+    >>> fig, axarr = plot.subplots(len(xds.data_vars))
     >>> plot.draw(axarr, xds)
     >>> report.add_copyright(axx[-1])
     >>> report.close_this_page(fig, fig_info)
@@ -71,7 +71,8 @@ class DrawQhist:
         """
         return Rectangle((0, 0), 0, 0, fill=False, edgecolor="none", visible=False)
 
-    def subplots(self: DrawQhist, npanels: int) -> tuple[Figure, list[Axes, ...]]:
+    @staticmethod
+    def subplots(npanels: int) -> tuple[Figure, list[Axes, ...]]:
         """Create a figure and a set of subplots for qhist-plots."""
         figsize = (10.0, 1 + (npanels + 1) * 1.65)
         fig, axarr = plt.subplots(npanels, sharex="all", figsize=figsize)

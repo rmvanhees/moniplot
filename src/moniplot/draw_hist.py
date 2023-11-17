@@ -27,9 +27,8 @@ from typing import TYPE_CHECKING
 import numpy as np
 import xarray as xr
 
-from moniplot.biweight import Biweight
-
-from .fig_info import FIGinfo
+from .biweight import Biweight
+from .lib.fig_info import FIGinfo
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -60,6 +59,7 @@ class DrawHist:
     --------
     Generate a figure with two histogram plots.
 
+    >>> from moniplot.mon_plot import MONplot
     >>> report = MONplot("test_monplot.pdf", "This is an example figure")
     >>> report.set_institute("SRON")
     >>> fig, axx = plt.subplots(1, 2, sharey="all", figsize=(9, 8))

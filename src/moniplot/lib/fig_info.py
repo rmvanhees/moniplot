@@ -52,8 +52,8 @@ class FIGinfo:
         self: FIGinfo, loc: str = "above", info_dict: dict | None = None
     ) -> None:
         """Create FIGinfo instance to hold information on the current plot."""
-        self.fig_info = {} if info_dict is None else info_dict
-        self._location = None
+        self.fig_info: dict | None = {} if info_dict is None else info_dict
+        self._location: str | None = None
         self.set_location(loc)
 
     def __bool__(self: FIGinfo) -> bool:

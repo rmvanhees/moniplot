@@ -31,7 +31,7 @@ import numpy as np
 from matplotlib.patches import Rectangle
 from matplotlib.ticker import AutoMinorLocator, MultipleLocator
 
-from moniplot.tol_colors import tol_cset
+from .tol_colors import tol_cset
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -77,7 +77,8 @@ class DrawTrend:
     >>> report.close()
     """
 
-    def subplots(self: DrawTrend, npanels: int) -> tuple[Figure, list[Axes, ...]]:
+    @staticmethod
+    def subplots(npanels: int) -> tuple[Figure, list[Axes, ...]]:
         """Create a figure and a set of subplots for trend-plots."""
         figsize = (10.0, 1 + (npanels + 1) * 1.5)
         fig, axarr = plt.subplots(npanels, figsize=figsize)
@@ -217,7 +218,8 @@ class DrawTrend:
 
         return ()
 
-    def decoration(self: DrawTrend, xarr: xr.DataArray) -> dataclass:
+    @staticmethod
+    def decoration(xarr: xr.DataArray) -> dataclass:
         """Return decoration parameters for trend-plots."""
         mytitle = xarr.attrs["long_name"] if "long_name" in xarr.attrs else "unknown"
         if isinstance(mytitle, bytes):
@@ -281,7 +283,6 @@ class DrawTrend:
         axx: Axes,
         xarr: xr.DataArray,
         scatter: bool = False,
-        legend: bool = False,
     ) -> None:
         """Add a subplot for measurement data.
 
@@ -294,8 +295,6 @@ class DrawTrend:
             Dimension must be 'orbit', 'hours' or 'time'.
         scatter: bool, default=False
             Make a scatter plot
-        legend: bool, default=False
-            Place a legend holding the value of attribute 'long_name'.
         """
         # derive line-decoration from attributes of the DataArray
         deco_fig = self.decoration(xarr)
