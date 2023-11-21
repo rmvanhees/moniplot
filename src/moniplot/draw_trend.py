@@ -230,38 +230,37 @@ class DrawTrend:
             units = units.decode()
 
         line_cset = tol_cset("bright")
-        fill_cset = tol_cset("light")
         match units:
-            case "K":
+            case "K" | "mK":
                 if (ii := mytitle.find(" temperature")) > 0:
                     mytitle = mytitle[:ii]
                 mylabel = f"temperature [{units}]"
-                l_color = line_cset.cyan
-                f_color = fill_cset.light_cyan
-            case "V" | "?V" | "\u03bcV" | "Volt":
+                l_color = line_cset.purple
+                f_color = "#EEBBDD"
+            case "V" | "pV" | "nV" | "\u03bcV" | "mV" | "Volt":
                 if (ii := mytitle.find(" voltage")) > 0:
                     mytitle = mytitle[:ii]
                 mylabel = f"voltage [{units}]"
                 l_color = line_cset.yellow
-                f_color = fill_cset.light_yellow
-            case "A" | "?A" | "\u03bcA":
+                f_color = "#EEEEAA"
+            case "A" | "pA" | "nA" | "\u03bcA" | "mA":
                 if (ii := mytitle.find(" current")) > 0:
                     mytitle = mytitle[:ii]
                 mylabel = f"current [{units}]"
                 l_color = line_cset.green
-                f_color = fill_cset.pear
+                f_color = "#CCDDAA"
             case "%":
                 if (ii := mytitle.find(" duty")) > 0:
                     mytitle = mytitle[:ii]
                 mylabel = f"duty cycle [{units}]"
                 l_color = line_cset.red
-                f_color = fill_cset.orange
+                f_color = "#FFCCCC"
             case _:
                 mylabel = "count" if units == "1" else f"value [{units}]"
                 l_color = (
                     xarr.attrs["_color"] if "_color" in xarr.attrs else line_cset.blue
                 )
-                f_color = fill_cset.light_blue
+                f_color = "#BBCCEE" if l_color == line_cset.blue else "#CCCCCC"
 
         # overwrite ylabel
         if "_ylabel" in xarr.attrs:
