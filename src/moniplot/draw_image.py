@@ -174,9 +174,15 @@ class DrawImage:
         return min(4, max(1, int(round(self._image.shape[1] / self._image.shape[0]))))
 
     def subplots(
-        self: DrawImage, side_panels: str = "default"
+        self: DrawImage, side_panels: bool = True
     ) -> tuple[Figure, dict[str, Axes]]:
-        """..."""
+        """Obtain matplotlib Figure and Axes for plot-layout.
+
+        Parameters
+        ----------
+        side_panels : bool, optional
+           Do you want side_panels with row and column statistics
+        """
         match self.aspect:
             case 1:
                 width_ratios = (8, 0.5, 0.5)
@@ -193,9 +199,7 @@ class DrawImage:
             case _:
                 raise ValueError("unknown aspect-ratio")
 
-        if side_panels == "none":
-            mosaic = [["caption", ".", "info"], ["image", "colorbar", "."]]
-        else:
+        if side_panels:
             mosaic = [
                 [".", "caption", ".", "info"],
                 ["y-panel", "image", "colorbar", "."],
@@ -203,6 +207,8 @@ class DrawImage:
             ]
             width_ratios = (1,) + width_ratios
             height_ratios += (1,)
+        else:
+            mosaic = [["caption", ".", "info"], ["image", "colorbar", "."]]
 
         fig, axx = plt.subplot_mosaic(
             mosaic,
@@ -233,7 +239,7 @@ class DrawImage:
             labelright=True,
         )
         axx["colorbar"].ticklabel_format(useOffset=False)
-        if side_panels != "none":
+        if side_panels:
             for xtl in axx["image"].get_xticklabels():
                 xtl.set_visible(False)
             for ytl in axx["image"].get_yticklabels():
@@ -435,8 +441,6 @@ class DrawImage:
             return
 
         match side_panels:
-            case "none":
-                return
             case "nanmedian" | "default":
                 func_panels = np.nanmedian
             case "nanmean":
@@ -520,8 +524,7 @@ class DrawImage:
            OrderedDict holding meta-data to be displayed in the figure.
         side_panels :  str, default='nanmedian'
            Show image row and column statistics in two side panels.
-           Use 'none' when you do not want the side panels.
-           Other valid values are: 'median', 'nanmedian', 'mean', 'nanmean',
+           Valid values are: 'median', 'nanmedian', 'mean', 'nanmean',
            'quality', 'std' and 'nanstd'.
         title :  str, default=None
            Title of this figure using `Axis.set_title`.
