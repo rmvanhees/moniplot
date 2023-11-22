@@ -73,6 +73,7 @@ class DrawTrend:
     >>> dist2.attrs["units"] = "%"
     >>> plot.draw_hk(axx[3], dist2)
     >>> report.add_copyright(axx[3])
+    >>> axx[-1].set_xlabel('orbit')
     >>> report.close_this_page(fig, None)
     >>> report.close()
     """
@@ -218,8 +219,7 @@ class DrawTrend:
 
         return ()
 
-    @staticmethod
-    def decoration(xarr: xr.DataArray) -> dataclass:
+    def decoration(self: DrawTrend, xarr: xr.DataArray) -> dataclass:
         """Return decoration parameters for trend-plots."""
         mytitle = xarr.attrs["long_name"] if "long_name" in xarr.attrs else "unknown"
         if isinstance(mytitle, bytes):
@@ -228,6 +228,7 @@ class DrawTrend:
         units = xarr.attrs["units"] if "units" in xarr.attrs else "1"
         if isinstance(units, bytes):
             units = units.decode()
+        units = self.adjust_units(units)
 
         line_cset = tol_cset("bright")
         match units:
@@ -236,44 +237,38 @@ class DrawTrend:
                     mytitle = mytitle[:ii]
                 mylabel = f"temperature [{units}]"
                 l_color = line_cset.purple
-                f_color = "#EEBBDD"
             case "V" | "pV" | "nV" | "\u03bcV" | "mV" | "Volt":
                 if (ii := mytitle.find(" voltage")) > 0:
                     mytitle = mytitle[:ii]
                 mylabel = f"voltage [{units}]"
                 l_color = line_cset.yellow
-                f_color = "#EEEEAA"
             case "A" | "pA" | "nA" | "\u03bcA" | "mA":
                 if (ii := mytitle.find(" current")) > 0:
                     mytitle = mytitle[:ii]
                 mylabel = f"current [{units}]"
                 l_color = line_cset.green
-                f_color = "#CCDDAA"
-            case "%":
-                if (ii := mytitle.find(" duty")) > 0:
-                    mytitle = mytitle[:ii]
+            case "%" if mytitle.find(" duty") > 0:
+                mytitle = mytitle[:mytitle.find(" duty")]
                 mylabel = f"duty cycle [{units}]"
                 l_color = line_cset.red
-                f_color = "#FFCCCC"
             case _:
-                mylabel = "count" if units == "1" else f"value [{units}]"
-                l_color = (
-                    xarr.attrs["_color"] if "_color" in xarr.attrs else line_cset.blue
-                )
-                f_color = "#BBCCEE" if l_color == line_cset.blue else "#CCCCCC"
-
-        # overwrite ylabel
-        if "_ylabel" in xarr.attrs:
-            mylabel = xarr.attrs["_ylabel"]
+                mytitle = ""
+                mylabel = "value" if units == "1" else f"value [{units}]"
+                l_color = line_cset.blue
 
         @dataclass(frozen=True)
         class DecoFig:
             """Define figure decorations."""
 
-            fcolor: str = f_color
-            lcolor: str = l_color
-            label: str = mylabel
-            title: str = mytitle
+            # fill-color
+            fcolor: str = "#CCCCCC"
+            # line-color
+            lcolor: str = xarr.attrs["_color"] if "_color" in xarr.attrs else l_color
+            # suggestion for the ylabel
+            ylabel: str = xarr.attrs["_ylabel"] if "_ylabel" in xarr.attrs else mylabel
+            # suggestion for the figure legend entry
+            legend: str = xarr.attrs["legend"] if "legend" in xarr.attrs else \
+                mytitle if mytitle != 'value' else ""
 
         return DecoFig()
 
@@ -369,14 +364,15 @@ class DrawTrend:
         if "orbit" in xarr.coords:
             axx.set_ylim(self.adjust_ylim(avg, err1, err2, [], -1))
 
-        axx.set_ylabel(deco_fig.label)
+        axx.set_ylabel(deco_fig.ylabel)
         axx.grid(True)
 
         # add legend with name of dataset inside current subplots
-        legend = axx.legend(
-            [self.blank_legend_handle], [deco_fig.title], loc="upper left"
-        )
-        legend.draw_frame(False)
+        if deco_fig.legend:
+            legend = axx.legend(
+                [self.blank_legend_handle], [deco_fig.legend], loc="upper left"
+            )
+            legend.draw_frame(False)
 
     def draw_hk(
         self: DrawTrend,
@@ -456,11 +452,11 @@ class DrawTrend:
         axx.locator_params(axis="y", nbins=4)
         if "orbit" in xarr.coords:
             axx.set_ylim(self.adjust_ylim(avg, err1, err2, vperc, vrange_last_orbits))
-        axx.set_ylabel(deco_fig.label)
+        axx.set_ylabel(deco_fig.ylabel)
         axx.grid(True)
 
         # add legend with name of dataset inside current subplots
         legend = axx.legend(
-            [self.blank_legend_handle], [deco_fig.title], loc="upper left"
+            [self.blank_legend_handle], [deco_fig.legend], loc="upper left"
         )
         legend.draw_frame(False)

@@ -88,10 +88,8 @@ class DrawImage:
         self.attrs = {
             "long_name": "",
             "units": "1",
-            "dims": ["row", "colum"],
+            "dims": ["row", "column"],
         }
-        self._xlabel: str | None = None
-        self._ylabel: str | None = None
         self._zlabel: str = "value"
 
         # check parameter 'zscale'
@@ -108,6 +106,7 @@ class DrawImage:
                 raise ValueError("Pixel-Quality data must be a xr.DataArray")
             # check attributes
             for key in [
+                "colors",
                 "long_name",
                 "thres_bad",
                 "thres_worst",
@@ -579,6 +578,12 @@ class DrawImage:
 
         # draw actual image
         self.__draw_image(axx, title)
-        self.__draw_side_panels(axx, side_panels)
+        if "x-panel" not in axx:
+            axx["image"].set_xlabel(self.attrs["dims"][1])
+            axx["image"].set_ylabel(self.attrs["dims"][0])
+        else:
+            self.__draw_side_panels(axx, side_panels)
+            axx["x-panel"].set_xlabel(self.attrs["dims"][1])
+            axx["y-panel"].set_ylabel(self.attrs["dims"][0])
 
         self.__add_info_box(axx["info"], fig_info)
