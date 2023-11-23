@@ -357,7 +357,7 @@ class DrawImage:
 
         return mcolors.Normalize(vmin=vmin, vmax=vmax)
 
-    def __draw_image(self: DrawImage, axx: dict, title: str | None) -> None:
+    def __draw_image(self: DrawImage, axx: dict) -> None:
         """..."""
         if self._zscale == "quality":
             cm_img = axx["image"].imshow(
@@ -403,12 +403,6 @@ class DrawImage:
             axx["colorbar"].set_yticklabels(self.attrs["flag_meanings"])
         else:
             _ = plt.colorbar(cm_img, cax=axx["colorbar"], label=self._zlabel)
-
-        # add title to image panel
-        if title is not None:
-            axx["image"].set_title(title)
-        else:
-            axx["image"].set_title(self.attrs["long_name"])
 
     def __draw_side_panels(self: DrawImage, axx: dict, side_panels: str) -> None:
         """..."""
@@ -580,7 +574,13 @@ class DrawImage:
                 )
 
         # draw actual image
-        self.__draw_image(axx, title)
+        self.__draw_image(axx)
+                # add title to image panel
+        if title is not None:
+            axx["image"].set_title(title)
+        else:
+            axx["image"].set_title(self.attrs["long_name"])
+
         if "x-panel" not in axx:
             axx["image"].set_xlabel(self.attrs["dims"][1])
             axx["image"].set_ylabel(self.attrs["dims"][0])
