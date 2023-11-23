@@ -204,7 +204,7 @@ class DrawLines:
         if "xscale" in kwargs:
             axx.set_xscale(kwargs["xscale"])
         if "yscale" in kwargs:
-            axx.set_ylabel(kwargs["yscale"])
+            axx.set_yscale(kwargs["yscale"])
 
         # format the X-axis when it is a time-axis
         if self.time_axis:
@@ -215,6 +215,11 @@ class DrawLines:
                 locator = AutoDateLocator()
                 axx.xaxis.set_major_locator(locator)
                 axx.xaxis.set_major_formatter(ConciseDateFormatter(locator))
+        else:
+            if "xlim" in kwargs and (kwargs["xlim"][1] % 10) == 0:
+                axx.set_xticks(np.linspace(0, kwargs["xlim"][1], 6, dtype=int))
+            elif "xlim" in kwargs and (kwargs["xlim"][1] % 8) == 0:
+                axx.set_xticks(np.linspace(0, kwargs["xlim"][1], 5, dtype=int))
 
         # draw legenda in figure
         if axx.get_legend_handles_labels()[1]:
