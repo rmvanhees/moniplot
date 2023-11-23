@@ -118,7 +118,7 @@ class DrawGeo:
            Title of this figure using `Axis.set_title`
         """
         myproj = {"projection": ccrs.Robinson(central_longitude=11.5)}
-        fig, axx = plt.subplots(figsize=(12.85, 6), subplot_kw=myproj)
+        fig, axx = plt.subplots(figsize=(12, 6.5), subplot_kw=myproj)
 
         # add title to image panel
         if title is not None:
