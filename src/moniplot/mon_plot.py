@@ -27,9 +27,13 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
+import xarray as xr
 from matplotlib.backends.backend_pdf import PdfPages
 
+from .draw_image import DrawImage
+
 if TYPE_CHECKING:
+    import numpy as np
     from matplotlib.axes import Axes
     from matplotlib.figure import Figure
 
@@ -249,7 +253,11 @@ class MONplot:
         `matplotlib`. Maybe this should be the default, which the user may
         override.
         """
-        if title is None and isinstance(data, xr.DataArray) and "long_name" in data.attrs:
+        if (
+            title is None
+            and isinstance(data, xr.DataArray)
+            and "long_name" in data.attrs
+        ):
             title = data.attrs["long_name"]
 
         plot = DrawImage(data.copy(), **kwargs)
