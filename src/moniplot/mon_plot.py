@@ -139,12 +139,9 @@ class MONplot:
         if fig_info is None or fig_info.location != "above":
             return
 
-        xpos = 1 - 0.4 / fig.get_figwidth()
-        ypos = 1 - 0.25 / fig.get_figheight()
-
         fig.text(
-            xpos,
-            ypos,
+            1 - 0.4 / fig.get_figwidth(),
+            1 - 0.25 / fig.get_figheight(),
             fig_info.as_str(),
             fontsize="x-small",
             style="normal",
@@ -195,9 +192,9 @@ class MONplot:
         # add save figure
         if self.__pdf is None:
             plt.savefig(self.filename)
-            plt.close(fig)
         else:
             self.__pdf.savefig()
+        plt.close()
 
     def close(self: MONplot) -> None:
         """Close PNG or (multipage) PDF document."""
@@ -214,7 +211,7 @@ class MONplot:
         elif self.__institute:
             doc["Author"] = f"(c) {self.__institute}"
         self.__pdf.close()
-        plt.close("all")
+        # plt.close("all")
 
     def draw_signal(
         self: MONplot,

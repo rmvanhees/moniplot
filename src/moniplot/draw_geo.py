@@ -100,7 +100,6 @@ class DrawGeo:
         lons: np.ndarray,
         lats: np.ndarray,
         icids: np.ndarray,
-        title: str | None = None,
     ) -> tuple[Figure, Axes]:
         """Display tracks of satellite on a world map.
 
@@ -114,47 +113,42 @@ class DrawGeo:
            Latitude coordinates at start and end of measurement
         icids :  (N) array-like
            ICID of measurements per (lon, lat)
-        title :  str, optional
-           Title of this figure using `Axis.set_title`
         """
-        myproj = {"projection": ccrs.Robinson(central_longitude=11.5)}
-        fig, axx = plt.subplots(figsize=(12, 6.5), subplot_kw=myproj)
-
-        # add title to image panel
-        if title is not None:
-            axx.set_title(title)
+        fig = plt.figure(figsize=(12, 6.5))
+        # myproj = {"projection": ccrs.Robinson(central_longitude=11.5)}
+        axx = plt.axes(projection=ccrs.Robinson(central_longitude=11.5))
 
         # draw coastlines and gridlines
         axx.set_global()
         axx.coastlines(resolution="110m")
-        axx.gridlines()
-
-        # draw satellite position(s)
-        for val in np.unique(icids):
-            mask = icids == val
-            # pylint: disable=abstract-class-instantiated
-            plt.plot(
-                lons[mask],
-                lats[mask],
-                linestyle="",
-                marker="s",
-                markersize=2,
-                label=f"ICID: {val}",
-                transform=ccrs.PlateCarree(),
-            )
-        axx.legend(loc="lower left")
 
         # show SAA region
         if self._saa is not None:
             # pylint: disable=abstract-class-instantiated
             saa_poly = Polygon(
                 xy=self._saa,
-                closed=True,
+                closed=False,
                 alpha=1.0,
                 facecolor=tol_cset("bright").grey,
-                transform=ccrs.PlateCarree(),
+                transform=ccrs.Geodetic(),
             )
             axx.add_patch(saa_poly)
+
+        # draw satellite position(s)
+        for val in np.unique(icids):
+            mask = icids == val
+            # pylint: disable=abstract-class-instantiated
+            axx.scatter(
+                lons[mask],
+                lats[mask],
+                s=2,
+                marker="s",
+                label=f"ICID: {val}",
+                transform=ccrs.Geodetic(),
+            )
+        axx.legend(loc="lower left")
+        axx.gridlines()
+
         return fig, axx
 
     # --------------------------------------------------
