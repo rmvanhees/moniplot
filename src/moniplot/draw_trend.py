@@ -248,7 +248,7 @@ class DrawTrend:
                 mylabel = f"current [{units}]"
                 l_color = line_cset.green
             case "%" if mytitle.find(" duty") > 0:
-                mytitle = mytitle[:mytitle.find(" duty")]
+                mytitle = mytitle[: mytitle.find(" duty")]
                 mylabel = f"duty cycle [{units}]"
                 l_color = line_cset.red
             case _:
@@ -267,8 +267,13 @@ class DrawTrend:
             # suggestion for the ylabel
             ylabel: str = xarr.attrs["_ylabel"] if "_ylabel" in xarr.attrs else mylabel
             # suggestion for the figure legend entry
-            legend: str = xarr.attrs["legend"] if "legend" in xarr.attrs else \
-                mytitle if mytitle != 'value' else ""
+            legend: str = (
+                xarr.attrs["legend"]
+                if "legend" in xarr.attrs
+                else mytitle
+                if mytitle != "value"
+                else ""
+            )
 
         return DecoFig()
 

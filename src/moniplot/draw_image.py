@@ -337,12 +337,15 @@ class DrawImage:
             vmin -= 1e-3 * scale
             vmax += 1e-3 * scale
             vcntr = (vmin + vmax) / 2
-            if self._zscale == "diff" and vmin < 0 < vmax:
+
+        if self._zscale == "diff":
+            if vmin < 0 < vmax:
                 vcntr = 0.0
                 tmp1, tmp2 = (vmin, vmax)
                 vmin = -max(-tmp1, tmp2)
                 vmax = max(-tmp1, tmp2)
-
+            else:
+                vcntr = (vmin + vmax) / 2
             return mcolors.TwoSlopeNorm(vcntr, vmin=vmin, vmax=vmax)
 
         if self._zscale == "ratio":
@@ -575,7 +578,7 @@ class DrawImage:
 
         # draw actual image
         self.__draw_image(axx)
-                # add title to image panel
+        # add title to image panel
         if title is not None:
             axx["image"].set_title(title)
         else:
