@@ -220,8 +220,24 @@ class DrawTrend:
         return ()
 
     def decoration(self: DrawTrend, xarr: xr.DataArray) -> dataclass:
-        """Return decoration parameters for trend-plots."""
-        mytitle = xarr.attrs["long_name"] if "long_name" in xarr.attrs else "unknown"
+        """Return decoration parameters for trend-plots.
+
+        Notes
+        -----
+        Please make sure that your DataArray contains attributes: 'long_name'
+        and 'units'. Then if 'long_name' contains temperature, voltage, current and
+        duty-cycle ylabel & legend will be defined.
+
+
+        Returns
+        -------
+        dataclass
+         - fcolor: fill-color used in axx.fill_between()
+         - lcolor: line-color used in axx.plot() or axx.step(), overwitten by '_color'
+         - ylabel: text along the y-axis, overwritten by '_ylabel'
+         - legend: text displayed with axx.legend(), overwritten by 'legend'
+        """
+        mytitle = xarr.attrs["long_name"] if "long_name" in xarr.attrs else ""
         if isinstance(mytitle, bytes):
             mytitle = mytitle.decode()
 
@@ -231,8 +247,9 @@ class DrawTrend:
         units = self.adjust_units(units)
 
         line_cset = tol_cset("bright")
+        l_color = line_cset.blue
         match units:
-            case "K" | "mK":
+            case "K" | "mK" | "C" | "mC":
                 if (ii := mytitle.find(" temperature")) > 0:
                     mytitle = mytitle[:ii]
                 mylabel = f"temperature [{units}]"
@@ -252,9 +269,11 @@ class DrawTrend:
                 mylabel = f"duty cycle [{units}]"
                 l_color = line_cset.red
             case _:
+                if "legend" in xarr.attrs:
+                    mylabel = "count" if units == "1" else f"value [{units}]"
+                else:
+                    mylabel = f"{mytitle}" if units == "1" else f"{mytitle} [{units}]"
                 mytitle = ""
-                mylabel = "value" if units == "1" else f"value [{units}]"
-                l_color = line_cset.blue
 
         @dataclass(frozen=True)
         class DecoFig:
@@ -267,13 +286,7 @@ class DrawTrend:
             # suggestion for the ylabel
             ylabel: str = xarr.attrs["_ylabel"] if "_ylabel" in xarr.attrs else mylabel
             # suggestion for the figure legend entry
-            legend: str = (
-                xarr.attrs["legend"]
-                if "legend" in xarr.attrs
-                else mytitle
-                if mytitle != "value"
-                else ""
-            )
+            legend: str = xarr.attrs["legend"] if "legend" in xarr.attrs else mytitle
 
         return DecoFig()
 
