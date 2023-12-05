@@ -117,10 +117,7 @@ class DrawGeo:
         fig = plt.figure(figsize=(12, 6.5))
         # myproj = {"projection": ccrs.Robinson(central_longitude=11.5)}
         axx = plt.axes(projection=ccrs.Robinson(central_longitude=11.5))
-
-        # draw coastlines and gridlines
         axx.set_global()
-        axx.coastlines(resolution="110m")
 
         # show SAA region
         if self._saa is not None:
@@ -147,6 +144,9 @@ class DrawGeo:
                 transform=ccrs.Geodetic(),
             )
         axx.legend(loc="lower left")
+
+        # draw coastlines and gridlines
+        axx.coastlines(resolution="110m")
         axx.gridlines()
 
         return fig, axx
