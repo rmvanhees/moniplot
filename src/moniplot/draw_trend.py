@@ -264,6 +264,9 @@ class DrawTrend:
                     mytitle = mytitle[:ii]
                 mylabel = f"current [{units}]"
                 l_color = line_cset.green
+            case "e" | "1" if mytitle.find("noise") > 0:
+                mytitle = ""
+                mylabel = "value" if units == "1" else f"value [{units}]"
             case "%" if mytitle.find(" duty") > 0:
                 mytitle = mytitle[: mytitle.find(" duty")]
                 mylabel = f"duty cycle [{units}]"
@@ -272,7 +275,7 @@ class DrawTrend:
                 if "legend" in xarr.attrs:
                     mylabel = "count" if units == "1" else f"value [{units}]"
                 else:
-                    mylabel = f"{mytitle}" if units == "1" else f"{mytitle} [{units}]"
+                    mylabel = mytitle if units == "1" else f"{mytitle} [{units}]"
                 mytitle = ""
 
         @dataclass(frozen=True)
