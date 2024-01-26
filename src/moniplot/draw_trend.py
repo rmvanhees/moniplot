@@ -87,6 +87,9 @@ class DrawTrend:
             axarr = [axarr]
         margin = min(1.0 / (1.65 * (npanels + 1)), 0.25)
         fig.subplots_adjust(bottom=margin, top=1 - margin, hspace=0.05)
+        for ii in range(npanels - 1):
+            for xtl in axarr[ii].get_xticklabels():
+                xtl.set_visible(False)
 
         return fig, axarr
 
@@ -456,7 +459,13 @@ class DrawTrend:
                     linewidth=0,
                     facecolor=deco_fig.fcolor,
                 )
-                axx.plot(xdata[isel], avg[isel], linewidth=1.5, color=deco_fig.lcolor)
+                axx.step(
+                    np.append(xdata[isel], xdata[jj]),
+                    np.append(avg[isel], avg[jj]),
+                    where="post",
+                    linewidth=1.5,
+                    color=deco_fig.lcolor,
+                )
             else:
                 axx.plot(xdata[isel], avg[isel], linewidth=1.5, color=deco_fig.lcolor)
             ii = jj + 1
