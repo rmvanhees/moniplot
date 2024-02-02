@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2019-2023 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2019-2024 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""This module contains our Python of the Tukey's biweight algorithm."""
+"""Python implementation of the Tukey's biweight algorithm."""
 
 from __future__ import annotations
 
@@ -68,6 +68,7 @@ class Biweight:
        0.5042069490893494
        > Biweight((1, 2, 2.5, 1.75, 2)).unbiased_std
        0.6131156500926488
+
     """
 
     def __init__(
@@ -209,6 +210,7 @@ def biweight(
     -------
     out : ndarray or tuple
        biweight median and biweight spread if parameter "spread" is True
+
     """
     bwght = Biweight(data, axis=axis)
     if spread:

@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2024 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,8 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""This module contains the class `DrawTrend`."""
+#
+"""Definition of the monitplot class `DrawTrend`."""
 
 from __future__ import annotations
 
@@ -76,6 +77,7 @@ class DrawTrend:
     >>> axx[-1].set_xlabel('orbit')
     >>> report.close_this_page(fig, None)
     >>> report.close()
+
     """
 
     @staticmethod
@@ -100,6 +102,7 @@ class DrawTrend:
         See Also
         --------
         matplotlib.pyplot.legend : Place a legend on the Axes.
+
         """
         return Rectangle((0, 0), 0, 0, fill=False, edgecolor="none", visible=False)
 
@@ -130,6 +133,7 @@ class DrawTrend:
         -------
         tuple of floats
             Return the limits of the Y-coordinate
+
         """
         if err1 is not None and err2 is not None:
             indx = np.isfinite(err1) & np.isfinite(err2)
@@ -185,6 +189,7 @@ class DrawTrend:
         -------
         str
             Units with consistent abbreviation of electron(s) and Volt
+
         """
         if zunit is None or zunit == "1":
             return "1"
@@ -211,6 +216,7 @@ class DrawTrend:
         -------
         list
             Indices to xdata where np.diff(xdata) greater than xstep
+
         """
         if not issubclass(xdata.dtype.type, Integral):
             return ()
@@ -239,12 +245,13 @@ class DrawTrend:
          - lcolor: line-color used in axx.plot() or axx.step(), overwitten by '_color'
          - ylabel: text along the y-axis, overwritten by '_ylabel'
          - legend: text displayed with axx.legend(), overwritten by 'legend'
+
         """
-        mytitle = xarr.attrs["long_name"] if "long_name" in xarr.attrs else ""
+        mytitle = xarr.attrs.get("long_name", "")
         if isinstance(mytitle, bytes):
             mytitle = mytitle.decode()
 
-        units = xarr.attrs["units"] if "units" in xarr.attrs else "1"
+        units = xarr.attrs.get("units", "1")
         if isinstance(units, bytes):
             units = units.decode()
         units = self.adjust_units(units)
@@ -288,11 +295,11 @@ class DrawTrend:
             # fill-color
             fcolor: str = "#CCCCCC"
             # line-color
-            lcolor: str = xarr.attrs["_color"] if "_color" in xarr.attrs else l_color
+            lcolor: str = xarr.attrs.get("_color", l_color)
             # suggestion for the ylabel
-            ylabel: str = xarr.attrs["_ylabel"] if "_ylabel" in xarr.attrs else mylabel
+            ylabel: str = xarr.attrs.get("_ylabel", mylabel)
             # suggestion for the figure legend entry
-            legend: str = xarr.attrs["legend"] if "legend" in xarr.attrs else mytitle
+            legend: str = xarr.attrs.get("legend", mytitle)
 
         return DecoFig()
 
@@ -313,6 +320,7 @@ class DrawTrend:
             Dimension must be 'orbit', 'hours' or 'time'.
         scatter: bool, default=False
             Make a scatter plot
+
         """
         # derive line-decoration from attributes of the DataArray
         deco_fig = self.decoration(xarr)
@@ -419,6 +427,7 @@ class DrawTrend:
             (neglected when vrange_last_orbits is used)
         vrange_last_orbits :  int
             Use the last N orbits to determine vrange (orbit coordinate only)
+
         """
         # derive line-decoration from attributes of the DataArray
         deco_fig = self.decoration(xarr)

@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2019-2023, Paul Tol
+# Copyright (c) 2019-2024, Paul Tol
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,8 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
-This module contains definitions of color schemes and color sets.
+#
+"""Definitions of the moniplot color schemes and color sets.
 
 Provided by `Paul Tol <https://personal.sron.nl/~pault/>`_.
 
@@ -722,6 +722,7 @@ def tol_cmap(colormap: str = None, lut: int = 0) -> colormaps:
     Typical usage::
 
     > cmap = tol_cmap('nightfall')
+
     """
     if colormap is None:
         return _cmap_dict.keys()
@@ -770,6 +771,7 @@ def tol_cset(colorset: str = None) -> dataclass:
     Typical usage::
 
     > cset = tol_cset('bright')
+
     """
     if colorset is None:
         return _cset_dict.keys()
@@ -786,6 +788,7 @@ def tol_rgba(cname: str, lut: int | None = None) -> np.ndarray:
        Name of a colormap or colorset.
     lut : int, default=0
        Number of discrete colors in colormap (*not colorset*).
+
     """
     if cname == "rainbow_discrete":
         cclass = RainbowDiscrete()

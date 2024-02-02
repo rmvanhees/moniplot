@@ -1,12 +1,21 @@
 #
-# This file is part of pyspex
+# https://github.com/rmvanhees/moniplot.git
 #
-# https://github.com/rmvanhees/pyspex.git
+# Copyright (c) 2023-2024 SRON - Netherlands Institute for Space Research
 #
-# Copyright (c) 2023 SRON - Netherlands Institute for Space Research
-#    All Rights Reserved
+# License:  GPLv3
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
 #
-# License:  BSD-3-Clause
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 """Read SAA definition from YAML file."""
 

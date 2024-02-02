@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2024 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,8 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""This module contains the class `DrawImage`."""
+#
+"""Definition of the moniplot class `DrawGeo`."""
 
 from __future__ import annotations
 
@@ -60,7 +61,7 @@ def set_proj_parms(lon_0: float = 0.0, lat_0: float = 0.0) -> dict:
 
 # - class definition -------------------------------
 class DrawGeo:
-    """..."""
+    """Class to show satellite tracks or sub-satellite points projected on the Earth."""
 
     def __init__(self: DrawGeo) -> None:
         """..."""
@@ -113,6 +114,7 @@ class DrawGeo:
            Latitude coordinates at start and end of measurement
         icids :  (N) array-like
            ICID of measurements per (lon, lat)
+
         """
         fig = plt.figure(figsize=(12, 6.5))
         # myproj = {"projection": ccrs.Robinson(central_longitude=11.5)}
@@ -173,6 +175,7 @@ class DrawGeo:
         title :  str, optional
            Title of the figure. Default is None
            Suggestion: use attribute "comment" of data-product
+
         """
         # determine central longitude
         if lons.max() - lons.min() > 180:
@@ -244,6 +247,7 @@ class DrawGeo:
         title :  str, optional
            Title of the figure. Default is None
            Suggestion: use attribute "comment" of data-product
+
         """
 
         def extent_arr(aa: np.ndarray) -> np.ndarray:

@@ -2,7 +2,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2024 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -18,10 +18,9 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
-"""This is the SRON Python package `moniplot`.
+"""SRON Python package: `moniplot`.
 
-Moniplot is a Python data visualization library for (satellite)
-instrument monitoring.
+Moniplot is a Python data visualization library for (satellite) instrument monitoring.
 """
 import contextlib
 from importlib.metadata import PackageNotFoundError, version

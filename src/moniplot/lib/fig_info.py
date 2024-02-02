@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2024 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,8 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""This module contains the class `FIGinfo`."""
+#
+"""Definition of the moniplot class `FIGinfo`."""
 
 from __future__ import annotations
 
@@ -46,6 +47,7 @@ class FIGinfo:
     The figure-box can only hold a limited number of entries, because it will
     grow with the number of lines and overlap with the main image or its
     color bar. You may try loc='below', which is only available for image plots.
+
     """
 
     def __init__(
@@ -80,6 +82,7 @@ class FIGinfo:
         ----------
         loc : str
           Location of the fig_info box
+
         """
         if loc not in ("above", "none"):
             raise KeyError("location should be: 'above' or 'none'")
@@ -97,6 +100,7 @@ class FIGinfo:
           Value of the fig_info key. A tuple will be formatted as \*value
         fmt : str, default='{}'
           Convert value to a string, using the string format method
+
         """
         if isinstance(value, tuple):
             self.fig_info[key] = fmt.format(*value)
@@ -110,7 +114,7 @@ class FIGinfo:
             info_str += f"{key}: {value}\n"
 
         # add timestamp
-        res = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
+        res = dt.datetime.now(dt.UTC).isoformat(timespec="seconds")
         info_str += f"created: {res.replace('+00:00', 'Z')}"
 
         return info_str

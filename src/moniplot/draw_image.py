@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2024 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""This module contains the class `DrawImage`."""
+"""Definition of the moniplot class `DrawImage`."""
 
 from __future__ import annotations
 
@@ -72,6 +72,7 @@ class DrawImage:
     >>> report.add_copyright(axx["image"])
     # Note fig_info=None, already added by plot.draw
     >>> report.close_this_page(fig, None)
+
     """
 
     def __init__(
@@ -182,6 +183,7 @@ class DrawImage:
         ----------
         side_panels : bool, optional
            Do you want side_panels with row and column statistics
+
         """
         match self.aspect:
             case 1:
@@ -280,6 +282,7 @@ class DrawImage:
         -------
         dscale
             Factor to scale data accoring to zunits
+
         """
         if zunits == "1":
             return 1
@@ -328,6 +331,7 @@ class DrawImage:
         Returns
         -------
         matplotlib.colors.mcolors
+
         """
         if self._zscale == "log":
             return mcolors.LogNorm(vmin=max(vmin, 1e-6), vmax=vmax)
@@ -484,8 +488,10 @@ class DrawImage:
         Parameters
         ----------
         axx :  matplotlib.axes.Axes
+            Matplotlib Axes object
         fig_info :  FIGinfo
             Instance of pys5p.lib.plotlib.FIGinfo to be displayed
+
         """
         if fig_info is None or fig_info.location != "above":
             return
@@ -517,6 +523,7 @@ class DrawImage:
         Parameters
         ----------
         axx :  dict[str, Axes]
+           Dictionary with Matplotlib Axes objects
         fig_info :  FIGinfo, <default=None
            OrderedDict holding meta-data to be displayed in the figure.
         side_panels :  str, default='nanmedian'
@@ -542,6 +549,7 @@ class DrawImage:
         (`numpy.ndarray` or `xarray.DataArray`) with side-panels and title::
 
         ...
+
         """
         # add data statistics to fig_info
         if fig_info is None:

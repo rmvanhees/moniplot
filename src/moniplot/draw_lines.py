@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2024 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,8 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""This module contains the class `DrawLines`."""
+#
+"""Definition of the monitplot class `DrawLines`."""
 
 from __future__ import annotations
 
@@ -69,6 +70,7 @@ class DrawLines:
     >>> report.add_copyright(axx[1, 1])
     >>> report.close_this_page(fig, None)
     >>> report.close()
+
     """
 
     def __init__(
@@ -91,6 +93,7 @@ class DrawLines:
            Name of color set. Use None to get the default matplotlib value.
         cnum : int, optional
            Number of discrete colors in colormap (*not colorset*).
+
         """
         if not isinstance(cname, str):
             raise ValueError("The name of a color-set should be a string.")
@@ -142,6 +145,7 @@ class DrawLines:
         See Also
         --------
         matplotlib.pyplot.plot, matplotlib.pyplot.stairs
+
         """
         if xdata is None:
             xdata = np.arange(len(ydata)) if self.xdata is None else self.xdata
@@ -186,6 +190,7 @@ class DrawLines:
             Default: {'fontsize': 'small', 'loc': 'best'}
         **kwargs :  keyword arguments
             Recognized are 'xlabel', 'ylabel', 'xlim', 'ylim', 'xscale', 'yscale'
+
         """
         # add title to image panel
         if title is not None:

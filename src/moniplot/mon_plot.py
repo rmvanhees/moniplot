@@ -3,7 +3,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2024 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,9 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""This module contains the class `MONplot`."""
+#
+"""Definition of the moniplot class `MONplot`."""
+
 from __future__ import annotations
 
 __all__ = ["MONplot"]
@@ -47,8 +49,7 @@ if TYPE_CHECKING:
 
 # - main function ----------------------------------
 class MONplot:
-    """
-    Generate PDF reports (or figures) for instrument calibration or monitoring.
+    """Generate PDF reports (or figures) for instrument calibration or monitoring.
 
     Parameters
     ----------
@@ -65,6 +66,7 @@ class MONplot:
     However, when you use the labeled arrays and datasets of `xarray`then
     the software will use the name of the xarray class, coordinate names and
     data attributes, such as `long_name` and `units`.
+
     """
 
     def __init__(
@@ -93,6 +95,7 @@ class MONplot:
         ----------
         caption :  str
            Default title of all pages at the top of the page.
+
         """
         self.__caption = caption
 
@@ -110,6 +113,7 @@ class MONplot:
         institute :  str
            Provide abbreviation of the name of your institute to be used in
            the copyright statement in the main panel of the figures.
+
         """
         self.__institute = institute
 
@@ -134,7 +138,10 @@ class MONplot:
         Parameters
         ----------
         fig :  matplotlib.figure.Figure
+           Matplotlib object Figure
         fig_info :  FIGinfo, optional
+           Moniplot object with figure annotations
+
         """
         if fig_info is None or fig_info.location != "above":
             return
@@ -185,6 +192,7 @@ class MONplot:
            Provide text for the figure info-box
         axx: Axes, optional
            Provide axes and use set_title to place the caption (DrawImage)
+
         """
         self.__add_caption(fig, axx)
         self.__add_fig_box(fig, fig_info)
@@ -249,6 +257,7 @@ class MONplot:
         Currently, we have turned off the automatic offset notation of
         `matplotlib`. Maybe this should be the default, which the user may
         override.
+
         """
         if (
             title is None

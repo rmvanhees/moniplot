@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2024 SRON - Netherlands Institute for Space Research
 # All rights reserved.
 #
 # License:  GPLv3
@@ -42,6 +42,7 @@ def add_fig_box(axx_c: Axes, aspect: int, fig_info: FIGinfo) -> None:
     aspect :  int
     fig_info :  FIGinfo
         instance of moniplot.lib.fig_info to be displayed
+
     """
     if fig_info is None:
         return

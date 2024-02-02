@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022-2023 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2024 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
-This module contains the routines `h5_to_xr` and `data_to_xr`.
+"""Definition of the moniplot routines `h5_to_xr` and `data_to_xr`.
 
 These functions store a HDF5 dataset or numpy array in a labeled array
 (class `xarray.DataArray`).
@@ -50,6 +49,7 @@ def __get_attrs(dset: h5py.Dataset, field: str) -> dict:
     Returns
     -------
     dict with numpy arrays
+
     """
     _field = None
     if field is not None:
@@ -106,6 +106,7 @@ def __get_coords(dset: h5py.Dataset, data_sel: tuple[slice | int]) -> list:
     Returns
     -------
     A sequence of tuples [(dims, data), ...]
+
     """
     coords = []
     if len(dset.dims) == dset.ndim:
@@ -154,6 +155,7 @@ def __set_coords(
     Returns
     -------
     A sequence of tuples [(dims, data), ...]
+
     """
     if dims is None:
         if dset.ndim > 3:
@@ -193,6 +195,7 @@ def __get_data(
     Notes
     -----
     Read floats always as doubles
+
     """
     if data_sel is None:
         data_sel = ()
@@ -226,6 +229,7 @@ def __check_selection(data_sel: slice | tuple | int, ndim: int) -> slice | tuple
     * [2-D dataset]: np.s\_[:-1, :], np.s\_[0, :], np.s\_[:-1, 0]
     * [3-D dataset]: np.s\_[:-1, :, 2:4], np.s\_[0, :, :], np.s\_[:-1, 0, 2:4]
     * [Ellipsis] np.s\_[0, ...], np.s\_[..., 4], np.s\_[0, ..., 4]
+
     """
     if data_sel in (np.s_[:], np.s_[...], np.s_[()]):
         return None
@@ -314,6 +318,7 @@ def h5_to_xr(
 
     > xdata = xdata.assign_coords(
     > ... column = np.arange(xdata.column.size, dtype='u4'))
+
     """
     # Check data selection
     if data_sel is not None:
@@ -385,6 +390,7 @@ def data_to_xr(
     Notes
     -----
     All floating datasets are converted to Python type 'float'
+
     """
     coords = __set_coords(data, None, dims)
     attrs = {

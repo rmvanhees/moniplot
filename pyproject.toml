@@ -65,6 +65,7 @@ where = ["src"]
 line-length = 88
 target-version = "py311"
 
+[tool.ruff.lint]
 select = [
   "F",   # pyflakes
   "D",   # pydocstyle
@@ -81,7 +82,7 @@ select = [
   "TCH", # flake8-type-checking
   "NPY", # NumPy-specific rules
 ]
-ignore = ["Q000", "Q003"]
+ignore = ["D203", "D213", "Q000", "Q003"]
 
-[tool.ruff.pydocstyle]
+[lint.pydocstyle]
 convention = "pep257"
