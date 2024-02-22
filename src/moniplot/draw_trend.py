@@ -277,6 +277,10 @@ class DrawTrend:
             case "e" | "1" if mytitle.find("noise") > 0:
                 mytitle = ""
                 mylabel = "value" if units == "1" else f"value [{units}]"
+            case "W" if mytitle.find(" power") > 0:
+                mytitle = mytitle[: mytitle.find(" power")]
+                mylabel = f"power [{units}]"
+                l_color = line_cset.purple
             case "%" if mytitle.find(" duty") > 0:
                 mytitle = mytitle[: mytitle.find(" duty")]
                 mylabel = f"duty cycle [{units}]"
