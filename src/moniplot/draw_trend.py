@@ -84,7 +84,7 @@ class DrawTrend:
     def subplots(npanels: int) -> tuple[Figure, list[Axes, ...]]:
         """Create a figure and a set of subplots for trend-plots."""
         figsize = (10.0, 1 + (npanels + 1) * 1.5)
-        fig, axarr = plt.subplots(npanels, figsize=figsize)
+        fig, axarr = plt.subplots(npanels, figsize=figsize, sharex=True)
         if npanels == 1:
             axarr = [axarr]
         margin = min(1.0 / (1.65 * (npanels + 1)), 0.25)
