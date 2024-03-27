@@ -218,13 +218,17 @@ class DrawTrend:
             Indices to xdata where np.diff(xdata) greater than xstep
 
         """
-        if not issubclass(xdata.dtype.type, Integral):
+        if issubclass(xdata.dtype.type, np.datetime64):
+            diff_data = np.rint(np.diff(xdata).astype(float) / 1e9).astype(int)
+        elif issubclass(xdata.dtype.type, Integral):
+            diff_data = np.diff(xdata)
+        else:
             return ()
 
-        uvals, counts = np.unique(np.diff(xdata), return_counts=True)
+        uvals, counts = np.unique(diff_data, return_counts=True)
         if counts.size > 1 and counts.max() / xdata.size > 0.5:
             xstep = uvals[counts.argmax()]
-            return tuple(i for i in (np.diff(xdata) > xstep).nonzero()[0])
+            return tuple(i for i in (diff_data > xstep).nonzero()[0])
 
         return ()
 
