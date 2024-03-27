@@ -140,7 +140,7 @@ class DrawGeo:
             axx.add_patch(saa_poly)
 
         # draw satellite position(s)
-        cset = tol_cset("mute")
+        cset = tol_cset("muted")
         for ii, val in enumerate(np.unique(icids)):
             mask = icids == val
             # pylint: disable=abstract-class-instantiated
@@ -153,7 +153,10 @@ class DrawGeo:
                 label=f"{label_id}: {val}",
                 transform=ccrs.Geodetic(),
             )
-        axx.legend(loc="lower left")
+        if ii < 5:
+            axx.legend(loc="lower left")
+        else:
+            axx.legend(loc="upper left", bbox_to_anchor=(-0.15, 1))
 
         # draw coastlines and gridlines
         axx.coastlines(resolution="110m")
