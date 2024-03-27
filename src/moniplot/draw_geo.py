@@ -140,13 +140,15 @@ class DrawGeo:
             axx.add_patch(saa_poly)
 
         # draw satellite position(s)
-        for val in np.unique(icids):
+        cset = tol_cset("mute")
+        for ii, val in enumerate(np.unique(icids)):
             mask = icids == val
             # pylint: disable=abstract-class-instantiated
             axx.scatter(
                 lons[mask],
                 lats[mask],
                 marker="s",
+                c=cset.colors[ii % 9] if val > 0 else cset.pale_grey,
                 s=markersize,
                 label=f"{label_id}: {val}",
                 transform=ccrs.Geodetic(),
