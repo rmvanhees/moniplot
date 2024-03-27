@@ -101,6 +101,8 @@ class DrawGeo:
         lons: np.ndarray,
         lats: np.ndarray,
         icids: np.ndarray,
+        markersize: int = 2,
+        label_id: str = "ICID",
     ) -> tuple[Figure, Axes]:
         """Display tracks of satellite on a world map.
 
@@ -113,7 +115,11 @@ class DrawGeo:
         lats :  (N, 2) array-like
            Latitude coordinates at start and end of measurement
         icids :  (N) array-like
-           ICID of measurements per (lon, lat)
+           Measurements settings ID per (lon, lat)
+        label_id :  str, default="ICID"
+           Measurement settings can be ICID (Tropomi) or MPS_ID (SPEXone)
+        markersize :  int, default=2
+           Size of the marker (matplotlib.pyplot.scatter)
 
         """
         fig = plt.figure(figsize=(12, 6.5))
@@ -140,9 +146,9 @@ class DrawGeo:
             axx.scatter(
                 lons[mask],
                 lats[mask],
-                s=2,
                 marker="s",
-                label=f"ICID: {val}",
+                s=markersize,
+                label=f"{label_id}: {val}",
                 transform=ccrs.Geodetic(),
             )
         axx.legend(loc="lower left")
