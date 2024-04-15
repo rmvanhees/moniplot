@@ -29,6 +29,7 @@ from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.dates import AutoDateLocator, ConciseDateFormatter
 from matplotlib.patches import Rectangle
 from matplotlib.ticker import AutoMinorLocator, MultipleLocator
 
@@ -395,6 +396,10 @@ class DrawTrend:
         if "hours" in xarr.coords:
             axx.xaxis.set_major_locator(MultipleLocator(3))
             axx.xaxis.set_minor_locator(MultipleLocator(1))
+        elif "time" in xarr.coords:
+            locator = AutoDateLocator()
+            axx.xaxis.set_major_locator(locator)
+            axx.xaxis.set_major_formatter(ConciseDateFormatter(locator))
         else:
             axx.xaxis.set_minor_locator(AutoMinorLocator())
         axx.set_xlim([xdata[0], xdata[-1]])
@@ -491,6 +496,10 @@ class DrawTrend:
         if "hours" in xarr.coords:
             axx.xaxis.set_major_locator(MultipleLocator(3))
             axx.xaxis.set_minor_locator(MultipleLocator(1))
+        elif "time" in xarr.coords:
+            locator = AutoDateLocator()
+            axx.xaxis.set_major_locator(locator)
+            axx.xaxis.set_major_formatter(ConciseDateFormatter(locator))
         else:
             axx.xaxis.set_minor_locator(AutoMinorLocator())
         axx.set_xlim([xdata[0], xdata[-1]])
