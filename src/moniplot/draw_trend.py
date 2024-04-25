@@ -316,7 +316,6 @@ class DrawTrend:
                 f_color = "#EEBBDD"
             case _:
                 f_color = "#DDDDDD"
-        print(l_color, f_color, mytitle, mylabel)
 
         @dataclass(frozen=True)
         class DecoFig:
