@@ -201,6 +201,8 @@ class DrawTrend:
             zunit = zunit.replace("Volt", "V")
         if zunit.find(".s-1") >= 0:
             zunit = zunit.replace(".s-1", " s$^{-1}$")
+        if zunit.find("degC") >= 0:
+            zunit = zunit.replace("degC", "\u00B0C")
 
         return zunit
 
@@ -262,9 +264,9 @@ class DrawTrend:
         units = self.adjust_units(units)
 
         line_cset = tol_cset("bright")
-        l_color = line_cset.blue
+        l_color = line_cset.cyan
         match units:
-            case "K" | "mK" | "C" | "mC":
+            case "K" | "mK" | "degC" | "\u00B0C":
                 if (ii := mytitle.find(" temperature")) > 0:
                     mytitle = mytitle[:ii]
                 mylabel = f"temperature [{units}]"
@@ -285,7 +287,7 @@ class DrawTrend:
             case "W" if mytitle.find(" power") > 0:
                 mytitle = mytitle[: mytitle.find(" power")]
                 mylabel = f"power [{units}]"
-                l_color = line_cset.purple
+                l_color = line_cset.blue
             case "%" if mytitle.find(" duty") > 0:
                 mytitle = mytitle[: mytitle.find(" duty")]
                 mylabel = f"duty cycle [{units}]"
@@ -297,14 +299,33 @@ class DrawTrend:
                     mylabel = mytitle if units == "1" else f"{mytitle} [{units}]"
                 mytitle = ""
 
+        # set the fill-color according to the line-color
+        l_color = xarr.attrs.get("_color", l_color)
+        match l_color:
+            case line_cset.blue:
+                f_color = "#BBDDFF"
+            case line_cset.cyan:
+                f_color = "#CCEEFF"
+            case line_cset.green:
+                f_color = "#BBDDBB"
+            case line_cset.yellow:
+                f_color = "#EEEEBB"
+            case line_cset.red:
+                f_color = "#FFBBCC"
+            case line_cset.purple:
+                f_color = "#EEBBDD"
+            case _:
+                f_color = "#DDDDDD"
+        print(l_color, f_color, mytitle, mylabel)
+
         @dataclass(frozen=True)
         class DecoFig:
             """Define figure decorations."""
 
             # fill-color
-            fcolor: str = "#CCCCCC"
+            fcolor: str = f_color
             # line-color
-            lcolor: str = xarr.attrs.get("_color", l_color)
+            lcolor: str = l_color
             # suggestion for the ylabel
             ylabel: str = xarr.attrs.get("_ylabel", mylabel)
             # suggestion for the figure legend entry
