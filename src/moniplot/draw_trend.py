@@ -30,7 +30,7 @@ from typing import TYPE_CHECKING
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.dates import AutoDateLocator, ConciseDateFormatter
-from matplotlib.patches import Rectangle
+from matplotlib.patches import Polygon, Rectangle
 from matplotlib.ticker import AutoMinorLocator, MultipleLocator
 
 from .tol_colors import tol_cset
@@ -202,7 +202,7 @@ class DrawTrend:
         if zunit.find(".s-1") >= 0:
             zunit = zunit.replace(".s-1", " s$^{-1}$")
         if zunit.find("degC") >= 0:
-            zunit = zunit.replace("degC", "\u00B0C")
+            zunit = zunit.replace("degC", "\u00b0C")
 
         return zunit
 
@@ -266,7 +266,7 @@ class DrawTrend:
         line_cset = tol_cset("bright")
         l_color = line_cset.cyan
         match units:
-            case "K" | "mK" | "degC" | "\u00B0C":
+            case "K" | "mK" | "degC" | "\u00b0C":
                 if (ii := mytitle.find(" temperature")) > 0:
                     mytitle = mytitle[:ii]
                 mylabel = f"temperature [{units}]"
@@ -300,22 +300,23 @@ class DrawTrend:
                 mytitle = ""
 
         # set the fill-color according to the line-color
+        fill_cset = tol_cset("plain")
         l_color = xarr.attrs.get("_color", l_color)
         match l_color:
             case line_cset.blue:
-                f_color = "#BBDDFF"
+                f_color = fill_cset.blue
             case line_cset.cyan:
-                f_color = "#CCEEFF"
+                f_color = fill_cset.cyan
             case line_cset.green:
-                f_color = "#BBDDBB"
+                f_color = fill_cset.green
             case line_cset.yellow:
-                f_color = "#EEEEBB"
+                f_color = fill_cset.yellow
             case line_cset.red:
-                f_color = "#FFBBCC"
+                f_color = fill_cset.red
             case line_cset.purple:
-                f_color = "#EEBBDD"
+                f_color = fill_cset.purple
             case _:
-                f_color = "#DDDDDD"
+                f_color = fill_cset.grey
 
         @dataclass(frozen=True)
         class DecoFig:
@@ -533,6 +534,45 @@ class DrawTrend:
 
         # add legend with name of dataset inside current subplots
         legend = axx.legend(
-            [self.blank_legend_handle], [deco_fig.legend], loc="upper left"
+            [self.blank_legend_handle],
+            [deco_fig.legend],
+            loc="upper left",
+            fontsize="large",
         )
         legend.draw_frame(False)
+
+    def masked_hk(
+        self: DrawTrend, axx: Axes, xarr: xr.DataArray, mask: np.ndarray
+    ) -> None:
+        """Show where housekeeping data is available, but not shown.
+
+        Parameters
+        ----------
+        axx :  matplotlib.Axes
+            Matplotlib Axes object of the current panel
+        xarr :  xarray.DataArray
+            Object holding housekeeping data and attributes.
+            Dimension must be 'orbit', 'hours' or 'time'.
+        mask :  np.ndarray
+            mask array of data which is not shown in the figure
+
+        """
+        # derive line-decoration from attributes of the DataArray
+        deco_fig = self.decoration(xarr)
+
+        poly_bgn = (np.diff(mask.astype(int)) == 1).nonzero()[0]
+        poly_end = (np.diff(mask.astype(int)) == -1).nonzero()[0] + 1
+        if poly_end.size > poly_bgn.size:
+            poly_bgn = np.concatenate(([0], poly_bgn))
+        if poly_bgn.size > poly_end.size:
+            poly_end = np.concatenate((poly_end, [-1]))
+
+        ylim = axx.get_ylim()
+        for ni, nj in zip(poly_bgn, poly_end, strict=True):
+            tt0 = xarr.coords["time"].values[ni]
+            tt0 = (tt0 - np.datetime64("1970-01-01")) / np.timedelta64(1, "D")
+            tt1 = xarr.coords["time"].values[nj]
+            tt1 = (tt1 - np.datetime64("1970-01-01")) / np.timedelta64(1, "D")
+            verts = [(tt0, ylim[0]), (tt0, ylim[1]), (tt1, ylim[1]), (tt1, ylim[0])]
+            poly = Polygon(verts, facecolor=deco_fig.lcolor, edgecolor=None)
+            axx.add_patch(poly)

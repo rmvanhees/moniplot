@@ -27,6 +27,7 @@ Routines in this module::
    tol_cset(colorset=None)
    tol_rgba(cname, cnum=None)
 """
+
 from __future__ import annotations
 
 __all__ = ["tol_cmap", "tol_cset", "tol_rgba"]
@@ -546,6 +547,28 @@ class Bright:
 
 
 @dataclass
+class Plain:
+    """Defines the plain colors of the Bright colorset.
+
+    The default scheme for data-ranges for the Bright colorset.
+    """
+
+    blue: str = "#BBDDFF"
+    cyan: str = "#CCEEFF"
+    green: str = "#BBDDBB"
+    yellow: str = "#EEEEBB"
+    red: str = "#FFBBCC"
+    purple: str = "#EEBBDD"
+    grey: str = "#DDDDDD"
+    black: str = "#000000"
+
+    @property
+    def colors(self: Plain) -> tuple[str, ...]:
+        """Return tuple with colors."""
+        return astuple(self)
+
+
+@dataclass
 class HighContrast:
     """Defines a qualitative colour scheme.
 
@@ -674,6 +697,7 @@ class Light:
 
 _cset_dict = {
     "bright": Bright(),
+    "plain": Plain(),
     "high-contrast": HighContrast(),
     "medium-contrast": MediumContrast(),
     "vibrant": Vibrant(),
@@ -811,7 +835,7 @@ def tol_rgba(cname: str, lut: int | None = None) -> np.ndarray:
 def __show_cset() -> None:
     """Show colormaps tol_cset()."""
     schemes = tol_cset()
-    fig, axes = plt.subplots(ncols=len(schemes), figsize=(9, 3))
+    fig, axes = plt.subplots(ncols=len(schemes), figsize=(11, 3))
     fig.subplots_adjust(top=0.9, bottom=0.02, left=0.02, right=0.92)
     for axx, scheme in zip(axes, schemes, strict=True):
         cset = tol_cset(scheme)
