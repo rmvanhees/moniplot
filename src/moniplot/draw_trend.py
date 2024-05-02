@@ -557,6 +557,9 @@ class DrawTrend:
             mask array of data which is not shown in the figure
 
         """
+        if mask is None or np.sum(mask) == 0:
+            return
+
         # derive line-decoration from attributes of the DataArray
         deco_fig = self.decoration(xarr)
 
