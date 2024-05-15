@@ -563,8 +563,8 @@ class DrawTrend:
         # derive line-decoration from attributes of the DataArray
         deco_fig = self.decoration(xarr)
 
-        poly_bgn = (np.diff(mask.astype(int)) == 1).nonzero()[0]
-        poly_end = (np.diff(mask.astype(int)) == -1).nonzero()[0] + 1
+        poly_bgn = (np.diff(mask.astype(int)) == 1).nonzero()[0] + 1
+        poly_end = (np.diff(mask.astype(int)) == -1).nonzero()[0]
         if poly_end.size > poly_bgn.size:
             poly_bgn = np.concatenate(([0], poly_bgn))
         if poly_bgn.size > poly_end.size:
