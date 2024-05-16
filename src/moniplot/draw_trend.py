@@ -113,7 +113,7 @@ class DrawTrend:
         err1: np.ndarray | Iterable | None,
         err2: np.ndarray | Iterable | None,
         vperc: list[int, int],
-        vrange_last_orbits: int,
+        vrange_last_orbits: int = 0,
     ) -> tuple[float, float]:
         """Set minimum and maximum values of ylim.
 
@@ -127,8 +127,8 @@ class DrawTrend:
             Values of the data plus its uncertainty, None if without uncertainty
         vperc : list
             Limit the data range to the given percentiles
-        vrange_last_orbits: int
-            Use only data of the last N orbits
+        vrange_last_orbits: int, default=0
+            Use only data of the last N orbits, ignored when vrange_last_orbits <= 0
 
         Returns
         -------
@@ -459,7 +459,7 @@ class DrawTrend:
         vperc :  list | None, optional
             Reject outliers before determining vrange
             (neglected when vrange_last_orbits is used)
-        vrange_last_orbits :  int
+        vrange_last_orbits :  int, default=-1
             Use the last N orbits to determine vrange (orbit coordinate only)
 
         """
@@ -529,6 +529,8 @@ class DrawTrend:
         axx.locator_params(axis="y", nbins=4)
         if "orbit" in xarr.coords:
             axx.set_ylim(self.adjust_ylim(avg, err1, err2, vperc, vrange_last_orbits))
+        else:
+            axx.set_ylim(self.adjust_ylim(avg, err1, err2, vperc))
         axx.set_ylabel(deco_fig.ylabel)
         axx.grid(True)
 
