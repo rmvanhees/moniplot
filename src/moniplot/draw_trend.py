@@ -468,19 +468,20 @@ class DrawTrend:
 
         # define xdata and determine gap_list (always one element!)
         isel = np.s_[:]
-        if "orbit" in xarr.coords:
-            xdata = xarr.coords["orbit"].values
-            gap_list = self.get_gap_list(xdata)
+        if "time" in xarr.coords:
+            xdata = xarr.coords["time"].values
+            if "orbit" in xarr.coords:
+                print("INFO: use both orbit and time")
+                gap_list = self.get_gap_list(xarr.coords["orbit"].values)
+            else:
+                gap_list = self.get_gap_list(xdata)
         elif "hours" in xarr.coords:
             xdata = xarr.coords["hours"].values
             isel = np.s_[0, :]
             gap_list = self.get_gap_list(np.round(3600 * xdata).astype(int))
-        else:
-            xdata = xarr.coords["time"].values
-            if "orbit" in xarr.data_vars:
-                gap_list = self.get_gap_list(xarr["orbit"].values)
-            else:
-                gap_list = self.get_gap_list(xdata)
+        else: 
+            xdata = xarr.coords["orbit"].values
+            gap_list = self.get_gap_list(xdata)
         gap_list += (xdata.size - 1,)
 
         # define avg, err1, err2
