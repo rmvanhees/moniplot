@@ -471,7 +471,6 @@ class DrawTrend:
         if "time" in xarr.coords:
             xdata = xarr.coords["time"].values
             if "orbit" in xarr.coords:
-                print("INFO: use both orbit and time")
                 gap_list = self.get_gap_list(xarr.coords["orbit"].values)
             else:
                 gap_list = self.get_gap_list(xdata)
