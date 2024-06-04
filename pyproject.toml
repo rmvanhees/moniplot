@@ -6,7 +6,6 @@ requires = [
   "setuptools_scm>=8.0",
   'tomli>=1; python_version < "3.11"',
   'typing-extensions; python_version < "3.11"',
-  "wheel",
 ]
 
 [project]

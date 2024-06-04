@@ -89,7 +89,7 @@ class DrawImage:
         self.attrs = {
             "long_name": "",
             "units": "1",
-            "dims": ["row", "column"],
+            "dims": arr.dims if isinstance(arr, xr.DataArray) else ("row", "column"),
         }
         self._zlabel: str = "value"
 

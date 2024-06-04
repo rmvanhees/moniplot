@@ -29,7 +29,8 @@ from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.patches import Rectangle
+from matplotlib.dates import AutoDateLocator, ConciseDateFormatter
+from matplotlib.patches import Polygon, Rectangle
 from matplotlib.ticker import AutoMinorLocator, MultipleLocator
 
 from .tol_colors import tol_cset
@@ -84,7 +85,7 @@ class DrawTrend:
     def subplots(npanels: int) -> tuple[Figure, list[Axes, ...]]:
         """Create a figure and a set of subplots for trend-plots."""
         figsize = (10.0, 1 + (npanels + 1) * 1.5)
-        fig, axarr = plt.subplots(npanels, figsize=figsize)
+        fig, axarr = plt.subplots(npanels, figsize=figsize, sharex=True)
         if npanels == 1:
             axarr = [axarr]
         margin = min(1.0 / (1.65 * (npanels + 1)), 0.25)
@@ -112,7 +113,7 @@ class DrawTrend:
         err1: np.ndarray | Iterable | None,
         err2: np.ndarray | Iterable | None,
         vperc: list[int, int],
-        vrange_last_orbits: int,
+        vrange_last_orbits: int = 0,
     ) -> tuple[float, float]:
         """Set minimum and maximum values of ylim.
 
@@ -126,8 +127,8 @@ class DrawTrend:
             Values of the data plus its uncertainty, None if without uncertainty
         vperc : list
             Limit the data range to the given percentiles
-        vrange_last_orbits: int
-            Use only data of the last N orbits
+        vrange_last_orbits: int, default=0
+            Use only data of the last N orbits, ignored when vrange_last_orbits <= 0
 
         Returns
         -------
@@ -200,6 +201,8 @@ class DrawTrend:
             zunit = zunit.replace("Volt", "V")
         if zunit.find(".s-1") >= 0:
             zunit = zunit.replace(".s-1", " s$^{-1}$")
+        if zunit.find("degC") >= 0:
+            zunit = zunit.replace("degC", "\u00b0C")
 
         return zunit
 
@@ -218,13 +221,17 @@ class DrawTrend:
             Indices to xdata where np.diff(xdata) greater than xstep
 
         """
-        if not issubclass(xdata.dtype.type, Integral):
+        if issubclass(xdata.dtype.type, np.datetime64):
+            diff_data = np.rint(np.diff(xdata).astype(float) / 1e9).astype(int)
+        elif issubclass(xdata.dtype.type, Integral):
+            diff_data = np.diff(xdata)
+        else:
             return ()
 
-        uvals, counts = np.unique(np.diff(xdata), return_counts=True)
+        uvals, counts = np.unique(diff_data, return_counts=True)
         if counts.size > 1 and counts.max() / xdata.size > 0.5:
             xstep = uvals[counts.argmax()]
-            return tuple(i for i in (np.diff(xdata) > xstep).nonzero()[0])
+            return tuple(i for i in (diff_data > xstep).nonzero()[0])
 
         return ()
 
@@ -257,9 +264,9 @@ class DrawTrend:
         units = self.adjust_units(units)
 
         line_cset = tol_cset("bright")
-        l_color = line_cset.blue
+        l_color = line_cset.cyan
         match units:
-            case "K" | "mK" | "C" | "mC":
+            case "K" | "mK" | "degC" | "\u00b0C":
                 if (ii := mytitle.find(" temperature")) > 0:
                     mytitle = mytitle[:ii]
                 mylabel = f"temperature [{units}]"
@@ -280,7 +287,7 @@ class DrawTrend:
             case "W" if mytitle.find(" power") > 0:
                 mytitle = mytitle[: mytitle.find(" power")]
                 mylabel = f"power [{units}]"
-                l_color = line_cset.purple
+                l_color = line_cset.blue
             case "%" if mytitle.find(" duty") > 0:
                 mytitle = mytitle[: mytitle.find(" duty")]
                 mylabel = f"duty cycle [{units}]"
@@ -292,14 +299,33 @@ class DrawTrend:
                     mylabel = mytitle if units == "1" else f"{mytitle} [{units}]"
                 mytitle = ""
 
+        # set the fill-color according to the line-color
+        fill_cset = tol_cset("plain")
+        l_color = xarr.attrs.get("_color", l_color)
+        match l_color:
+            case line_cset.blue:
+                f_color = fill_cset.blue
+            case line_cset.cyan:
+                f_color = fill_cset.cyan
+            case line_cset.green:
+                f_color = fill_cset.green
+            case line_cset.yellow:
+                f_color = fill_cset.yellow
+            case line_cset.red:
+                f_color = fill_cset.red
+            case line_cset.purple:
+                f_color = fill_cset.purple
+            case _:
+                f_color = fill_cset.grey
+
         @dataclass(frozen=True)
         class DecoFig:
             """Define figure decorations."""
 
             # fill-color
-            fcolor: str = "#CCCCCC"
+            fcolor: str = f_color
             # line-color
-            lcolor: str = xarr.attrs.get("_color", l_color)
+            lcolor: str = l_color
             # suggestion for the ylabel
             ylabel: str = xarr.attrs.get("_ylabel", mylabel)
             # suggestion for the figure legend entry
@@ -391,6 +417,10 @@ class DrawTrend:
         if "hours" in xarr.coords:
             axx.xaxis.set_major_locator(MultipleLocator(3))
             axx.xaxis.set_minor_locator(MultipleLocator(1))
+        elif "time" in xarr.coords:
+            locator = AutoDateLocator()
+            axx.xaxis.set_major_locator(locator)
+            axx.xaxis.set_major_formatter(ConciseDateFormatter(locator))
         else:
             axx.xaxis.set_minor_locator(AutoMinorLocator())
         axx.set_xlim([xdata[0], xdata[-1]])
@@ -429,7 +459,7 @@ class DrawTrend:
         vperc :  list | None, optional
             Reject outliers before determining vrange
             (neglected when vrange_last_orbits is used)
-        vrange_last_orbits :  int
+        vrange_last_orbits :  int, default=-1
             Use the last N orbits to determine vrange (orbit coordinate only)
 
         """
@@ -438,15 +468,18 @@ class DrawTrend:
 
         # define xdata and determine gap_list (always one element!)
         isel = np.s_[:]
-        if "orbit" in xarr.coords:
-            xdata = xarr.coords["orbit"].values
-            gap_list = self.get_gap_list(xdata)
+        if "time" in xarr.coords:
+            xdata = xarr.coords["time"].values
+            if "orbit" in xarr.coords:
+                gap_list = self.get_gap_list(xarr.coords["orbit"].values)
+            else:
+                gap_list = self.get_gap_list(xdata)
         elif "hours" in xarr.coords:
             xdata = xarr.coords["hours"].values
             isel = np.s_[0, :]
             gap_list = self.get_gap_list(np.round(3600 * xdata).astype(int))
-        else:
-            xdata = xarr.coords["time"].values
+        else: 
+            xdata = xarr.coords["orbit"].values
             gap_list = self.get_gap_list(xdata)
         gap_list += (xdata.size - 1,)
 
@@ -487,6 +520,10 @@ class DrawTrend:
         if "hours" in xarr.coords:
             axx.xaxis.set_major_locator(MultipleLocator(3))
             axx.xaxis.set_minor_locator(MultipleLocator(1))
+        elif "time" in xarr.coords:
+            locator = AutoDateLocator()
+            axx.xaxis.set_major_locator(locator)
+            axx.xaxis.set_major_formatter(ConciseDateFormatter(locator))
         else:
             axx.xaxis.set_minor_locator(AutoMinorLocator())
         axx.set_xlim([xdata[0], xdata[-1]])
@@ -495,11 +532,55 @@ class DrawTrend:
         axx.locator_params(axis="y", nbins=4)
         if "orbit" in xarr.coords:
             axx.set_ylim(self.adjust_ylim(avg, err1, err2, vperc, vrange_last_orbits))
+        else:
+            axx.set_ylim(self.adjust_ylim(avg, err1, err2, vperc))
         axx.set_ylabel(deco_fig.ylabel)
         axx.grid(True)
 
         # add legend with name of dataset inside current subplots
         legend = axx.legend(
-            [self.blank_legend_handle], [deco_fig.legend], loc="upper left"
+            [self.blank_legend_handle],
+            [deco_fig.legend],
+            loc="upper left",
+            fontsize="large",
         )
         legend.draw_frame(False)
+
+    def masked_hk(
+        self: DrawTrend, axx: Axes, xarr: xr.DataArray, mask: np.ndarray
+    ) -> None:
+        """Show where housekeeping data is available, but not shown.
+
+        Parameters
+        ----------
+        axx :  matplotlib.Axes
+            Matplotlib Axes object of the current panel
+        xarr :  xarray.DataArray
+            Object holding housekeeping data and attributes.
+            Dimension must be 'orbit', 'hours' or 'time'.
+        mask :  np.ndarray
+            mask array of data which is not shown in the figure
+
+        """
+        if mask is None or np.sum(mask) == 0:
+            return
+
+        # derive line-decoration from attributes of the DataArray
+        deco_fig = self.decoration(xarr)
+
+        poly_bgn = (np.diff(mask.astype(int)) == 1).nonzero()[0] + 1
+        poly_end = (np.diff(mask.astype(int)) == -1).nonzero()[0]
+        if poly_end.size > poly_bgn.size:
+            poly_bgn = np.concatenate(([0], poly_bgn))
+        if poly_bgn.size > poly_end.size:
+            poly_end = np.concatenate((poly_end, [-1]))
+
+        ylim = axx.get_ylim()
+        for ni, nj in zip(poly_bgn, poly_end, strict=True):
+            tt0 = xarr.coords["time"].values[ni]
+            tt0 = (tt0 - np.datetime64("1970-01-01")) / np.timedelta64(1, "D")
+            tt1 = xarr.coords["time"].values[nj]
+            tt1 = (tt1 - np.datetime64("1970-01-01")) / np.timedelta64(1, "D")
+            verts = [(tt0, ylim[0]), (tt0, ylim[1]), (tt1, ylim[1]), (tt1, ylim[0])]
+            poly = Polygon(verts, facecolor=deco_fig.lcolor, edgecolor=None)
+            axx.add_patch(poly)
