@@ -150,7 +150,7 @@ class MONplot:
             1 - 0.4 / fig.get_figwidth(),
             1 - 0.25 / fig.get_figheight(),
             fig_info.as_str(),
-            fontsize="x-small",
+            fontsize="x-small" if len(fig_info) > 5 else "small",
             style="normal",
             verticalalignment="top",
             horizontalalignment="right",
