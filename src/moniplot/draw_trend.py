@@ -478,7 +478,7 @@ class DrawTrend:
             xdata = xarr.coords["hours"].values
             isel = np.s_[0, :]
             gap_list = self.get_gap_list(np.round(3600 * xdata).astype(int))
-        else: 
+        else:
             xdata = xarr.coords["orbit"].values
             gap_list = self.get_gap_list(xdata)
         gap_list += (xdata.size - 1,)
