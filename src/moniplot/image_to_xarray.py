@@ -130,8 +130,10 @@ def __get_coords(dset: h5py.Dataset, data_sel: tuple[slice | int]) -> list:
                     buff = buff[data_sel[ii]]
 
                 coords.append((name, buff))
-        except RuntimeError:
-            coords = []
+        except RuntimeError as exc:
+            raise RuntimeError(
+                f"failed to collect coordinates of dataset {dset.name}"
+            ) from exc
 
     return coords
 
@@ -324,19 +326,19 @@ def h5_to_xr(
     # Check data selection
     if data_sel is not None:
         data_sel = __check_selection(data_sel, h5_dset.ndim)
+    # print(f"data_sel: {data_sel}")
 
-    # Name of this array
-    name = PurePath(h5_dset.name).name if field is None else field
-
-    # Values for this array
-    data = __get_data(h5_dset, data_sel, field)
-
-    # Coordinates (tick labels) to use for indexing along each dimension
+    # get coordinates of the dataset
     coords = []
     if dims is None:
         coords = __get_coords(h5_dset, data_sel)
     if not coords:
         coords = __set_coords(h5_dset, data_sel, dims)
+    # print(f"dims: {dims}")
+    # print(f"coords: {coords}")
+
+    # get values for the dataset
+    data = __get_data(h5_dset, data_sel, field)
 
     # - check if dimension of dataset and coordinates agree
     if data.ndim < len(coords):
@@ -345,17 +347,19 @@ def h5_to_xr(
                 del coords[ii]
 
     # - remove empty coordinates
-    dims = []
     co_dict = {}
     for key, val in coords:
-        dims.append(key)
         if val is not None:
             co_dict[key] = val
+    # print(f"co_dict: {co_dict}")
 
-    # Attributes to assign to the array
+    # get dataset attributes
     attrs = __get_attrs(h5_dset, field)
 
-    return xr.DataArray(data, coords=co_dict, dims=dims, name=name, attrs=attrs)
+    # get name of the dataset
+    name = PurePath(h5_dset.name).name if field is None else field
+
+    return xr.DataArray(data, coords=co_dict, name=name, attrs=attrs)
 
 
 def data_to_xr(
