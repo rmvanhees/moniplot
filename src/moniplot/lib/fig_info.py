@@ -25,7 +25,6 @@ __all__ = ["FIGinfo"]
 
 import datetime as dt
 from copy import deepcopy
-from typing import Any
 
 
 # - main function -------------------------
@@ -89,7 +88,7 @@ class FIGinfo:
 
         self._location = loc
 
-    def add(self: FIGinfo, key: str, value: Any, fmt: str = "{}") -> None:
+    def add(self: FIGinfo, key: str, value: ..., fmt: str = "{}") -> None:
         r"""Extent fig_info by adding a new line.
 
         Parameters
