@@ -29,6 +29,7 @@ import cartopy.feature as cfeature
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+import xarray as xr
 from cartopy import crs as ccrs
 from cartopy.mpl.gridliner import LATITUDE_FORMATTER, LONGITUDE_FORMATTER
 from matplotlib.axes import Axes
@@ -38,7 +39,6 @@ from .lib.saa_region import saa_region
 from .tol_colors import tol_cmap, tol_cset
 
 if TYPE_CHECKING:
-    import xarray as xr
     from matplotlib.figure import Figure
 
 # - global variables -------------------------------
@@ -228,11 +228,12 @@ class DrawGeo:
     # --------------------------------------------------
     def mash(
         self: DrawGeo,
-        lons: np.ndarray,
-        lats: np.ndarray,
-        data_in: np.ndarray | xr.DataArray,
+        lons: np.ndarray | tuple[np.ndarray],
+        lats: np.ndarray | tuple[np.ndarray],
+        data_in: np.ndarray | xr.DataArray | tuple[np.ndarray],
         *,
         whole_globe: bool = False,
+        extent: list[float, float, float, float] | None = None,
         vperc: list[float, float] | None = None,
         vrange: list[float, float] | None = None,
         title: str | None = None,
@@ -241,9 +242,9 @@ class DrawGeo:
 
         Parameters
         ----------
-        lons :  ndarray
+        lons :  ndarray | tuple[ndarray]
            Longitude coordinates (N, M,)
-        lats :  ndarray
+        lats :  ndarray | tuple[ndarray]
            Latitude coordinates (N, M,)
         data_in :  ndarray | xr.DataArray
            Pixel values  (N, M,) or (N-1, M-1,)
@@ -255,6 +256,8 @@ class DrawGeo:
            keyword 'vperc' is ignored when vrange is given
         whole_globe :  bool, default=False
            Display the whole globe
+        extent :  list[float, float, float, float], optional
+           ...
         title :  str, optional
            Title of the figure. Default is None
            Suggestion: use attribute "comment" of data-product
@@ -262,8 +265,9 @@ class DrawGeo:
         """
 
         def extent_arr(aa: np.ndarray) -> np.ndarray:
-            res = aa - ((aa[:, 1] - aa[:, 0]) / 2).reshape(-1, 1)
-            return np.append(res, (2 * res[:, -1] - res[:, -2]).reshape(-1, 1), axis=1)
+            """Extent array by one element."""
+            bb = aa - ((aa[:, 1] - aa[:, 0]) / 2).reshape(-1, 1)
+            return np.append(bb, (2 * bb[:, -1] - bb[:, -2]).reshape(-1, 1), axis=1)
 
         if vrange is None and vperc is None:
             vperc = (1.0, 99.0)
@@ -274,39 +278,49 @@ class DrawGeo:
             if len(vrange) != 2:
                 raise TypeError("keyword vrange requires two values")
 
+        if isinstance(lats, np.ndarray):
+            lats = (lats,)
+        if isinstance(lons, np.ndarray):
+            lons = (lons,)
+
         zlabel = "value"
         if isinstance(data_in, np.ndarray):
-            data = data_in
-        else:
-            data = data_in.values
+            data = (data_in,)
+        elif isinstance(data_in, xr.DataArray):
+            data = (data_in.values,)
             if "units" in data_in.attrs and data_in.attrs["units"] != "1":
                 zlabel = rf'value [{data_in.attrs["units"]}]'
+        else:
+            data = data_in
 
         # determine central longitude
-        if lons.max() - lons.min() > 180:
-            if np.sum(lons > 0) > np.sum(lons < 0):
-                lons[lons < 0] += 360
-            else:
-                lons[lons > 0] -= 360
-        lon_0 = np.around(np.mean(lons), decimals=0)
+
+        if np.concatenate(lons).max() - np.concatenate(lons).min() > 180:
+            for xx in lons:
+                if np.sum(lons > 0) > np.sum(lons < 0):
+                    xx[xx < 0] += 360
+                else:
+                    xx[xx > 0] -= 360
+        lon_0 = np.around(np.concatenate(lons).mean(), decimals=0)
 
         # determine central latitude
-        lat_0 = 0.0 if whole_globe else np.around(np.mean(lats), decimals=0)
-
-        if lons.shape == data.shape:
-            lons = extent_arr(lons)
-            lats = extent_arr(lats)
+        lat_0 = (
+            0.0 if whole_globe else np.around(np.concatenate(lats).mean(), decimals=0)
+        )
 
         # define data-range
         if vrange is None:
-            vmin, vmax = np.nanpercentile(data, vperc)
+            vmin, vmax = np.nanpercentile(np.concatenate(data), vperc)
         else:
             vmin, vmax = vrange
 
         # inititalize figure
         # pylint: disable=abstract-class-instantiated
+        print(f"Central location: ({lon_0}, {lat_0})")
         myproj = {"projection": ccrs.ObliqueMercator(**set_proj_parms(lon_0, lat_0))}
         fig, axx = plt.subplots(figsize=(12, 9), subplot_kw=myproj)
+        if extent is not None and len(extent) == 4:
+            axx.set_extent(extent, crs=ccrs.PlateCarree())
 
         # add title to image panel
         if title is not None:
@@ -321,16 +335,27 @@ class DrawGeo:
         self.__draw_worldmap(axx, whole_globe=whole_globe)
 
         # draw sub-satellite spot(s)
-        img = axx.pcolormesh(
-            lons,
-            lats,
-            data,
-            vmin=vmin,
-            vmax=vmax,
-            cmap=self._cmap,
-            rasterized=False,
-            transform=ccrs.PlateCarree(),
-        )
+        for xx, yy, zz in zip(lons, lats, data, strict=True):
+            if xx.shape == zz.shape:
+                xx = extent_arr(xx)
+                yy = extent_arr(yy)
+
+            print(
+                xx.shape,
+                np.mean(xx),
+                np.mean(yy),
+                np.nanmean(zz),
+            )
+            img = axx.pcolormesh(
+                xx,
+                yy,
+                zz,
+                vmin=vmin,
+                vmax=vmax,
+                cmap=self._cmap,
+                rasterized=False,
+                transform=ccrs.PlateCarree(),
+            )
         plt.draw()
         posn = axx.get_position()
         cax.set_position([posn.x0 + posn.width + 0.01, posn.y0, 0.04, posn.height])
