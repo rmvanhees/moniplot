@@ -32,13 +32,13 @@ import numpy as np
 import xarray as xr
 from cartopy import crs as ccrs
 from cartopy.mpl.gridliner import LATITUDE_FORMATTER, LONGITUDE_FORMATTER
-from matplotlib.axes import Axes
 from matplotlib.patches import Polygon
 
 from .lib.saa_region import saa_region
 from .tol_colors import tol_cmap, tol_cset
 
 if TYPE_CHECKING:
+    from matplotlib.axes import Axes
     from matplotlib.figure import Figure
 
 # - global variables -------------------------------
@@ -60,6 +60,7 @@ def set_proj_parms(lon_0: float = 0.0, lat_0: float = 0.0) -> dict:
 
 
 # - class definition -------------------------------
+# pylint: disable=too-many-arguments
 class DrawGeo:
     """Class to show satellite tracks or sub-satellite points projected on the Earth."""
 
@@ -141,19 +142,20 @@ class DrawGeo:
 
         # draw satellite position(s)
         cset = tol_cset("muted")
-        for ii, val in enumerate(np.unique(icids)):
-            mask = icids == val
+        icid_uniq = np.unique(icids)
+        for ii, ic_id in enumerate(icid_uniq):
+            mask = icids == ic_id
             # pylint: disable=abstract-class-instantiated
             axx.scatter(
                 lons[mask],
                 lats[mask],
                 marker="s",
-                c=cset.colors[ii % 9] if val > 0 else cset.pale_grey,
+                c=cset.colors[ii % 9] if ic_id > 0 else cset.pale_grey,
                 s=markersize,
-                label=f"{label_id}: {val}",
+                label=f"{label_id}: {ic_id}",
                 transform=ccrs.Geodetic(),
             )
-        if ii < 5:
+        if len(icid_uniq) < 5:
             axx.legend(loc="lower left")
         else:
             axx.legend(loc="upper left", bbox_to_anchor=(-0.15, 1))
@@ -363,4 +365,4 @@ class DrawGeo:
         # add color-bar
         plt.colorbar(img, cax=cax, label=zlabel)
 
-        return fig, Axes
+        return fig, axx
