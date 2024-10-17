@@ -146,7 +146,8 @@ class DrawHist:
             axx.bar(
                 self.__edges[:-1],
                 self.__hist,
-                np.diff(self.__edges),
+                width=np.diff(self.__edges),
+                align="edge",
                 edgecolor="#4477AA",
                 facecolor="#77AADD",
                 linewidth=1.5,
