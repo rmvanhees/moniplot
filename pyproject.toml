@@ -59,6 +59,7 @@ where = ["src"]
 "moniplot.data" = ["*.yaml"]
 
 [tool.setuptools_scm]
+# can be empty if no extra settings are needed, presence enables setuptools_scm
 
 [tool.ruff]
 line-length = 88
@@ -81,7 +82,7 @@ select = [
   "TCH", # flake8-type-checking
   "NPY", # NumPy-specific rules
 ]
-ignore = ["D203", "D213", "Q000", "Q003"]
+ignore = ["D203", "D213"]
 
 [lint.pydocstyle]
 convention = "pep257"
