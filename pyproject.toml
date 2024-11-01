@@ -1,12 +1,10 @@
 # pyproject.toml
 [build-system]
-build-backend = "setuptools.build_meta"
 requires = [
-  "setuptools>=70",
-  "setuptools_scm>=8.0",
-  'tomli>=1; python_version < "3.11"',
-  'typing-extensions; python_version < "3.11"',
+   "hatchling",
+   "versioningit",
 ]
+build-backend = "hatchling.build"
 
 [project]
 name = "moniplot"
@@ -44,6 +42,8 @@ dependencies = [
   'typing-extensions; python_version < "3.11"',
 ]
 
+[project.scripts]
+
 [project.urls]
 homepage = "https://github.com/rmvanhees/moniplot"
 documentation = "https://moniplot.readthedocs.io/en/latest/"
@@ -51,15 +51,18 @@ documentation = "https://moniplot.readthedocs.io/en/latest/"
 # Changelog = "https://github.com/rmvanhees/moniplot/HISTORY.rst"
 "Issue tracker" = "https://github.com/rmvanhees/moniplot/issues"
 
-[tool.setuptools.packages.find]
-namespaces = true
-where = ["src"]
+[tool.hatch.version]
+source = "versioningit"
 
-[tool.setuptools.package-data]
-"moniplot.data" = ["*.yaml"]
+[tool.versioningit]
 
-[tool.setuptools_scm]
-# can be empty if no extra settings are needed, presence enables setuptools_scm
+[tool.versioningit.next-version]
+method = "smallest"
+
+[tool.versioningit.format]
+distance = "{next_version}.dev{distance}+{vcs}{rev}"
+dirty = "{base_version}+d{build_date:%Y%m%d}"
+distance-dirty = "{next_version}.dev{distance}+{vcs}{rev}.d{build_date:%Y%m%d}"
 
 [tool.ruff]
 line-length = 88
