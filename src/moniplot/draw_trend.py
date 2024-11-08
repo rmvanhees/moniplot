@@ -303,6 +303,9 @@ class DrawTrend:
         fill_cset = tol_cset("plain")
         l_color = xarr.attrs.get("_color", l_color)
         match l_color:
+            case "none":
+                l_color = None
+                f_color = None
             case line_cset.blue:
                 f_color = fill_cset.blue
             case line_cset.cyan:
