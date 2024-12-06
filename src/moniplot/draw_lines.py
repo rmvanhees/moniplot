@@ -24,7 +24,7 @@ from __future__ import annotations
 __all__ = ["DrawLines"]
 
 import datetime as dt
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NotRequired, TypedDict, Unpack
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -41,6 +41,19 @@ if TYPE_CHECKING:
 
 # - global variables -------------------------------
 DEFAULT_CSET = "bright"
+
+
+class DrawKeys(TypedDict):
+    """Define keyword arguments of DrawLines.draw()."""
+
+    title: NotRequired[str]
+    xlabel: NotRequired[str]
+    ylabel: NotRequired[str]
+    xlim: NotRequired[list[float, float]]
+    ylim: NotRequired[list[float, float]]
+    xscale: NotRequired[str]
+    yscale: NotRequired[str]
+    kwlegend: NotRequired[dict]
 
 
 # - class definition -------------------------------
@@ -172,10 +185,9 @@ class DrawLines:
 
     def draw(
         self: DrawLines,
+        /,
         axx: Axes,
-        title: str | None = None,
-        kwlegend: dict | None = None,
-        **kwargs: int,
+        **kwargs: Unpack[DrawKeys],
     ) -> None:
         """Add annotations to a subplot, before closing it.
 
@@ -183,33 +195,37 @@ class DrawLines:
         ----------
         axx :  matplotlib.Axes
             Matplotlib Axes object of plot window
-        title :  str | None
-            Title of the figure
-        kwlegend :  dict | None
-            Provide keywords for the function `Axes.legend`.
+        **kwargs :  Unpack[DrawKeys]
+            keyword arguments, recognized are
+            'kwlegend', 'title', 'xlabel', 'ylabel', 'xlim', 'ylim', 'xscale', 'yscale'.
+            where dictionary kwlegend is passed to `Axes.legend`
             Default: {'fontsize': 'small', 'loc': 'best'}
-        **kwargs :  keyword arguments
-            Recognized are 'xlabel', 'ylabel', 'xlim', 'ylim', 'xscale', 'yscale'
 
         """
         # add title to image panel
-        if title is not None:
-            axx.set_title(title, fontsize="large")
+        if "title" in kwargs:
+            axx.set_title(kwargs["title"], fontsize="large")
+
         # add X & Y label
         if "xlabel" in kwargs:
             axx.set_xlabel(kwargs["xlabel"])
         if "ylabel" in kwargs:
             axx.set_ylabel(kwargs["ylabel"])
+
         # set the limits of the X-axis & Y-axis
         if "xlim" in kwargs:
             axx.set_xlim(kwargs["xlim"])
         if "ylim" in kwargs:
             axx.set_ylim(kwargs["ylim"])
+
         # set the scale of the X & Y axis {"linear", "log", "symlog", ...}
         if "xscale" in kwargs:
             axx.set_xscale(kwargs["xscale"])
         if "yscale" in kwargs:
             axx.set_yscale(kwargs["yscale"])
+
+        # define parameters for `Axes.legend`
+        kwlegend = kwargs.get("kwlegend", {"fontsize": "small", "loc": "best"})
 
         # format the X-axis when it is a time-axis
         if self.time_axis:
@@ -228,10 +244,7 @@ class DrawLines:
 
         # draw legenda in figure
         if axx.get_legend_handles_labels()[1]:
-            if kwlegend is None:
-                axx.legend(fontsize="small", loc="best")
-            else:
-                axx.legend(**kwlegend)
+            axx.legend(**kwlegend)
 
         # add grid lines (default settings)
         axx.grid(True)
