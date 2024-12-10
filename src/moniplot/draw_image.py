@@ -78,7 +78,7 @@ class DrawImage:
     def __init__(
         self: DrawImage,
         arr: np.ndarray | xr.DataArray,
-        zscale: str = None,
+        zscale: str | None = None,
         vperc: list[int, int] | None = None,
         vrange: list[float, float] | None = None,
     ) -> None:
@@ -207,7 +207,7 @@ class DrawImage:
                 ["y-panel", "image", "colorbar", "."],
                 [".", "x-panel", ".", "."],
             ]
-            width_ratios = (1,) + width_ratios
+            width_ratios = (1, *width_ratios)
             height_ratios += (1,)
         else:
             mosaic = [["caption", ".", "info"], ["image", "colorbar", "."]]

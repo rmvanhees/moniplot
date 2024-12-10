@@ -299,6 +299,10 @@ class DrawTrend:
                     mylabel = mytitle if units == "1" else f"{mytitle} [{units}]"
                 mytitle = ""
 
+        # redefine mylabel or mytitle when attributes of xarr are set
+        mylabel = xarr.attrs.get("_ylabel", mylabel)
+        mytitle = xarr.attrs.get("legend", mytitle)
+
         # set the fill-color according to the line-color
         fill_cset = tol_cset("plain")
         l_color = xarr.attrs.get("_color", l_color)
@@ -330,9 +334,9 @@ class DrawTrend:
             # line-color
             lcolor: str = l_color
             # suggestion for the ylabel
-            ylabel: str = xarr.attrs.get("_ylabel", mylabel)
+            ylabel: str = mylabel
             # suggestion for the figure legend entry
-            legend: str = xarr.attrs.get("legend", mytitle)
+            legend: str = mytitle
 
         return DecoFig()
 

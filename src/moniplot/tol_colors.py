@@ -721,7 +721,7 @@ _cmap_dict = {
 
 
 # - functions --------------------------------------
-def tol_cmap(colormap: str = None, lut: int = 0) -> colormaps:
+def tol_cmap(colormap: str | None = None, lut: int = 0) -> colormaps:
     """Continuous and discrete color sets for ordered data.
 
     Definition of colour schemes for lines which also work for colour-blind
@@ -773,7 +773,7 @@ def tol_cmap(colormap: str = None, lut: int = 0) -> colormaps:
     return cmap
 
 
-def tol_cset(colorset: str = None) -> dataclass:
+def tol_cset(colorset: str | None = None) -> dataclass:
     """Discrete color sets for qualitative data.
 
     Definition of colour schemes for lines which also work for colour-blind

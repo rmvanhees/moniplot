@@ -84,7 +84,7 @@ class DrawHist:
         """Create a DrawHist object."""
         self.xlabel = "value"
         self.ylabel = (
-            "density" if "density" in kwargs and kwargs["density"] else "number"
+            "density" if kwargs.get("density") else "number"
         )
         self.zunits = "1"
         if isinstance(arr, xr.DataArray):

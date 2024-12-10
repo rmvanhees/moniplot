@@ -24,7 +24,7 @@ These functions store a HDF5 dataset or numpy array in a labeled array
 
 from __future__ import annotations
 
-__all__ = ["h5_to_xr", "data_to_xr"]
+__all__ = ["data_to_xr", "h5_to_xr"]
 
 from pathlib import PurePath
 from typing import TYPE_CHECKING
@@ -347,10 +347,7 @@ def h5_to_xr(
                 del coords[ii]
 
     # - remove empty coordinates
-    co_dict = {}
-    for key, val in coords:
-        if val is not None:
-            co_dict[key] = val
+    co_dict = {key: val for key, val in coords if val is not None}
     # print(f"co_dict: {co_dict}")
 
     # get dataset attributes
