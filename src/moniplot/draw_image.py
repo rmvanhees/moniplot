@@ -562,13 +562,13 @@ class DrawImage:
                 fig_info.add(self.attrs["flag_meanings"][1], np.sum(self._image == 1))
             else:
                 fig_info.add(
-                    f'{self.attrs["flag_meanings"][2]}'
-                    f' (quality < {self.attrs["thres_bad"]})',
+                    f"{self.attrs['flag_meanings'][2]}"
+                    f" (quality < {self.attrs['thres_bad']})",
                     np.sum((self._image == 1) | (self._image == 2)),
                 )
                 fig_info.add(
-                    f'{self.attrs["flag_meanings"][1]}'
-                    f' (quality < {self.attrs["thres_worst"]})',
+                    f"{self.attrs['flag_meanings'][1]}"
+                    f" (quality < {self.attrs['thres_worst']})",
                     np.sum(self._image == 1),
                 )
         else:

@@ -291,7 +291,7 @@ class DrawGeo:
         elif isinstance(data_in, xr.DataArray):
             data = (data_in.values,)
             if "units" in data_in.attrs and data_in.attrs["units"] != "1":
-                zlabel = rf'value [{data_in.attrs["units"]}]'
+                zlabel = rf"value [{data_in.attrs['units']}]"
         else:
             data = data_in
 
