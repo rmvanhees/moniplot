@@ -488,6 +488,11 @@ class DrawTrend:
         else:
             xdata = xarr.coords["orbit"].values
             gap_list = self.get_gap_list(xdata)
+
+        # check if we have any data to work with
+        if xdata.size == 0:
+            print("WARNING: can not draw a figure without data")
+            return
         gap_list += (xdata.size - 1,)
 
         # define avg, err1, err2
@@ -501,6 +506,7 @@ class DrawTrend:
 
         # plot data
         ii = 0
+        # print(f"gap_list: {gap_list}")
         for jj in gap_list:
             isel = np.s_[ii : jj + 1]
             if err1 is not None:
