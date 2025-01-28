@@ -382,7 +382,7 @@ class RainbowDiscrete:
     """Defines sequential color scheme 'RainbowDiscrete'."""
 
     bad_color: str = "#777777"
-    colors: list[str, ...] = field(default_factory=list)
+    colors: list[str] = field(default_factory=list)
 
     def __post_init__(self: RainbowDiscrete) -> None:
         self.set_lut()

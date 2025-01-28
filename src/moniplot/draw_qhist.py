@@ -138,10 +138,10 @@ class DrawQhist:
             legend.draw_frame(False)
             # add decoration
             axx.grid(which="major", axis="y", color="#AAAAAA", ls="--")
-            axx.set_xlim([0, 1])
+            axx.set_xlim(0, 1)
             axx.xaxis.set_minor_locator(AutoMinorLocator(2))
             axx.set_ylabel("density" if density else "count")
-            axx.set_ylim([1e-4, 10])
+            axx.set_ylim(1e-4, 10)
             axx.set_yticks([1e-4, 1e-3, 1e-2, 1e-1, 1])
 
         # finally add a label for the X-coordinate

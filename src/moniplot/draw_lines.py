@@ -214,9 +214,9 @@ class DrawLines:
 
         # set the limits of the X-axis & Y-axis
         if "xlim" in kwargs:
-            axx.set_xlim(kwargs["xlim"])
+            axx.set_xlim(*kwargs["xlim"])
         if "ylim" in kwargs:
-            axx.set_ylim(kwargs["ylim"])
+            axx.set_ylim(*kwargs["ylim"])
 
         # set the scale of the X & Y axis {"linear", "log", "symlog", ...}
         if "xscale" in kwargs:

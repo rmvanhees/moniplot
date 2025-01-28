@@ -26,13 +26,13 @@ __all__ = ["DrawGeo"]
 from typing import TYPE_CHECKING
 
 import cartopy.feature as cfeature
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 from cartopy import crs as ccrs
 from cartopy.mpl.gridliner import LATITUDE_FORMATTER, LONGITUDE_FORMATTER
 from matplotlib.patches import Polygon
+from matplotlib.ticker import FixedLocator
 
 from .lib.saa_region import saa_region
 from .tol_colors import tol_cmap, tol_cset
@@ -91,8 +91,8 @@ class DrawGeo:
         axx.patch.set_facecolor(self._cset["water"])
         axx.add_feature(cfeature.LAND, edgecolor="none", facecolor=self._cset["land"])
         glx = axx.gridlines(linestyle="-", linewidth=0.5, color=self._cset["grid"])
-        glx.xlocator = mpl.ticker.FixedLocator(np.linspace(-180, 180, 13))
-        glx.ylocator = mpl.ticker.FixedLocator(np.linspace(-90, 90, 13))
+        glx.xlocator = FixedLocator(np.linspace(-180, 180, 13))
+        glx.ylocator = FixedLocator(np.linspace(-90, 90, 13))
         glx.xformatter = LONGITUDE_FORMATTER
         glx.yformatter = LATITUDE_FORMATTER
 
@@ -330,13 +330,14 @@ class DrawGeo:
 
         # Add the colorbar axes anywhere in the figure.
         # Its position will be re-calculated at each figure resize.
-        cax = fig.add_axes([0, 0, 0.1, 0.1])
+        cax = fig.add_axes((0, 0, 0.1, 0.1))
         fig.subplots_adjust(hspace=0, wspace=0, left=0.05, right=0.85)
 
         # draw worldmap
         self.__draw_worldmap(axx, whole_globe=whole_globe)
 
         # draw sub-satellite spot(s)
+        img = None
         for xx, yy, zz in zip(lons, lats, data, strict=True):
             if xx.shape == zz.shape:
                 xx = extent_arr(xx)

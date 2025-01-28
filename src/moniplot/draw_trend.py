@@ -112,7 +112,7 @@ class DrawTrend:
         data: np.ndarray | Iterable,
         err1: np.ndarray | Iterable | None,
         err2: np.ndarray | Iterable | None,
-        vperc: list[int, int],
+        vperc: list[int, int] | None,
         vrange_last_orbits: int = 0,
     ) -> tuple[float, float]:
         """Set minimum and maximum values of ylim.
@@ -125,7 +125,7 @@ class DrawTrend:
             Values of the data minus its uncertainty, None if without uncertainty
         err2 :  array_like
             Values of the data plus its uncertainty, None if without uncertainty
-        vperc : list
+        vperc : list[int, int] | None
             Limit the data range to the given percentiles
         vrange_last_orbits: int, default=0
             Use only data of the last N orbits, ignored when vrange_last_orbits <= 0
@@ -430,12 +430,12 @@ class DrawTrend:
             axx.xaxis.set_major_formatter(ConciseDateFormatter(locator))
         else:
             axx.xaxis.set_minor_locator(AutoMinorLocator())
-        axx.set_xlim([xdata[0], xdata[-1]])
+        axx.set_xlim(xdata[0], xdata[-1])
 
         # adjust data X-coordinate
         axx.locator_params(axis="y", nbins=5)
         if "orbit" in xarr.coords:
-            axx.set_ylim(self.adjust_ylim(avg, err1, err2, [], -1))
+            axx.set_ylim(*self.adjust_ylim(avg, err1, err2, None, -1))
 
         axx.set_ylabel(deco_fig.ylabel)
         axx.grid(True)
@@ -451,7 +451,7 @@ class DrawTrend:
         self: DrawTrend,
         axx: Axes,
         xarr: xr.DataArray,
-        vperc: list | None = None,
+        vperc: list[int, int] | None = None,
         vrange_last_orbits: int = -1,
     ) -> None:
         """Add a subplot for housekeeping data.
@@ -539,14 +539,14 @@ class DrawTrend:
             axx.xaxis.set_major_formatter(ConciseDateFormatter(locator))
         else:
             axx.xaxis.set_minor_locator(AutoMinorLocator())
-        axx.set_xlim([xdata[0], xdata[-1]])
+        axx.set_xlim(xdata[0], xdata[-1])
 
         # adjust data Y-coordinate
         axx.locator_params(axis="y", nbins=4)
         if "orbit" in xarr.coords:
-            axx.set_ylim(self.adjust_ylim(avg, err1, err2, vperc, vrange_last_orbits))
+            axx.set_ylim(*self.adjust_ylim(avg, err1, err2, vperc, vrange_last_orbits))
         else:
-            axx.set_ylim(self.adjust_ylim(avg, err1, err2, vperc))
+            axx.set_ylim(*self.adjust_ylim(avg, err1, err2, vperc))
         axx.set_ylabel(deco_fig.ylabel)
         axx.grid(True)
 
