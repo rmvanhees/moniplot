@@ -35,7 +35,7 @@ from matplotlib.patches import Polygon
 from matplotlib.ticker import FixedLocator
 
 from .lib.saa_region import saa_region
-from .tol_colors import tol_cmap, tol_cset
+from .tol_colors import tol_cmap, tol_cset, tol_rgba
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -43,7 +43,7 @@ if TYPE_CHECKING:
 
 # - global variables -------------------------------
 SPHERE_RADIUS = 6370997.0
-
+DEFAULT_CSET = "muted"
 
 # - helper functions -------------------------------
 def set_proj_parms(lon_0: float = 0.0, lat_0: float = 0.0) -> dict:
@@ -66,14 +66,34 @@ class DrawGeo:
 
     def __init__(self: DrawGeo) -> None:
         """..."""
-        self._cmap = tol_cmap("rainbow_PuRd")
-        self._cset = {
+        self._cgeo = {
             "water": "#DDEEFF",
             "land": "#E1C999",
             "grid": "#BBBBBB",
             "satellite": "#EE6677",
         }
+        self._cmap = tol_cmap("rainbow_PuRd")
+        self._cset = tol_rgba(DEFAULT_CSET)[:9]
         self._saa = None
+
+    def set_cset(self: DrawGeo, cname: str, cnum: int | None = None) -> None:
+        """Use alternative color-set through which `draw_geo` will cycle.
+
+        Parameters
+        ----------
+        cname :  str
+           Name of color set. Use None to get the default matplotlib value.
+        cnum : int, optional
+           Number of discrete colors in colormap (*not colorset*).
+
+        """
+        if not isinstance(cname, str):
+            raise ValueError("The name of a color-set should be a string.")
+        self._cset = tol_rgba(cname, cnum)
+
+    def unset_cset(self: DrawGeo) -> None:
+        """Set color set to its default."""
+        self._cset = tol_rgba(DEFAULT_CSET)[:9]
 
     def set_saa(self: DrawGeo) -> None:
         """Define SAA region."""
@@ -88,9 +108,9 @@ class DrawGeo:
             axx.set_ylim(-meridian_half, meridian_half)
 
         axx.spines["geo"].set_visible(False)
-        axx.patch.set_facecolor(self._cset["water"])
-        axx.add_feature(cfeature.LAND, edgecolor="none", facecolor=self._cset["land"])
-        glx = axx.gridlines(linestyle="-", linewidth=0.5, color=self._cset["grid"])
+        axx.patch.set_facecolor(self._cgeo["water"])
+        axx.add_feature(cfeature.LAND, edgecolor="none", facecolor=self._cgeo["land"])
+        glx = axx.gridlines(linestyle="-", linewidth=0.5, color=self._cgeo["grid"])
         glx.xlocator = FixedLocator(np.linspace(-180, 180, 13))
         glx.ylocator = FixedLocator(np.linspace(-90, 90, 13))
         glx.xformatter = LONGITUDE_FORMATTER
@@ -127,6 +147,7 @@ class DrawGeo:
         # myproj = {"projection": ccrs.Robinson(central_longitude=11.5)}
         axx = plt.axes(projection=ccrs.Robinson(central_longitude=11.5))
         axx.set_global()
+        axx.set_prop_cycle(color=self._cset)
 
         # show SAA region
         if self._saa is not None:
@@ -141,7 +162,6 @@ class DrawGeo:
             axx.add_patch(saa_poly)
 
         # draw satellite position(s)
-        cset = tol_cset("muted")
         icid_uniq = np.unique(icids)
         for ii, ic_id in enumerate(icid_uniq):
             mask = icids == ic_id
@@ -150,7 +170,6 @@ class DrawGeo:
                 lons[mask],
                 lats[mask],
                 marker="s",
-                c=cset.colors[ii % 9] if ic_id > 0 else cset.pale_grey,
                 s=markersize,
                 label=f"{label_id}: {ic_id}",
                 transform=ccrs.Geodetic(),
@@ -223,7 +242,7 @@ class DrawGeo:
             transform=ccrs.PlateCarree(),
             marker="o",
             linewidth=0,
-            color=self._cset["satellite"],
+            color=self._cgeo["satellite"],
         )
         return fig, axx
 
