@@ -45,6 +45,7 @@ if TYPE_CHECKING:
 SPHERE_RADIUS = 6370997.0
 DEFAULT_CSET = "muted"
 
+
 # - helper functions -------------------------------
 def set_proj_parms(lon_0: float = 0.0, lat_0: float = 0.0) -> dict:
     """Return settings for the ObliqueMercator projection."""
@@ -163,7 +164,7 @@ class DrawGeo:
 
         # draw satellite position(s)
         icid_uniq = np.unique(icids)
-        for ii, ic_id in enumerate(icid_uniq):
+        for ic_id in icid_uniq:
             mask = icids == ic_id
             # pylint: disable=abstract-class-instantiated
             axx.scatter(
