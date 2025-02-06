@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2019-2024 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2019-2025 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -23,14 +23,12 @@ from __future__ import annotations
 __all__ = ["Biweight", "biweight"]
 
 import warnings
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 import numpy as np
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
-
-    from numpy import ndarray
+    from numpy.typing import ArrayLike, NDArray
 
 
 # ----- class Biweight -------------------------
@@ -39,14 +37,14 @@ class Biweight:
 
     Parameters
     ----------
-    data : array_like
+    data : ArrayLike
        input array
     axis : int, optional
        axis along which the biweight medians are computed.
 
     Notes
     -----
-    Parameter `data` should not contain any invalid value.
+    Parameter `data` should not contain any infinite values.
 
     Parameter `axis` will be ignored when data is a 1-D array.
 
@@ -56,6 +54,18 @@ class Biweight:
        If axis is not an integer.
     ValueError
        If axis is invalid, e.g. axis > data.ndim.
+
+    Notes
+    -----
+    This implementation as been verified against the AstroPy implementation.
+    If the input array does contain any NaN's then the following is true:
+
+    * Biweight.median(data, axis=N) equal to astropy.biweight_location(data, axis=N)
+    * Biweight.spead(data, axis=N) equal to astropy.biweight_scale(data, axis=N)
+
+    Else you will have to use the parameter `ignore_nan=True` in the astropy
+    implementation, because Biweight will always ignore NaN's and suppress any
+    'All-NaN slice encountered' warning.
 
     Examples
     --------
@@ -69,11 +79,16 @@ class Biweight:
        > Biweight((1, 2, 2.5, 1.75, 2)).unbiased_std
        0.6131156500926488
 
+    References
+    ----------
+    [1] astropy.biweight_location:
+        https://docs.astropy.org/en/stable/api/astropy.stats.biweight_location.html
+    [2] astropy.biweight_scale:
+        https://docs.astropy.org/en/stable/api/astropy.stats.biweight_scale.html.
+
     """
 
-    def __init__(
-        self: Biweight, data: ndarray | Iterable, axis: int | None = None
-    ) -> None:
+    def __init__(self: Biweight, data: ArrayLike, axis: int | None = None) -> None:
         """Initialize a Biweight object."""
         data = np.asarray(data)
 
@@ -121,8 +136,16 @@ class Biweight:
             self.__mask = _mm
             self.__med_data = np.squeeze(self.__med_data)
 
+    def __enter__(self: Biweight) -> Self:
+        """Initiate the context manager."""
+        return self
+
+    def __exit__(self: Biweight, *args: object) -> bool:
+        """Exit the context manager."""
+        return False  # any exception is raised by the with statement.
+
     @property
-    def median(self: Biweight) -> float | ndarray:
+    def median(self: Biweight) -> float | NDArray:
         """Return biweight median."""
         if self.axis is None:
             if self.__med_delta == 0:
@@ -144,7 +167,7 @@ class Biweight:
         return self.__med_data
 
     @property
-    def spread(self: Biweight) -> float | ndarray:
+    def spread(self: Biweight) -> float | NDArray:
         """Return biweight spread."""
         if self.axis is None:
             if self.__med_delta == 0:
@@ -163,11 +186,12 @@ class Biweight:
                 np.nansum((1 - umn) * (1 - 5 * umn), axis=self.axis)[_mm] ** 2
             )
             biweight_var[_mm] *= self.nr_valid[_mm]
+            biweight_var[~_mm] = np.nan
 
         return np.sqrt(biweight_var)
 
     @property
-    def unbiased_std(self: Biweight) -> float | ndarray:
+    def unbiased_std(self: Biweight) -> float | NDArray:
         """Return unbiased estimator."""
         count = self.nr_valid
         if self.axis is None:
@@ -192,13 +216,13 @@ class Biweight:
 
 # ----- main function -------------------------
 def biweight(
-    data: ndarray | Iterable, axis: int | None = None, spread: bool = False
-) -> ndarray | tuple[ndarray, ndarray]:
+    data: ArrayLike, axis: int | None = None, spread: bool = False
+) -> NDArray | tuple[NDArray, NDArray]:
     """Python implementation of the Tukey's biweight algorithm.
 
     Parameters
     ----------
-    data : array_like
+    data : ArrayLike
        input array
     axis : int, optional
        axis along which the biweight medians are computed.
@@ -208,7 +232,7 @@ def biweight(
 
     Returns
     -------
-    out : ndarray or tuple
+    out : NDArray or tuple[NDArray, NDArray]
        biweight median and biweight spread if parameter "spread" is True
 
     """
