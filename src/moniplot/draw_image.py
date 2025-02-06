@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022-2024 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2025 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -572,17 +572,17 @@ class DrawImage:
                     np.sum(self._image == 1),
                 )
         else:
-            biwght = Biweight(self._image)
-            if self.attrs["units"] == "1":
-                fig_info.add("median", biwght.median, "{:.5g}")
-                fig_info.add("spread", biwght.spread, "{:.5g}")
-            else:
-                fig_info.add(
-                    "median", (biwght.median, self.attrs["units"]), "{:.5g} {}"
-                )
-                fig_info.add(
-                    "spread", (biwght.spread, self.attrs["units"]), "{:.5g} {}"
-                )
+            with  Biweight(self._image) as bwght:
+                if self.attrs["units"] == "1":
+                    fig_info.add("median", bwght.median, "{:.5g}")
+                    fig_info.add("spread", bwght.spread, "{:.5g}")
+                else:
+                    fig_info.add(
+                        "median", (bwght.median, self.attrs["units"]), "{:.5g} {}"
+                    )
+                    fig_info.add(
+                        "spread", (bwght.spread, self.attrs["units"]), "{:.5g} {}"
+                    )
 
         # draw actual image
         self.__draw_image(axx)

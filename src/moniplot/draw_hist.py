@@ -112,13 +112,13 @@ class DrawHist:
         if fig_info is None:
             fig_info = FIGinfo()
 
-        biwght = Biweight(self.__data)
-        if self.zunits == "1":
-            fig_info.add("median", biwght.median, "{:.5g}")
-            fig_info.add("spread", biwght.spread, "{:.5g}")
-        else:
-            fig_info.add("median", (biwght.median, self.zunits), "{:.5g} {}")
-            fig_info.add("spread", (biwght.spread, self.zunits), "{:.5g} {}")
+        with Biweight(self.__data) as bwght:
+            if self.zunits == "1":
+                fig_info.add("median", bwght.median, "{:.5g}")
+                fig_info.add("spread", bwght.spread, "{:.5g}")
+            else:
+                fig_info.add("median", (bwght.median, self.zunits), "{:.5g} {}")
+                fig_info.add("spread", (bwght.spread, self.zunits), "{:.5g} {}")
 
         return fig_info
 
