@@ -291,7 +291,7 @@ class DrawTrend:
             case "%" if mytitle.find(" duty") > 0:
                 mytitle = mytitle[: mytitle.find(" duty")]
                 mylabel = f"duty cycle [{units}]"
-                l_color = line_cset.red
+                l_color = line_cset.green
             case _:
                 if "legend" in xarr.attrs:
                     mylabel = "count" if units == "1" else f"value [{units}]"
@@ -330,9 +330,9 @@ class DrawTrend:
             """Define figure decorations."""
 
             # fill-color
-            fcolor: str = f_color
+            fcolor: str | None = f_color
             # line-color
-            lcolor: str = l_color
+            lcolor: str | None = l_color
             # suggestion for the ylabel
             ylabel: str = mylabel
             # suggestion for the figure legend entry
