@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2019-2025 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2025 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -24,7 +24,6 @@ __all__ = ["DrawTimeSerie"]
 
 from typing import TYPE_CHECKING, NotRequired, TypedDict, Unpack
 
-import matplotlib.pyplot as plt
 import numpy as np
 
 from .digitized_biweight import digitized_biweight
@@ -118,6 +117,15 @@ class DrawTimeSerie:
             self.x_mnmx = np.insert(self.x_mnmx, i_g, self.x_mnmx[i_g])
             self.y_mnmx = np.insert(self.y_mnmx, i_g, self.y_mnmx[:, i_g - 1], axis=1)
 
+    # def set_colors(
+    #    self: DrawTimeSerie,
+    #    color_avg: str,
+    #    color_fill1: str | None = None,
+    #    color_fill2: str | None = None,
+    # ) -> None:
+    #    """..."""
+    #    return
+
     def draw(
         self: DrawTimeSerie,
         /,
@@ -128,6 +136,10 @@ class DrawTimeSerie:
         blue = tol_cset("bright").blue
         plain_blue = tol_cset("light").light_blue
         grey = tol_cset("plain").grey
+
+        # add title to image panel
+        if "title" in kwargs:
+            axx.set_title(kwargs["title"], fontsize="large")
 
         # add X & Y label
         if "xlabel" in kwargs:
@@ -170,21 +182,3 @@ class DrawTimeSerie:
             label="median",
         )
         plot.draw(axx)
-        plt.show()
-
-
-def test() -> None:
-    """..."""
-    xdata = np.arange("2024-07-01", "2024-07-11", dtype="datetime64[h]")
-    xdata[5 * 24 :] += np.timedelta64(2, "D")
-    ydata = np.arange(240, dtype=float)
-
-    _, axx = plt.subplots(figsize=(14, 7))
-    # plot = DrawTimeSerie(xdata, ydata, percentiles=None)
-    # plot = DrawTimeSerie(xdata, ydata, percentiles=(25, 99))
-    plot = DrawTimeSerie(xdata, ydata, percentiles=(1, 25, 75, 99))
-    plot.draw(axx)
-
-
-if __name__ == "__main__":
-    test()
