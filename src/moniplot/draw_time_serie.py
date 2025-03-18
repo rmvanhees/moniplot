@@ -25,6 +25,7 @@ __all__ = ["DrawTimeSerie"]
 from typing import TYPE_CHECKING, NotRequired, TypedDict, Unpack
 
 import numpy as np
+from matplotlib.patches import Rectangle
 
 from .digitized_biweight import digitized_biweight
 from .draw_lines import DrawLines
@@ -41,6 +42,7 @@ class DrawKeys(TypedDict):
     """Define keyword arguments of DrawLines.draw()."""
 
     title: NotRequired[str]
+    subtitle: NotRequired[str]
     xlabel: NotRequired[str]
     ylabel: NotRequired[str]
     xlim: NotRequired[list[float, float]]
@@ -130,6 +132,7 @@ class DrawTimeSerie:
         self: DrawTimeSerie,
         /,
         axx: Axes,
+        nolabel: bool = False,
         **kwargs: Unpack[DrawKeys],
     ) -> None:
         """Draw the actual plot and add annotations to a subplot, before closing it."""
@@ -140,6 +143,16 @@ class DrawTimeSerie:
         # add title to image panel
         if "title" in kwargs:
             axx.set_title(kwargs["title"], fontsize="large")
+
+        if "subtitle" in kwargs:
+            blank_legend_handle = Rectangle(
+                (0, 0), 0, 0, fill=False, edgecolor="none", visible=False
+            )
+            legend = axx.legend(
+                [blank_legend_handle], [kwargs["subtitle"]], loc="upper left"
+            )
+            legend.draw_frame(False)
+            axx.add_artist(legend)
 
         # add X & Y label
         if "xlabel" in kwargs:
@@ -161,7 +174,7 @@ class DrawTimeSerie:
                 self.y_mnmx[-1, :],
                 step="post",  # THIS IS IMPORTANT!
                 color=grey if len(self.perc) == 4 else plain_blue,
-                label=f"[{self.perc[0]}%, {self.perc[-1]}%]",
+                label=None if nolabel else f"[{self.perc[0]}%, {self.perc[-1]}%]",
             )
             if len(self.perc) == 4:
                 axx.fill_between(
@@ -170,7 +183,7 @@ class DrawTimeSerie:
                     self.y_mnmx[2, :],
                     step="post",  # THIS IS IMPORTANT!
                     color=plain_blue,
-                    label=f"[{self.perc[1]}%, {self.perc[2]}%]",
+                    label=None if nolabel else f"[{self.perc[1]}%, {self.perc[2]}%]",
                 )
         plot.add_line(
             axx,
@@ -179,6 +192,9 @@ class DrawTimeSerie:
             use_steps=True,
             lw=2,
             color=blue,
-            label="median",
+            label=None if nolabel else "median",
         )
-        plot.draw(axx)
+        if "kwlegend" in kwargs:
+            plot.draw(axx, kwlegend=kwargs["kwlegend"])
+        else:
+            plot.draw(axx)
