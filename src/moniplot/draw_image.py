@@ -172,7 +172,7 @@ class DrawImage:
         if self._image is None:
             return None
 
-        return min(4, max(1, int(round(self._image.shape[1] / self._image.shape[0]))))
+        return min(4, max(1, round(self._image.shape[1] / self._image.shape[0])))
 
     def subplots(
         self: DrawImage, side_panels: bool = True
@@ -560,19 +560,25 @@ class DrawImage:
                 fig_info.add(self.attrs["flag_meanings"][3], np.sum(self._image == 4))
                 fig_info.add(self.attrs["flag_meanings"][2], np.sum(self._image == 2))
                 fig_info.add(self.attrs["flag_meanings"][1], np.sum(self._image == 1))
+            elif self.attrs["thres_worst"] is None:
+                fig_info.add(
+                    f"{self.attrs['flag_meanings'][2]}"
+                    f" (quality == {self.attrs['thres_bad']})",
+                    (self._image == 1).sum(),
+                )
             else:
                 fig_info.add(
                     f"{self.attrs['flag_meanings'][2]}"
                     f" (quality < {self.attrs['thres_bad']})",
-                    np.sum((self._image == 1) | (self._image == 2)),
+                    ((self._image == 1) | (self._image == 2)).sum(),
                 )
                 fig_info.add(
                     f"{self.attrs['flag_meanings'][1]}"
                     f" (quality < {self.attrs['thres_worst']})",
-                    np.sum(self._image == 1),
+                    (self._image == 1).sum(),
                 )
         else:
-            with  Biweight(self._image) as bwght:
+            with Biweight(self._image) as bwght:
                 if self.attrs["units"] == "1":
                     fig_info.add("median", bwght.median, "{:.5g}")
                     fig_info.add("spread", bwght.spread, "{:.5g}")
