@@ -142,10 +142,12 @@ class DrawTimeSerie:
         Parameters
         ----------
         axx :  matplotlib.Axes
-            Matplotlib Axes object of plot window.
+            Matplotlib Axes object of plot window
         nolabel :  bool, default=False
-            
-           
+            Do not add a Matplotlib legend
+        **kwargs :  Unpack[DrawKeys]
+            Keywords passed to matplotlib.pyplot
+
         """
         blue = tol_cset("bright").blue
         plain_blue = tol_cset("light").light_blue
@@ -214,4 +216,3 @@ class DrawTimeSerie:
         # draw legenda in figure
         if axx.get_legend_handles_labels()[1]:
             axx.legend(**kwlegend)
-
