@@ -16,6 +16,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
 """Definition of the monitplot class `DrawTimeSerie`."""
 
 from __future__ import annotations
@@ -28,7 +29,6 @@ import numpy as np
 from matplotlib.patches import Rectangle
 
 from .digitized_biweight import digitized_biweight
-from .draw_lines import DrawLines
 from .tol_colors import tol_cset
 
 if TYPE_CHECKING:
@@ -56,15 +56,18 @@ class DrawTimeSerie:
 
     Parameters
     ----------
-    xdata: NDArray[np.datetime64]
+    xdata :  NDArray[np.datetime64]
        X data (timestamps).
-    ydata: NDArray
+    ydata :  NDArray
        Y data.
-    bin_size: int, default=1
+    bin_size :  int, default=1
        Size of the date-bins in days or hours.
-    percentiles: tuple[int, ...], optional
+    min_in_bins :  int, default=25
+       Minimum number of data-samples per date-bin
+    percentiles :  tuple[int, ...], optional
        Sequence of pairs of percentages for the percentiles to compute.
-       Values must be between 0 and 100 inclusive. The median will always be shown.
+       Values must be between 0 and 100 inclusive, excluding 50.
+       The median will always be determined.
 
     Examples
     --------
@@ -77,56 +80,55 @@ class DrawTimeSerie:
         xdata: NDArray[np.datetime64],
         ydata: NDArray,
         bin_size: int = 1,
+        min_in_bins: int = 25,
         percentiles: tuple[int, ...] | None = None,
     ) -> None:
         """Create DrawTimeSerie object."""
-        self.perc = None
-        self.x_mnmx = None
-        self.y_mnmx = None
+        self.x_perc = None
+        self.y_perc = None
+
+        # check percentiles
+        if percentiles is not None and (50 in percentiles or len(percentiles) % 2 == 1):
+            raise KeyError("number of percentiles should be odd and not contain 50")
+        self.perc = percentiles
+
         res = digitized_biweight(
             xdata, ydata, bin_size=bin_size, y_in_bins=percentiles is not None
         )
-        # add one point at the end because we use option steps
-        self.xbin = np.append(res[0], res[0][-1] + ONE_DAY)
-        self.ybin = res[1]
+        # (x_avg, y_avg) contain the timestamps and median of the input data
+        # which are shown using the matplotlib step-function.
+        self.x_avg = res[0]
+        self.y_avg = res[1]
         if percentiles is None:
             return
-        self.perc = percentiles
         y_in_bins = res[3]
 
-        # check percentiles
-        if 50 in percentiles or len(percentiles) % 2 == 1:
-            raise KeyError("number of percentiles should be odd and not contain 50")
-
         # calculate percentiles per date-bin
-        self.y_mnmx = np.zeros((len(percentiles), self.ybin.size + 1), dtype=float)
+        self.x_perc = np.append(res[0], res[0][-1] + ONE_DAY)
+        self.y_perc = np.full((len(percentiles), self.x_perc.size), np.nan)
         for ii, ybuff in enumerate(y_in_bins):
-            self.y_mnmx[:, ii] = np.nanpercentile(ybuff, self.perc)
+            if ybuff.size >= min_in_bins:
+                self.y_perc[:, ii] = np.nanpercentile(ybuff, self.perc)
+            else:
+                self.y_avg[ii] = np.nan
 
         # add one point at the end (actualy, at the end of every data-gap)
-        self.y_mnmx[:, -1] = self.y_mnmx[:, -2]
-        self.x_mnmx = self.xbin.copy()
+        self.y_perc[:, -1] = self.y_perc[:, -2]
 
         # close data-gaps (date-bins without data)
-        i_gaps = np.isnan(self.ybin).nonzero()[0]
+        i_gaps = np.isnan(self.y_avg).nonzero()[0]
         if i_gaps.size == 0:
             return
 
+        offs = 0
         i_diff = np.append([0], np.diff(i_gaps))
         for i_d, i_g in zip(i_diff, i_gaps, strict=True):
             if i_d == 1:
                 continue
-            self.x_mnmx = np.insert(self.x_mnmx, i_g, self.x_mnmx[i_g])
-            self.y_mnmx = np.insert(self.y_mnmx, i_g, self.y_mnmx[:, i_g - 1], axis=1)
-
-    # def set_colors(
-    #    self: DrawTimeSerie,
-    #    color_avg: str,
-    #    color_fill1: str | None = None,
-    #    color_fill2: str | None = None,
-    # ) -> None:
-    #    """..."""
-    #    return
+            i_g += offs
+            self.x_perc = np.insert(self.x_perc, i_g, self.x_perc[i_g])
+            self.y_perc = np.insert(self.y_perc, i_g, self.y_perc[:, i_g - 1], axis=1)
+            offs += 1
 
     def draw(
         self: DrawTimeSerie,
@@ -135,7 +137,16 @@ class DrawTimeSerie:
         nolabel: bool = False,
         **kwargs: Unpack[DrawKeys],
     ) -> None:
-        """Draw the actual plot and add annotations to a subplot, before closing it."""
+        """Draw the actual plot and add annotations to a subplot, before closing it.
+
+        Parameters
+        ----------
+        axx :  matplotlib.Axes
+            Matplotlib Axes object of plot window.
+        nolabel :  bool, default=False
+            
+           
+        """
         blue = tol_cset("bright").blue
         plain_blue = tol_cset("light").light_blue
         grey = tol_cset("plain").grey
@@ -154,6 +165,9 @@ class DrawTimeSerie:
             legend.draw_frame(False)
             axx.add_artist(legend)
 
+        # add grid lines (default settings)
+        axx.grid(True)
+
         # add X & Y label
         if "xlabel" in kwargs:
             axx.set_xlabel(kwargs["xlabel"])
@@ -166,35 +180,38 @@ class DrawTimeSerie:
         if "ylim" in kwargs:
             axx.set_ylim(*kwargs["ylim"])
 
-        plot = DrawLines()
+        # define parameters for `Axes.legend`
+        kwlegend = kwargs.get("kwlegend", {"fontsize": "small", "loc": "best"})
+
+        # draw pannel
         if self.perc is not None:
             axx.fill_between(
-                self.x_mnmx,
-                self.y_mnmx[0, :],
-                self.y_mnmx[-1, :],
-                step="post",  # THIS IS IMPORTANT!
+                self.x_perc,
+                self.y_perc[0, :],
+                self.y_perc[-1, :],
+                step="post",
                 color=grey if len(self.perc) == 4 else plain_blue,
                 label=None if nolabel else f"[{self.perc[0]}%, {self.perc[-1]}%]",
             )
             if len(self.perc) == 4:
                 axx.fill_between(
-                    self.x_mnmx,
-                    self.y_mnmx[1, :],
-                    self.y_mnmx[2, :],
-                    step="post",  # THIS IS IMPORTANT!
+                    self.x_perc,
+                    self.y_perc[1, :],
+                    self.y_perc[2, :],
+                    step="post",
                     color=plain_blue,
                     label=None if nolabel else f"[{self.perc[1]}%, {self.perc[2]}%]",
                 )
-        plot.add_line(
-            axx,
-            self.ybin,
-            xdata=self.xbin,
-            use_steps=True,
-            lw=2,
+        axx.step(
+            self.x_avg,
+            self.y_avg,
+            where="post",
+            linewidth=2,
             color=blue,
             label=None if nolabel else "median",
         )
-        if "kwlegend" in kwargs:
-            plot.draw(axx, kwlegend=kwargs["kwlegend"])
-        else:
-            plot.draw(axx)
+
+        # draw legenda in figure
+        if axx.get_legend_handles_labels()[1]:
+            axx.legend(**kwlegend)
+
