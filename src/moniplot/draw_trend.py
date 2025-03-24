@@ -1,7 +1,7 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022-2024 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2025 SRON - Netherlands Institute for Space Research
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -82,17 +82,31 @@ class DrawTrend:
     """
 
     @staticmethod
-    def subplots(npanels: int) -> tuple[Figure, list[Axes, ...]]:
+    def subplots(
+            npanels: int, *, two_col: bool = False
+    ) -> tuple[Figure, list[Axes, ...]]:
         """Create a figure and a set of subplots for trend-plots."""
-        figsize = (10.0, 1 + (npanels + 1) * 1.5)
-        fig, axarr = plt.subplots(npanels, figsize=figsize, sharex=True)
-        if npanels == 1:
-            axarr = [axarr]
-        margin = min(1.0 / (1.65 * (npanels + 1)), 0.25)
+        nrows = npanels // 2 if two_col else npanels
+        ncols = 2 if two_col else 1
+        ysize = 17.5 if two_col else 10
+        figsize = (ysize, 1 + (nrows + 1) * 1.5)
+        fig, axarr = plt.subplots(nrows, ncols, figsize=figsize, sharex=True)
+        if not two_col:
+            if npanels == 1:
+                axarr = [axarr]
+
+            for ii in range(npanels - 1):
+                for xtl in axarr[ii].get_xticklabels():
+                    xtl.set_visible(False)
+        else:
+            for jj in range(ncols):
+                for ii in range(nrows - 1):
+                    for xtl in axarr[ii, jj].get_xticklabels():
+                        xtl.set_visible(False)
+            axarr = axarr.swapaxes(0, 1).reshape(-1)
+
+        margin = min(1.0 / (1.65 * (nrows + 1)), 0.3)
         fig.subplots_adjust(bottom=margin, top=1 - margin, hspace=0.05)
-        for ii in range(npanels - 1):
-            for xtl in axarr[ii].get_xticklabels():
-                xtl.set_visible(False)
 
         return fig, axarr
 
