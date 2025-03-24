@@ -1,7 +1,8 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2019-2024, Paul Tol
+# Copyright (c) 2019-2025 Paul Tol (SRON)
+#    All rights reserved.
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify

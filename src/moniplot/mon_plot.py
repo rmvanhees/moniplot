@@ -3,7 +3,8 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022-2024 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2025 SRON
+#    All rights reserved.
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -215,7 +216,7 @@ class MONplot:
             doc["Title"] = self.__caption
         doc["Subject"] = "Generated using https://github.com/rmvanhees/moniplot.git"
         if self.__institute == "SRON":
-            doc["Author"] = "(c) SRON Netherlands Institute for Space Research"
+            doc["Author"] = "(c) SRON"
         elif self.__institute:
             doc["Author"] = f"(c) {self.__institute}"
         self.__pdf.close()

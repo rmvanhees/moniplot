@@ -2,7 +2,8 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022-2024 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2025 SRON
+#    All rights reserved.
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify

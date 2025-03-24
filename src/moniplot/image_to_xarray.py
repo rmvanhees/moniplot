@@ -1,7 +1,8 @@
 #
 # https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2022-2024 SRON - Netherlands Institute for Space Research
+# Copyright (c) 2022-2025 SRON
+#    All rights reserved.
 #
 # License:  GPLv3
 #    This program is free software: you can redistribute it and/or modify
@@ -16,6 +17,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
 """Definition of the moniplot routines `h5_to_xr` and `data_to_xr`.
 
 These functions store a HDF5 dataset or numpy array in a labeled array
