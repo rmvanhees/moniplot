@@ -39,6 +39,7 @@ from .tol_colors import tol_rgba
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from matplotlib.figure import Figure
 
 # - global variables -------------------------------
 DEFAULT_CSET = "bright"
@@ -68,20 +69,20 @@ class DrawLines:
     >>> report = MONplot("test_monplot.pdf", "This is an example figure")
     >>> report.set_institute("SRON")
     >>> plot = DrawLines()
-    >>> fig, axx = plt.subplots(2, 2, sharex="all", figsize=(10, 10))
-    >>> plot.add_line(axx[0, 0], ydata1, xdata=xdata, marker=".", ls="-", label="1")
-    >>> plot.add_line(axx[0, 0], ydata2, xdata=xdata, marker=".", ls="-", label="2")
-    >>> plot.draw(axx[0, 0], title="fig 1", xlabel="X", ylabel="Y")
-    >>> plot.add_line(axx[0, 1], ydata1, xdata=xdata, marker=".", ls="", label="a")
-    >>> plot.add_line(axx[0, 1], ydata2, xdata=xdata, marker="x", ls="", label="b")
-    >>> plot.draw(axx[0, 1], title="fig 2", xlabel="X", ylabel="Y")
-    >>> plot.add_line(axx[1, 0], ydata1, xdata=xdata, marker="o", ls="-", label="I")
-    >>> plot.add_line(axx[1, 0], ydata2, xdata=xdata, marker=".", ls="-", label="II")
-    >>> plot.draw(axx[1, 0], title="fig 3", xlabel="X", ylabel="Y")
-    >>> plot.add_line(axx[1, 1], ydata1, xdata=xdata, marker=".", ls="", label="one")
-    >>> plot.add_line(axx[1, 1], ydata2, xdata=xdata, marker="+", ls="", label="two")
-    >>> plot.draw(axx[1, 1], title="fig 4", xlabel="X", ylabel="Y")
-    >>> report.add_copyright(axx[1, 1])
+    >>> plot.subplots(4, xlim=[xdata.min(), xdata.max()], xlabel="X", ylabel="Y")
+    >>> plot.add_line(axx[0], ydata1, xdata=xdata, marker=".", ls="-", label="1")
+    >>> plot.add_line(axx[0], ydata2, marker=".", ls="-", label="2")
+    >>> plot.draw(axx[0], title="fig 1")
+    >>> plot.add_line(axx[1], ydata1, xdata=xdata, marker=".", ls="", label="a")
+    >>> plot.add_line(axx[1], ydata2, marker="x", ls="", label="b")
+    >>> plot.draw(axx[1], title="fig 2")
+    >>> plot.add_line(axx[2], ydata1, xdata=xdata, marker="o", ls="-", label="I")
+    >>> plot.add_line(axx[2], ydata2, marker=".", ls="-", label="II")
+    >>> plot.draw(axx[2], title="fig 3")
+    >>> plot.add_line(axx[3], ydata1, xdata=xdata, marker=".", ls="", label="one")
+    >>> plot.add_line(axx[3], ydata2, marker="+", ls="", label="two")
+    >>> plot.draw(axx[3], title="fig 4")
+    >>> report.add_copyright(axx[-1])
     >>> report.close_this_page(fig, None)
     >>> report.close()
 
@@ -97,6 +98,128 @@ class DrawLines:
         self.square = square
         self.xdata = None
         self.time_axis = False
+
+    def subplots(
+        self: DrawLines,
+        n_panel: int,
+        xlim: list[float, float] | None = None,
+        ylim: list[float, float] | None = None,
+        xlabel: str | None = None,
+        ylabel: str | None = None,
+        figsize: tuple[float, float] | None = None,
+    ) -> tuple[Figure, list[Axes, ...]]:
+        """Create a figure and a set of subplots for line-plots.
+
+        Parameters
+        ----------
+        n_panel: int
+           Number of panels, valid between 1 and 9
+        xlim: list[float, float], optional
+           Set the X-axis view limits.
+           Note will remove unnecessary xticklabels and xlabels
+        ylim: list[float, float], optional
+           Set the Y-axis view limits
+           Note will remove unnecessary yticklabels and ylabels
+        xlabel: str, optional
+           Set the label for the X-axis
+        ylabel: str, optional
+           Set the label for the Y-axis
+        figsize: tuple[float, float], optiional
+           Figure dimension (width, height) in inches
+
+        Notes
+        -----
+        Distributes the panels as follows:
+         1: X
+
+         2: X X
+
+         3: X X X
+
+         4: X X
+            X X
+
+         5: X X X
+            X X
+
+         6: X X X
+            X X X
+
+         7: X X X
+            X X X
+            X
+
+         8: X X X
+            X X X
+            X X
+
+         9: X X X
+            X X X
+            X X X
+
+        """
+        match n_panel:
+            case 1:
+                n_row, n_col = (1, 1)
+                fig_size = (8, 8)
+            case 2:
+                n_row, n_col = (1, 2)
+                fig_size = (12, 6)
+            case 3:
+                n_row, n_col = (1, 3)
+                fig_size = (14, 6)
+            case 4:
+                n_row, n_col = (2, 2)
+                fig_size = (10, 10)
+            case 5:
+                n_row, n_col = (2, 3)
+                fig_size = (12, 9)
+            case 6:
+                n_row, n_col = (2, 3)
+                fig_size = (12, 9)
+            case 7:
+                n_row, n_col = (3, 3)
+                fig_size = (12, 12)
+            case 8:
+                n_row, n_col = (3, 3)
+                fig_size = (12, 12)
+            case 9:
+                n_row, n_col = (3, 3)
+                fig_size = (12, 12)
+            case _:
+                raise ValueError("value out of range: 1 <= n_panel <= 9")
+
+        fig = plt.figure(figsize=fig_size if figsize is None else figsize)
+        axx_arr = ()
+        for ii in range(n_panel):
+            axx = fig.add_subplot(n_row, n_col, ii + 1)
+
+            # decorate X-axis
+            if xlim is not None:
+                axx.set_xlim(*xlim)
+                if ii < (n_row - 1) * n_col:
+                    if not (
+                        (n_panel == 5 and ii == 2)
+                        or (n_panel == 7 and ii >= 4)
+                        or (n_panel == 8 and ii == 5)
+                    ):
+                        axx.set_xticklabels("")
+                    elif xlabel is not None:
+                        axx.set_xlabel(xlabel)
+                elif xlabel is not None:
+                    axx.set_xlabel(xlabel)
+
+            # decorate Y-axis
+            if ylim is not None:
+                axx.set_ylim(*ylim)
+                if ii % n_col:
+                    axx.set_yticklabels("")
+                elif ylabel is not None:
+                    axx.set_ylabel(ylabel)
+
+            axx_arr += (axx,)
+
+        return fig, np.array(axx_arr)
 
     def set_cset(self: DrawLines, cname: str, cnum: int | None = None) -> None:
         """Use alternative color-set through which `draw_lplot` will cycle.
@@ -225,6 +348,9 @@ class DrawLines:
         if "yscale" in kwargs:
             axx.set_yscale(kwargs["yscale"])
 
+        # add grid lines (default settings)
+        axx.grid(True)
+
         # define parameters for `Axes.legend`
         kwlegend = kwargs.get("kwlegend", {"fontsize": "small", "loc": "best"})
 
@@ -246,6 +372,3 @@ class DrawLines:
         # draw legenda in figure
         if axx.get_legend_handles_labels()[1]:
             axx.legend(**kwlegend)
-
-        # add grid lines (default settings)
-        axx.grid(True)
