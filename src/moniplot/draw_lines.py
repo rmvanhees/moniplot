@@ -102,18 +102,21 @@ class DrawLines:
     def subplots(
         self: DrawLines,
         n_panel: int,
+        one_column: bool = False,
         xlim: list[float, float] | None = None,
         ylim: list[float, float] | None = None,
         xlabel: str | None = None,
         ylabel: str | None = None,
-        figsize: tuple[float, float] | None = None,
+        # figsize: tuple[float, float] | None = None,
     ) -> tuple[Figure, list[Axes, ...]]:
         """Create a figure and a set of subplots for line-plots.
 
         Parameters
         ----------
         n_panel: int
-           Number of panels, valid between 1 and 9
+           Number of panels, 1 <= n_panel <= 9
+        one_column: bool, default=False
+           Put all panels in one column, n_panel <= 5
         xlim: list[float, float], optional
            Set the X-axis view limits.
            Note will remove unnecessary xticklabels and xlabels
@@ -124,8 +127,8 @@ class DrawLines:
            Set the label for the X-axis
         ylabel: str, optional
            Set the label for the Y-axis
-        figsize: tuple[float, float], optiional
-           Figure dimension (width, height) in inches
+        # figsize: tuple[float, float], optiional
+        #    Figure dimension (width, height) in inches
 
         Notes
         -----
@@ -158,38 +161,23 @@ class DrawLines:
             X X X
 
         """
-        match n_panel:
-            case 1:
-                n_row, n_col = (1, 1)
-                fig_size = (8, 8)
-            case 2:
-                n_row, n_col = (1, 2)
-                fig_size = (12, 6)
-            case 3:
-                n_row, n_col = (1, 3)
-                fig_size = (14, 6)
-            case 4:
-                n_row, n_col = (2, 2)
-                fig_size = (10, 10)
-            case 5:
-                n_row, n_col = (2, 3)
-                fig_size = (12, 9)
-            case 6:
-                n_row, n_col = (2, 3)
-                fig_size = (12, 9)
-            case 7:
-                n_row, n_col = (3, 3)
-                fig_size = (12, 12)
-            case 8:
-                n_row, n_col = (3, 3)
-                fig_size = (12, 12)
-            case 9:
-                n_row, n_col = (3, 3)
-                fig_size = (12, 12)
-            case _:
-                raise ValueError("value out of range: 1 <= n_panel <= 9")
+        if not 1 <= n_panel <= 9:
+            raise ValueError("value out of range: 1 <= n_panel <= 9")
 
-        fig = plt.figure(figsize=fig_size if figsize is None else figsize)
+        if one_column:
+            n_row = n_panel
+            n_col = 1
+            fig_size = ((10, 6), (10, 7), (10, 9), (10, 10), (10, 12))[n_panel - 1]
+        else:
+            n_row, n_col = (
+                ((1, 1), (1, 2), (1, 3), (2, 2)) + 2 * ((2, 3),) + 3 * ((3, 3),)
+            )[n_panel - 1]
+            fig_size = (
+                ((8, 8), (12, 6), (14, 6), (9, 9)) + 2 * ((12, 9),) + 3 * ((12, 12),)
+            )[n_panel - 1]
+
+        fig = plt.figure(figsize=fig_size)
+        plt.subplots_adjust(top=1 - 1.1 / fig_size[1])
         axx_arr = ()
         for ii in range(n_panel):
             axx = fig.add_subplot(n_row, n_col, ii + 1)
