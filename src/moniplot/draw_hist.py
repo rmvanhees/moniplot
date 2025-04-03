@@ -76,14 +76,13 @@ class DrawHist(DrawMoni):
 
     """
 
-    def __init__(
+    def add_hist(
         self: DrawHist,
         arr: xr.DataArray | np.ndarray,
         clip: tuple[float | None, float | None] | None = None,
         **kwargs: int,
     ) -> None:
         """Create a DrawHist object."""
-        super().__init__()
         self.ylabel = "density" if kwargs.get("density") else "number"
         if isinstance(arr, xr.DataArray):
             data = np.ravel(arr.values)
