@@ -18,7 +18,6 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
-#
 """Definition of the monitplot class `DrawMoni`."""
 
 from __future__ import annotations
@@ -149,28 +148,34 @@ class DrawMoni:
             axx = fig.add_subplot(n_row, n_col, ii + 1)
 
             # decorate X-axis
+            show_label = True
             if xlim is not None:
                 kw_adjust["hspace"] = 0.05
                 axx.set_xlim(*xlim)
-                if ii < (n_row - 1) * n_col:
-                    if not (
+                if (
+                    ii < (n_row - 1) * n_col
+                    and not (
                         (n_panel == 5 and ii == 2)
                         or (n_panel == 7 and ii >= 4)
                         or (n_panel == 8 and ii == 5)
-                    ):
-                        axx.set_xticklabels("")
-                    else:
-                        axx.set_xlabel(xlabel)
-            else:
+                    )
+                ):
+                    axx.set_xticklabels("")
+                    show_label = False
+
+            if show_label and xlabel is not None:
                 axx.set_xlabel(xlabel)
 
             # decorate Y-axis
+            show_label = True
             if ylim is not None:
-                kw_adjust["vspace"] = 0.05
+                kw_adjust["wspace"] = 0.1
                 axx.set_ylim(*ylim)
                 if ii % n_col:
                     axx.set_yticklabels("")
-            else:
+                    show_label = False
+
+            if show_label and ylabel is not None:
                 axx.set_ylabel(ylabel)
 
             axx_arr += (axx,)

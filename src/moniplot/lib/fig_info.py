@@ -26,6 +26,10 @@ __all__ = ["FIGinfo"]
 
 import datetime as dt
 from copy import deepcopy
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from matplotlib.figure import Figure
 
 
 # - main function -------------------------
@@ -118,3 +122,27 @@ class FIGinfo:
         info_str += f"created: {res.replace('+00:00', 'Z')}"
 
         return info_str
+
+    def draw(self: FIGinfo, fig: Figure) -> None:
+        """Display content of fig_info as a text block in the upper-right corner.
+
+        Parameters
+        ----------
+        fig :  matplotlib.figure.Figure
+           Matplotlib object Figure
+
+        """
+        if self.fig_info is None or self.fig_info.location != "above":
+            return
+
+        fig.text(
+            1 - 0.4 / fig.get_figwidth(),
+            1 - 0.25 / fig.get_figheight(),
+            self.fig_info.as_str(),
+            fontsize="x-small" if len(self.fig_info) > 5 else "small",
+            style="normal",
+            verticalalignment="top",
+            horizontalalignment="right",
+            multialignment="left",
+            bbox={"facecolor": "white", "pad": 5},
+        )
