@@ -29,10 +29,14 @@ from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, Unpack
 
 import matplotlib.pyplot as plt
 import numpy as np
-import xarray as xr
+from matplotlib.dates import (
+    AutoDateLocator,
+    ConciseDateFormatter,
+    DateFormatter,
+)
+from xarray import DataArray
 
 from moniplot.tol_colors import tol_rgba
-from moniplot.mon_plot import MONplot
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
@@ -41,6 +45,7 @@ if TYPE_CHECKING:
 # - global variables -------------------------------
 DEFAULT_CSET = "bright"
 
+
 class HistKeys(TypedDict):
     """Define keyword arguments of method add_hist()."""
 
@@ -48,6 +53,19 @@ class HistKeys(TypedDict):
     range: NotRequired[tuple[float, float]]
     weights: NotRequired[ArrayLike[float]]
     density: NotRequired[bool]
+
+
+class DrawKeys(TypedDict):
+    """Define keyword arguments of DrawMulti.draw()."""
+
+    title: NotRequired[str]
+    xlabel: NotRequired[str]
+    ylabel: NotRequired[str]
+    xlim: NotRequired[list[float, float]]
+    ylim: NotRequired[list[float, float]]
+    xscale: NotRequired[str]
+    yscale: NotRequired[str]
+    kwlegend: NotRequired[dict]
 
 
 # - class definition -------------------------------
@@ -67,11 +85,11 @@ class DrawMulti:
         self._decoration = {
             "sharex": sharex,
             "sharey": sharey,
-            "title": None,
-            "xlim": None,
-            "xlabel": None,
-            "ylim": None,
-            "ylabel": None,
+            "title": [],
+            "xlim": [],
+            "xlabel": [],
+            "ylim": [],
+            "ylabel": [],
         }
         self.fig = None
         self.axxs = None
@@ -96,13 +114,13 @@ class DrawMulti:
     def close(self: DrawMulti) -> None:
         """Decorate the panels of the figure."""
         for ii, axx in enumerate(self.axxs):
-            if self._decoration["xlim"] is not None:
+            if self._decoration["xlim"]:
                 axx.set_xlim(*self._decoration["xlim"])
 
-            if self._decoration["ylim"] is not None:
+            if self._decoration["ylim"]:
                 axx.set_ylim(*self._decoration["ylim"])
 
-            if self._decoration["title"][ii] is not None:
+            if len(self._decoration["title"]) >= ii:
                 if self._decoration["sharey"]:
                     axx.set_title(
                         self._decoration["title"][ii],
@@ -113,13 +131,9 @@ class DrawMulti:
                     )
                 else:
                     axx.set_title(self._decoration["title"][ii], fontsize="large")
-            if (
-                self.show_xlabel[ii] and self._decoration["xlabel"][ii] is not None
-            ):
+            if self.show_xlabel[ii]:
                 axx.set_xlabel(self._decoration["xlabel"][ii])
-            if (
-                self.show_ylabel[ii] and self._decoration["ylabel"][ii] is not None
-            ):
+            if self.show_ylabel[ii]:
                 axx.set_ylabel(self._decoration["ylabel"][ii])
 
     def _subplots_(
@@ -176,9 +190,6 @@ class DrawMulti:
 
         layout = "constrained" if not (sharex or sharey) else None
         self.fig = plt.figure(figsize=fig_size, layout=layout)
-        self._decoration["title"] = n_panel * [None]
-        self._decoration["xlabel"] = n_panel * [None]
-        self._decoration["ylabel"] = n_panel * [None]
 
         # adjust white-space around the panels
         if layout is None:
@@ -231,6 +242,7 @@ class DrawMulti:
            index of the multi-plot panel, use -1 for the last panel
         institute: str, default="SRON"
            name of the copyright owner
+
         """
         self.axxs[ipanel].text(
             1,
@@ -251,19 +263,19 @@ class DrawMulti:
             linespacing=2,
             position=(0.5, 1 - 0.3 / self.fig.get_figheight()),
         )
-        
+
     def set_xlim(
-            self: DrawMulti,
-            left: float | None = None,
-            right: float | None = None,
+        self: DrawMulti,
+        left: float | None = None,
+        right: float | None = None,
     ) -> None:
         """Set the X-axis view limits of all panels."""
         self._decoration["xlim"] = [left, right]
-        
+
     def update_xlim(self: DrawMulti, xdata: ArrayLike) -> None:
         """Update the X-axis view limits if sharex is True."""
         xlim = [np.min(xdata), np.max(xdata)]
-        if self._decoration["xlim"] is not None:
+        if self._decoration["xlim"]:
             xlim = [
                 min(self._decoration["xlim"][0], xlim[0]),
                 max(self._decoration["xlim"][1], xlim[1]),
@@ -271,17 +283,17 @@ class DrawMulti:
         self._decoration["xlim"] = xlim
 
     def set_ylim(
-            self: DrawMulti,
-            left: float | None = None,
-            right: float | None = None,
+        self: DrawMulti,
+        left: float | None = None,
+        right: float | None = None,
     ) -> None:
         """Set the Y-axis view limits of all panels."""
         self._decoration["ylim"] = [left, right]
-        
+
     def update_ylim(self: DrawMulti, ydata: ArrayLike) -> None:
         """Update the Y-axis view limits if sharey is True."""
         ylim = [np.min(ydata), np.max(ydata)]
-        if self._decoration["ylim"] is not None:
+        if self._decoration["ylim"]:
             ylim = [
                 min(self._decoration["ylim"][0], ylim[0]),
                 max(self._decoration["ylim"][1], ylim[1]),
@@ -307,10 +319,12 @@ class DrawMulti:
         """Set color set to its default."""
         self._cset = tol_rgba(DEFAULT_CSET)
 
+    # pylint: disable=too-many-arguments
     def add_hist(
         self: DrawMulti,
         ipanel: int,
         arr: DataArray | NDArray,
+        *,
         clip: tuple[float | None, float | None] | None = None,
         title: str | None = None,
         xlabel: str | None = None,
@@ -322,7 +336,7 @@ class DrawMulti:
         ----------
         ipanel: int
             index of the multi-plot panel
-        arr: xr.DataArray | np.ndarray
+        arr: DataArray | NDArray
             data-array
         clip: tuple[float | None, float | None], optional
             clip values of data-array using numpy.clip
@@ -339,19 +353,17 @@ class DrawMulti:
 
         """
         axx = self.axxs[ipanel]
-        if title is not None:
-            self._decoration["title"][ipanel] = title
-        self._decoration["xlabel"][ipanel] = "values" if xlabel is None else xlabel
-        self._decoration["ylabel"][ipanel] = (
+        self._decoration["title"].append(title)
+        self._decoration["xlabel"].append("values" if xlabel is None else xlabel)
+        self._decoration["ylabel"].append(
             "density" if kwargs.get("density") else "number"
         )
-        if isinstance(arr, xr.DataArray):
+        if isinstance(arr, DataArray):
             data = np.ravel(arr.values)
             if "long_name" in arr.attrs:
-                self.xlabel = arr.attrs["long_name"]
+                self._decoration["xlabel"][ipanel] = arr.attrs["long_name"]
             if "units" in arr.attrs:
-                self.zunits = arr.attrs["units"]
-                self.xlabel += f" [{self.zunits}]"
+                self._decoration["xlabel"][ipanel] += f" [{arr.attrs['units']}]"
         else:
             data = np.ravel(arr)
 
@@ -458,14 +470,11 @@ class DrawMulti:
 
         """
         axx = self.axxs[ipanel]
-        if "title" in kwargs:
-            self._decoration["title"][ipanel] = kwargs["title"]
+        self._decoration["title"].append(kwargs.get("title"))
 
         # add X & Y label
-        if "xlabel" in kwargs:
-            self._decoration["xlabel"][ipanel] = kwargs["xlabel"]
-        if "ylabel" in kwargs:
-            self._decoration["ylabel"][ipanel] = kwargs["ylabel"]
+        self._decoration["xlabel"].append(kwargs.get("xlabel"))
+        self._decoration["ylabel"].append(kwargs.get("ylabel"))
 
         # set the scale of the X & Y axis {"linear", "log", "symlog", ...}
         if "xscale" in kwargs:
@@ -482,7 +491,7 @@ class DrawMulti:
                 locator = AutoDateLocator()
                 axx.xaxis.set_major_locator(locator)
                 axx.xaxis.set_major_formatter(ConciseDateFormatter(locator))
-        elif self._decoration["xlim"] is not None:
+        elif self._decoration["xlim"]:
             if (self._decoration["xlim"][1] % 10) == 0:
                 axx.set_xticks(np.linspace(0, kwargs["xlim"][1], 6, dtype=int))
             elif (self._decoration["xlim"][1] % 8) == 0:
@@ -495,65 +504,3 @@ class DrawMulti:
 
         # add grid lines (default settings)
         axx.grid(which="major", color="#AAAAAA", linestyle="--")
-
-
-def main(n_panel: int = 1) -> None:
-    """..."""
-
-    mu, sigma = 0, 0.1 # mean and standard deviation
-    
-    with DrawMulti(n_panel) as plot:
-        for ii in range(n_panel):
-            plot.add_hist(
-                ii,
-                np.random.normal(mu, sigma, 1000),
-                title=f"Figure {ii+1}",
-                clip=[-0.4, 0.4],
-                bins=40,
-            )
-    plt.show()
-
-    with DrawMulti(n_panel, sharey=True) as plot:
-        for ii in range(n_panel):
-            plot.add_hist(
-                ii,
-                np.random.normal(mu, sigma, 1000),
-                title=f"Figure {ii+1}",
-                clip=[-0.4, 0.4],
-                bins=40,
-            )
-    plt.show()
-
-    with DrawMulti(n_panel, sharex=True, sharey=True) as plot:
-        for ii in range(n_panel):
-            plot.add_hist(
-                ii,
-                np.random.normal(mu, sigma, 1000),
-                title=f"Figure {ii+1}",
-                clip=[-0.4, 0.4],
-                bins=40,
-            )
-        plot.set_xlim(-0.425, 0.425)
-    plt.show()
-
-    report = MONplot("multi_line.pdf")
-    with DrawMulti(n_panel, sharex=True, sharey=True) as plot:
-        xdata = np.arange(128)
-        ydata = np.sin(xdata / np.pi)
-        for ii in range(n_panel):
-            plot.add_line(ii, xdata, ydata, marker="+", ls="--")
-            plot.add_line(ii, xdata + 1.5, ydata, marker="x", ls="--")
-            plot.add_line(ii, xdata - 1.5, ydata, marker="o", ls="--")
-            plot.draw(ii, xlabel="time", ylabel="value")
-        #plot.set_xlim(-0.5, 0.5)
-        #plot.set_ylim(0, 120)
-        plot.add_caption(
-            f"This is a Figure of {n_panel} line-plots"
-        )
-        plot.add_copyright(-1)
-        # fig_info.draw(plot.fig)
-    report.close_this_page(plt.figure)
-    report.close()
-
-if __name__ == "__main__":
-    main(5)
