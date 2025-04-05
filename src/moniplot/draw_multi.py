@@ -121,7 +121,7 @@ class DrawMulti:
                 axx.set_ylim(*self._decoration["ylim"])
 
             if len(self._decoration["title"]) >= ii:
-                if self._decoration["sharey"]:
+                if self._decoration["sharex"]:
                     axx.set_title(
                         self._decoration["title"][ii],
                         loc="right",
