@@ -30,13 +30,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
-import xarray as xr
 from matplotlib.backends.backend_pdf import PdfPages
 
-from .draw_image import DrawImage
-
 if TYPE_CHECKING:
-    import numpy as np
     from matplotlib.axes import Axes
     from matplotlib.figure import Figure
 
@@ -221,54 +217,3 @@ class MONplot:
             doc["Author"] = f"(c) {self.__institute}"
         self.__pdf.close()
         # plt.close("all")
-
-    def draw_signal(
-        self: MONplot,
-        data: xr.DataArray | np.ndarray,
-        *,
-        fig_info: FIGinfo | None = None,
-        side_panels: str = "nanmedian",
-        title: str | None = None,
-        **kwargs: int,
-    ) -> None:
-        """Display 2D array as an image.
-
-        Averaged column/row signal are optionally displayed in side-panels.
-
-        Parameters
-        ----------
-        data :  numpy.ndarray or xarray.DataArray
-           Object holding measurement data and attributes.
-        fig_info :  FIGinfo, <default=None
-           OrderedDict holding meta-data to be displayed in the figure.
-        side_panels :  str, default='nanmedian'
-           Show image row and column statistics in two side panels.
-           Use 'none' when you do not want the side panels.
-           Other valid values are: 'median', 'nanmedian', 'mean', 'nanmean',
-           'quality', 'std' and 'nanstd'.
-        title :  str, default=None
-           Title of this figure using `Axis.set_title`.
-        **kwargs :   other keywords
-           Pass keyword arguments: `zscale`, `vperc` or `vrange`
-
-        The information provided in the parameter `fig_info` will be displayed
-        in a text box. In addition, we display the creation date and the data
-        (biweight) median & spread.
-
-        Currently, we have turned off the automatic offset notation of
-        `matplotlib`. Maybe this should be the default, which the user may
-        override.
-
-        """
-        if (
-            title is None
-            and isinstance(data, xr.DataArray)
-            and "long_name" in data.attrs
-        ):
-            title = data.attrs["long_name"]
-
-        plot = DrawImage(data.copy(), **kwargs)
-        fig, axx = plot.subplots(side_panels=side_panels != "none")
-        plot.draw(axx, fig_info=fig_info.copy(), side_panels=side_panels, title=title)
-        self.add_copyright(axx["image"])
-        self.close_this_page(fig, None)
