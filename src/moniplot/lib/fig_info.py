@@ -132,14 +132,14 @@ class FIGinfo:
            Matplotlib object Figure
 
         """
-        if self.fig_info is None or self.fig_info.location != "above":
+        if not self.fig_info or self.location != "above":
             return
 
         fig.text(
             1 - 0.4 / fig.get_figwidth(),
             1 - 0.25 / fig.get_figheight(),
-            self.fig_info.as_str(),
-            fontsize="x-small" if len(self.fig_info) > 5 else "small",
+            self.as_str(),
+            fontsize="x-small" if len(self) > 5 else "small",
             style="normal",
             verticalalignment="top",
             horizontalalignment="right",
