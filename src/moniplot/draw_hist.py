@@ -30,17 +30,17 @@ import numpy as np
 import xarray as xr
 
 from .biweight import Biweight
-from .lib.draw_moni import DrawMoni
 from .lib.fig_info import FIGinfo
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
 # - global variables -------------------------------
+DEFAULT_CSET = "bright"
 
 
 # - class definition -------------------------------
-class DrawHist(DrawMoni):
+class DrawHist:
     """Create a histogram plot.
 
     Parameters
@@ -76,14 +76,16 @@ class DrawHist(DrawMoni):
 
     """
 
-    def add_hist(
+    def __init__(
         self: DrawHist,
         arr: xr.DataArray | np.ndarray,
         clip: tuple[float | None, float | None] | None = None,
         **kwargs: int,
     ) -> None:
         """Create a DrawHist object."""
+        self.xlabel = "value"
         self.ylabel = "density" if kwargs.get("density") else "number"
+        self.zunits = "1"
         if isinstance(arr, xr.DataArray):
             data = np.ravel(arr.values)
             if "long_name" in arr.attrs:
@@ -103,15 +105,15 @@ class DrawHist(DrawMoni):
         else:
             vrange = (data.min(), data.max())
 
-        self._data = data
-        self._hist, self._edges = np.histogram(data, range=vrange, **kwargs)
+        self.__data = data
+        self.__hist, self.__edges = np.histogram(data, range=vrange, **kwargs)
 
     def get_figinfo(self: DrawHist, fig_info: FIGinfo | None = None) -> FIGinfo:
         """..."""
         if fig_info is None:
             fig_info = FIGinfo()
 
-        with Biweight(self._data) as bwght:
+        with Biweight(self.__data) as bwght:
             if self.zunits == "1":
                 fig_info.add("median", bwght.median, "{:.5g}")
                 fig_info.add("spread", bwght.spread, "{:.5g}")
@@ -124,14 +126,15 @@ class DrawHist(DrawMoni):
     def draw(
         self: DrawHist,
         axx: Axes | None = None,
-        *,
         title: str | None = None,
+        xticks_visible: bool = True,
+        yticks_visible: bool = True,
     ) -> None:
         """..."""
-        if len(self._hist) > 24:
+        if len(self.__hist) > 24:
             axx.stairs(
-                self._hist,
-                self._edges,
+                self.__hist,
+                self.__edges,
                 edgecolor="#4477AA",
                 facecolor="#77AADD",
                 fill=True,
@@ -140,9 +143,9 @@ class DrawHist(DrawMoni):
             axx.grid(which="major", color="#AAAAAA", linestyle="--")
         else:
             axx.bar(
-                self._edges[:-1],
-                self._hist,
-                width=np.diff(self._edges),
+                self.__edges[:-1],
+                self.__hist,
+                width=np.diff(self.__edges),
                 align="edge",
                 edgecolor="#4477AA",
                 facecolor="#77AADD",
@@ -150,5 +153,17 @@ class DrawHist(DrawMoni):
             )
             axx.grid(which="major", axis="y", color="#AAAAAA", linestyle="--")
 
+        if not xticks_visible:
+            for xtl in axx.get_xticklabels():
+                xtl.set_visible(False)
+        else:
+            axx.set_xlabel(self.xlabel)
+
+        if not yticks_visible:
+            for ytl in axx.get_yticklabels():
+                ytl.set_visible(False)
+        else:
+            axx.set_ylabel(self.ylabel)
+
         if title is not None:
-            axx.set_title(title, fontsize="large")
+            axx.set_title(title)

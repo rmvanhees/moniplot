@@ -35,7 +35,7 @@ from matplotlib.dates import (
     DateFormatter,
 )
 
-from .lib.draw_moni import DrawMoni
+from .tol_colors import tol_rgba
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -58,7 +58,7 @@ class DrawKeys(TypedDict):
 
 
 # - class definition -------------------------------
-class DrawLines(DrawMoni):
+class DrawLines:
     """Create a line-plot (thin layer around plt.plot/plt.stairs).
 
     Examples
@@ -68,24 +68,69 @@ class DrawLines(DrawMoni):
     >>> report = MONplot("test_monplot.pdf", "This is an example figure")
     >>> report.set_institute("SRON")
     >>> plot = DrawLines()
-    >>> plot.subplots(4, xlim=[xdata.min(), xdata.max()], xlabel="X", ylabel="Y")
-    >>> plot.add_line(axx[0], ydata1, xdata=xdata, marker=".", ls="-", label="1")
-    >>> plot.add_line(axx[0], ydata2, marker=".", ls="-", label="2")
-    >>> plot.draw(axx[0], title="fig 1")
-    >>> plot.add_line(axx[1], ydata1, xdata=xdata, marker=".", ls="", label="a")
-    >>> plot.add_line(axx[1], ydata2, marker="x", ls="", label="b")
-    >>> plot.draw(axx[1], title="fig 2")
-    >>> plot.add_line(axx[2], ydata1, xdata=xdata, marker="o", ls="-", label="I")
-    >>> plot.add_line(axx[2], ydata2, marker=".", ls="-", label="II")
-    >>> plot.draw(axx[2], title="fig 3")
-    >>> plot.add_line(axx[3], ydata1, xdata=xdata, marker=".", ls="", label="one")
-    >>> plot.add_line(axx[3], ydata2, marker="+", ls="", label="two")
-    >>> plot.draw(axx[3], title="fig 4")
-    >>> report.add_copyright(axx[-1])
+    >>> fig, axx = plt.subplots(2, 2, sharex="all", figsize=(10, 10))
+    >>> plot.add_line(axx[0, 0], ydata1, xdata=xdata, marker=".", ls="-", label="1")
+    >>> plot.add_line(axx[0, 0], ydata2, xdata=xdata, marker=".", ls="-", label="2")
+    >>> plot.draw(axx[0, 0], title="fig 1", xlabel="X", ylabel="Y")
+    >>> plot.add_line(axx[0, 1], ydata1, xdata=xdata, marker=".", ls="", label="a")
+    >>> plot.add_line(axx[0, 1], ydata2, xdata=xdata, marker="x", ls="", label="b")
+    >>> plot.draw(axx[0, 1], title="fig 2", xlabel="X", ylabel="Y")
+    >>> plot.add_line(axx[1, 0], ydata1, xdata=xdata, marker="o", ls="-", label="I")
+    >>> plot.add_line(axx[1, 0], ydata2, xdata=xdata, marker=".", ls="-", label="II")
+    >>> plot.draw(axx[1, 0], title="fig 3", xlabel="X", ylabel="Y")
+    >>> plot.add_line(axx[1, 1], ydata1, xdata=xdata, marker=".", ls="", label="one")
+    >>> plot.add_line(axx[1, 1], ydata2, xdata=xdata, marker="+", ls="", label="two")
+    >>> plot.draw(axx[1, 1], title="fig 4", xlabel="X", ylabel="Y")
+    >>> report.add_copyright(axx[1, 1])
     >>> report.close_this_page(fig, None)
     >>> report.close()
 
     """
+
+    def __init__(
+        self: DrawLines,
+        *,
+        square: bool = False,
+    ) -> None:
+        """Create DrawLines object."""
+        self._cset = tol_rgba(DEFAULT_CSET)
+        self.square = square
+        self.xdata = None
+        self.time_axis = False
+
+    def set_cset(self: DrawLines, cname: str, cnum: int | None = None) -> None:
+        """Use alternative color-set through which `draw_lplot` will cycle.
+
+        Parameters
+        ----------
+        cname :  str
+           Name of color set. Use None to get the default matplotlib value.
+        cnum : int, optional
+           Number of discrete colors in colormap (*not colorset*).
+
+        """
+        if not isinstance(cname, str):
+            raise ValueError("The name of a color-set should be a string.")
+        self._cset = tol_rgba(cname, cnum)
+
+    def unset_cset(self: DrawLines) -> None:
+        """Set color set to its default."""
+        self._cset = tol_rgba(DEFAULT_CSET)
+
+    def figsize(
+        self: DrawLines,
+        ydata: np.ndarray | tuple | list | None = None,
+    ) -> tuple[float, float]:
+        """Create a figure and a set of subplots for line-plots."""
+        if self.square:
+            figsize = (10, 10)
+        elif ydata is None:
+            figsize = (10, 7)
+        else:
+            figsize = {0: (10, 7), 1: (10, 7), 2: (12, 7)}.get(
+                len(ydata) // 256, (14, 8)
+            )
+        return figsize
 
     def add_line(
         self: DrawLines,
@@ -180,9 +225,6 @@ class DrawLines(DrawMoni):
         if "yscale" in kwargs:
             axx.set_yscale(kwargs["yscale"])
 
-        # add grid lines (default settings)
-        axx.grid(True)
-
         # define parameters for `Axes.legend`
         kwlegend = kwargs.get("kwlegend", {"fontsize": "small", "loc": "best"})
 
@@ -204,3 +246,6 @@ class DrawLines(DrawMoni):
         # draw legenda in figure
         if axx.get_legend_handles_labels()[1]:
             axx.legend(**kwlegend)
+
+        # add grid lines (default settings)
+        axx.grid(True)
