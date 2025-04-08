@@ -41,6 +41,7 @@ from moniplot.tol_colors import tol_rgba
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
 
+    from moniplot.lib.fig_info import FIGinfo
 
 # - global variables -------------------------------
 DEFAULT_CSET = "bright"
@@ -83,6 +84,8 @@ class DrawMulti:
         """Create DrawMuli object."""
         self._cset = tol_rgba(DEFAULT_CSET)
         self._decoration = {
+            "fig_info": None,
+            "kw_adjust": {},
             "sharex": sharex,
             "sharey": sharey,
             "title": [],
@@ -135,6 +138,17 @@ class DrawMulti:
                 axx.set_xlabel(self._decoration["xlabel"][ii])
             if self.show_ylabel[ii]:
                 axx.set_ylabel(self._decoration["ylabel"][ii])
+
+        if self._decoration["fig_info"] is not None:
+            self._decoration["fig_info"].draw(self.fig)
+
+        if self._decoration["kw_adjust"]:
+            if self._decoration["fig_info"] is not None:
+                n_lines = len(self._decoration["fig_info"])
+                self._decoration["kw_adjust"]["top"] -= (
+                    (n_lines - 5) * 0.1 / self.fig.get_figheight()
+                )
+            plt.subplots_adjust(**self._decoration["kw_adjust"])
 
     def _subplots_(
         self: DrawMulti,
@@ -190,16 +204,14 @@ class DrawMulti:
 
         layout = "constrained" if not (sharex or sharey) else None
         self.fig = plt.figure(figsize=fig_size, layout=layout)
-
-        # adjust white-space around the panels
         if layout is None:
             margin = min(1.0 / (1.65 * (n_row + 1)), 0.3)
-            kw_adjust = {"bottom": margin, "top": 1 - 1.1 / fig_size[1]}
+            self._decoration["kw_adjust"]["bottom"] = margin
+            self._decoration["kw_adjust"]["top"] = 1 - 1.1 / self.fig.get_figheight()
             if sharex:
-                kw_adjust["hspace"] = 0.05
+                self._decoration["kw_adjust"]["hspace"] = 0.05
             if sharey:
-                kw_adjust["wspace"] = 0.1
-            plt.subplots_adjust(**kw_adjust)
+                self._decoration["kw_adjust"]["wspace"] = 0.1
 
         axx_arr = ()
         for ii in range(n_panel):
@@ -233,6 +245,15 @@ class DrawMulti:
         self.axxs = np.array(axx_arr)
 
     # - Public Methods ---------------------------------
+    def add_caption(self: DrawMulti, text: str) -> None:
+        """Add figure caption."""
+        self.fig.suptitle(
+            text,
+            fontsize="x-large",
+            linespacing=2,
+            position=(0.5, 1 - 0.3 / self.fig.get_figheight()),
+        )
+
     def add_copyright(self: DrawMulti, ipanel: int, institute: str = "SRON") -> None:
         """Display copyright statement in the lower right corner.
 
@@ -255,14 +276,9 @@ class DrawMulti:
             transform=self.axxs[ipanel].transAxes,
         )
 
-    def add_caption(self: DrawMulti, text: str) -> None:
-        """Add figure caption."""
-        self.fig.suptitle(
-            text,
-            fontsize="x-large",
-            linespacing=2,
-            position=(0.5, 1 - 0.3 / self.fig.get_figheight()),
-        )
+    def set_fig_info(self: DrawMulti, fig_info: FIGinfo) -> None:
+        """Add fig_info box to the figure."""
+        self._decoration["fig_info"] = fig_info
 
     def set_xlim(
         self: DrawMulti,
