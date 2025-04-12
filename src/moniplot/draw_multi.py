@@ -143,8 +143,9 @@ class DrawMulti:
             self._decoration["fig_info"].draw(self.fig)
 
         if self._decoration["kw_adjust"]:
-            if self._decoration["fig_info"] is not None:
-                n_lines = len(self._decoration["fig_info"])
+            if self._decoration["fig_info"] is not None and (
+                n_lines := len(self._decoration["fig_info"]) > 5
+            ):
                 self._decoration["kw_adjust"]["top"] -= (
                     (n_lines - 5) * 0.1 / self.fig.get_figheight()
                 )
