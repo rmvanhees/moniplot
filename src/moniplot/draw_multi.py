@@ -628,14 +628,14 @@ class DrawMulti:
             val_perc = percentiles
 
         mask = np.isfinite(ydata)
-        xarr = np.copy(xdata[mask])
-        yarr = np.copy(ydata[mask])
-        xbinned = np.copy(bins)
-        ybinned = np.full((len(val_perc), bins.size), np.nan)
+        xarr = xdata[mask].copy()
+        yarr = ydata[mask].copy()
+        xbinned = np.asarray(bins)
+        ybinned = np.full((len(val_perc), xbinned.size), np.nan)
 
         # collect data per bin
-        indx = np.searchsorted(bins, xarr, side="right")
-        for ii in range(bins.size):
+        indx = np.searchsorted(xbinned, xarr, side="right")
+        for ii in range(xbinned.size):
             mask = indx == ii + 1
             if mask.sum() < min_in_bins:
                 continue
