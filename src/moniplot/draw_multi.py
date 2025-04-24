@@ -410,55 +410,6 @@ class DrawMulti:
         else:
             self.axxs[ipanel].set_ylim(left, right)
 
-    def add_line(
-        self: DrawMulti,
-        ipanel: int,
-        xdata: ArrayLike,
-        ydata: ArrayLike,
-        *,
-        use_steps: bool = False,
-        **kwargs: int,
-    ) -> None:
-        """Add X/Y data as line and/or markers to a subplot.
-
-        Parameters
-        ----------
-        ipanel: int
-            index of the multi-plot panel
-        xdata :  ArrayLike
-            X data.
-        ydata :  ArrayLike
-            Y data.
-        use_steps :  bool, default=False
-            Use `matplotlib.pyplot.stairs` instead of matplotlib.pyplot.plot
-        **kwargs : keyword arguments
-            Keywords passed to matplotlib.pyplot.plot or matplotlib.pyplot.stairs
-
-        See Also
-        --------
-        matplotlib.pyplot.plot, matplotlib.pyplot.stairs
-
-        """
-        if len(self._decoration["mode"]) == ipanel:
-            self._decoration["mode"].append("LPLOT")
-        if isinstance(xdata[0], dt.date | dt.time | dt.datetime):
-            xdata = np.asarray(xdata, dtype="datetime64")
-            self.time_axis = True
-        self._xlim_update_(xdata)
-        self._ylim_update_(ydata)
-
-        axx = self.axxs[ipanel]
-        if not (axx.dataLim.mutatedx() or axx.dataLim.mutatedy()):
-            axx.set_prop_cycle(color=self._cset)
-
-        # draw line in subplot
-        if use_steps:
-            edges = np.append(xdata, xdata[-1])
-            values = np.append(ydata, ydata[-1])
-            axx.stairs(values, edges, **kwargs)
-        else:
-            axx.plot(xdata, ydata, **kwargs)
-
     def hist(
         self: DrawMulti,
         ipanel: int,
@@ -534,6 +485,56 @@ class DrawMulti:
                 linewidth=1.5,
             )
             axx.grid(which="major", axis="y", color="#AAAAAA", linestyle="--")
+
+    def add_line(
+        self: DrawMulti,
+        ipanel: int,
+        xdata: ArrayLike,
+        ydata: ArrayLike,
+        *,
+        use_steps: bool = False,
+        **kwargs: int,
+    ) -> None:
+        """Add X/Y data as line and/or markers to a subplot.
+
+        Parameters
+        ----------
+        ipanel: int
+            index of the multi-plot panel
+        xdata :  ArrayLike
+            X data.
+        ydata :  ArrayLike
+            Y data.
+        use_steps :  bool, default=False
+            Use `matplotlib.pyplot.stairs` instead of matplotlib.pyplot.plot
+        **kwargs : keyword arguments
+            Keywords passed to matplotlib.pyplot.plot or matplotlib.pyplot.stairs
+
+        See Also
+        --------
+        matplotlib.pyplot.plot, matplotlib.pyplot.stairs
+
+        """
+        if len(self._decoration["mode"]) == ipanel:
+            self._decoration["mode"].append("LPLOT")
+        if isinstance(xdata[0], dt.date | dt.time | dt.datetime):
+            xdata = np.asarray(xdata, dtype="datetime64")
+            self.time_axis = True
+
+        self._xlim_update_(xdata)
+        self._ylim_update_(ydata)
+
+        axx = self.axxs[ipanel]
+        if not (axx.dataLim.mutatedx() or axx.dataLim.mutatedy()):
+            axx.set_prop_cycle(color=self._cset)
+
+        # draw line in subplot
+        if use_steps:
+            edges = np.append(xdata, xdata[-1])
+            values = np.append(ydata, ydata[-1])
+            axx.stairs(values, edges, **kwargs)
+        else:
+            axx.plot(xdata, ydata, **kwargs)
 
     def end_line(
         self: DrawMulti,
