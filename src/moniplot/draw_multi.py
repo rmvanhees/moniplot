@@ -113,6 +113,7 @@ class DrawMulti:
     def __decorate__(self: DrawMulti) -> None:
         """Decorate the panels of the figure."""
         n_panel = len(self.axxs)
+        # pprint.pprint(self._decoration)
         for ii, axx in enumerate(self.axxs):
             if self._decoration["sharex"] and self._decoration["xlim"]:
                 axx.set_xlim(*self._decoration["xlim"])
@@ -146,7 +147,7 @@ class DrawMulti:
         # adjust the white space
         if self._decoration["kw_adjust"]:
             if self._decoration["fig_info"] is not None and (
-                n_lines := len(self._decoration["fig_info"]) > 5
+                (n_lines := len(self._decoration["fig_info"])) > 5
             ):
                 self._decoration["kw_adjust"]["top"] -= (
                     (n_lines - 5) * 0.1 / self.fig.get_figheight()
