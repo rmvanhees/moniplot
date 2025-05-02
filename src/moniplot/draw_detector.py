@@ -26,7 +26,7 @@ __all__ = ["DrawDetImage", "DrawDetQuality"]
 
 import warnings
 from math import log10
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
@@ -39,7 +39,6 @@ from moniplot.tol_colors import tol_cmap, tol_cset
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
-    from matplotlib.figure import Figure
     from matplotlib.image import AxesImage
     from numpy.typing import ArrayLike, NDArray
 
@@ -53,6 +52,7 @@ class DrawDetGen:
         arr: NDArray,
         attrs: dict | None = None,
         coords: dict[str, ArrayLike] | None = None,
+        side_panels: bool = True,
     ) -> None:
         """Initialize class DrawDetGen."""
         self._cmap = tol_cmap("rainbow_PuRd")
@@ -75,19 +75,23 @@ class DrawDetGen:
             }
         )
         self._image = arr
+        self._axx = self._subplots_(side_panels)
 
-    @property
-    def aspect(self: DrawDetGen) -> int | None:
-        """Return aspect-ratio of image data."""
-        if self._image is None:
-            return None
+    def __enter__(self: DrawDetGen) -> Self:
+        """Initiate the context manager."""
+        return self
 
-        return min(4, max(1, round(self._image.shape[1] / self._image.shape[0])))
+    def __exit__(self: DrawDetGen, *args: object) -> bool:
+        """Exit the context manager."""
+        self.close()
+        return False  # any exception is raised by the with statement.
 
-    def subplots(
-        self: DrawDetGen, side_panels: bool = True
-    ) -> tuple[Figure, dict[str, Axes]]:
-        """Obtain matplotlib Figure and Axes for plot-layout.
+    def close(self: DrawDetGen) -> None:
+        """Finalize all panels."""
+        return
+
+    def _subplots_(self: DrawDetGen, side_panels: bool) -> dict[str, Axes]:
+        """Obtain matplotlib Axes for plot-layout.
 
         Parameters
         ----------
@@ -122,7 +126,7 @@ class DrawDetGen:
         else:
             mosaic = [["caption", ".", "info"], ["image", "colorbar", "."]]
 
-        fig, axx = plt.subplot_mosaic(
+        _, axx = plt.subplot_mosaic(
             mosaic,
             width_ratios=width_ratios,
             height_ratios=height_ratios,
@@ -173,16 +177,68 @@ class DrawDetGen:
             axx["y-panel"].sharey(axx["image"])
             axx["y-panel"].yaxis.set_minor_locator(AutoMinorLocator())
 
-        return fig, axx
+        return axx
 
-    @staticmethod
-    def _add_info_box(axx: Axes, fig_info: FIGinfo) -> None:
+    @property
+    def aspect(self: DrawDetGen) -> int | None:
+        """Return aspect-ratio of image data."""
+        if self._image is None:
+            return None
+
+        return min(4, max(1, round(self._image.shape[1] / self._image.shape[0])))
+
+    def set_caption(self: DrawDetGen, caption: str) -> None:
+        """Add caption as a subtitle."""
+        self._axx["caption"].text(
+            0.5,
+            3.0,
+            caption,
+            fontsize="x-large",
+            horizontalalignment="center",
+            verticalalignment="top",
+            transform=self._axx["caption"].transAxes,
+        )
+        # plt.figure.subtitle(
+        #    caption,
+        #    fontsize="x-large",
+        #    position=(0.5, 1 - 0.3 / plt.figure.get_figheight())
+        # )
+
+    def set_title(self: DrawDetGen, title: str | None = None) -> None:
+        """Add title above the image panel."""
+        self._axx["image"].set_title(
+            self._attrs["long_name"] if title is None else title
+        )
+
+    def _draw_side_panels(self: DrawDetGen, _not_used: str) -> None:
+        """Add side-panels to figure."""
+        return
+
+    def add_side_panels(self: DrawDetGen, side_panels: str = "default") -> None:
+        """Add side-panels left and below the image panel.
+
+        Parameters
+        ----------
+        side_panels :  str, default='nanmedian'
+           Show image row and column statistics in two side panels.
+           Valid values are: 'median', 'nanmedian', 'mean', 'nanmean',
+           'quality', 'std' and 'nanstd'.
+
+        """
+        cnames = iter(self._coords.keys())
+        if "x-panel" not in self._axx:
+            self._axx["image"].set_ylabel(next(cnames))
+            self._axx["image"].set_xlabel(next(cnames))
+        else:
+            self._draw_side_panels(side_panels)
+            self._axx["y-panel"].set_ylabel(next(cnames))
+            self._axx["x-panel"].set_xlabel(next(cnames))
+
+    def _add_info_box(self: DrawDetGen, fig_info: FIGinfo) -> None:
         """Add a box with meta information in the current figure.
 
         Parameters
         ----------
-        axx :  matplotlib.axes.Axes
-            Matplotlib Axes object
         fig_info :  FIGinfo
             Instance of pys5p.lib.plotlib.FIGinfo to be displayed
 
@@ -190,31 +246,59 @@ class DrawDetGen:
         if fig_info is None or fig_info.location != "above":
             return
 
-        axx.text(
+        self._axx["info"].text(
             2.0,
             0.3,
             fig_info.as_str(),
             fontsize="x-small",
-            transform=axx.transAxes,
+            transform=self._axx["info"].transAxes,
             multialignment="left",
             verticalalignment="bottom",
             horizontalalignment="right",
             bbox={"facecolor": "white", "pad": 4},
         )
 
-    def _draw_image(self: DrawDetGen, axx: dict[str, Axes]) -> AxesImage:
+    def add_copyright(self: DrawDetGen, institute: str = "SRON") -> None:
+        """Display copyright statement in the lower right corner.
+
+        Parameters
+        ----------
+        institute: str, default="SRON"
+           name of the copyright owner
+
+        """
+        self._axx["image"].text(
+            1,
+            0,
+            rf" $\copyright$ {institute}",
+            horizontalalignment="right",
+            verticalalignment="bottom",
+            rotation="vertical",
+            fontsize="xx-small",
+            transform=self._axx["image"].transAxes,
+        )
+
+    def _draw_image(self: DrawDetGen) -> AxesImage:
         """..."""
         # adjust tickmarks
         if (self._image.shape[1] % 10) == 0:
-            axx["image"].set_xticks(np.linspace(0, self._image.shape[1], 6, dtype=int))
+            self._axx["image"].set_xticks(
+                np.linspace(0, self._image.shape[1], 6, dtype=int)
+            )
         elif (self._image.shape[1] % 8) == 0:
-            axx["image"].set_xticks(np.linspace(0, self._image.shape[1], 5, dtype=int))
+            self._axx["image"].set_xticks(
+                np.linspace(0, self._image.shape[1], 5, dtype=int)
+            )
         if (self._image.shape[0] % 10) == 0:
-            axx["image"].set_yticks(np.linspace(0, self._image.shape[0], 6, dtype=int))
+            self._axx["image"].set_yticks(
+                np.linspace(0, self._image.shape[0], 6, dtype=int)
+            )
         elif (self._image.shape[0] % 8) == 0:
-            axx["image"].set_yticks(np.linspace(0, self._image.shape[0], 5, dtype=int))
+            self._axx["image"].set_yticks(
+                np.linspace(0, self._image.shape[0], 5, dtype=int)
+            )
 
-        return axx["image"].imshow(
+        return self._axx["image"].imshow(
             self._image,
             cmap=self._cmap,
             norm=self._znorm,
@@ -239,6 +323,7 @@ class DrawDetImage(DrawDetGen):
         vperc: ArrayLike[int, int] | None = None,
         vrange: ArrayLike[float, float] | None = None,
         zscale: str | None = None,
+        side_panels: bool = True,
     ) -> None:
         """Initialize class DrawDetImage.
 
@@ -257,10 +342,12 @@ class DrawDetImage(DrawDetGen):
            range to normalize luminance between vmin and vmax.
         zscale :  str, default='linear'
            scale color-map: 'linear', 'log', 'diff' or 'ratio'
+        side_panels : bool, optional
+           Do you want side_panels with row and column statistics
 
         """
         self._zlabel = None
-        DrawDetGen.__init__(self, arr, attrs, coords)
+        DrawDetGen.__init__(self, arr, attrs, coords, side_panels)
 
         # set zscale
         if zscale is None:
@@ -408,16 +495,37 @@ class DrawDetImage(DrawDetGen):
         self._attrs["units"] = zunits
         return 1
 
-    def _draw_colorbar(
-        self: DrawDetImage, axx: dict[str, Axes], cm_img: AxesImage
-    ) -> None:
-        """..."""
-        _ = plt.colorbar(cm_img, cax=axx["colorbar"], label=self._zlabel)
+    def add_fig_info(self: DrawDetGen, fig_info: FIGinfo | None = None) -> None:
+        """Add fig_info box to the figure.
 
-    def _draw_side_panels(
-        self: DrawDetImage, axx: dict[str, Axes], side_panels: str
-    ) -> None:
-        """..."""
+        Parameters
+        ----------
+        fig_info :  FIGinfo, optional
+           OrderedDict holding meta-data to be displayed in the figure.
+
+        """
+        if fig_info is None:
+            fig_info = FIGinfo()
+
+        with Biweight(self._image) as bwght:
+            if self._attrs["units"] == "1":
+                fig_info.add("median", bwght.median, "{:.5g}")
+                fig_info.add("spread", bwght.spread, "{:.5g}")
+            else:
+                fig_info.add(
+                    "median", (bwght.median, self._attrs["units"]), "{:.5g} {}"
+                )
+                fig_info.add(
+                    "spread", (bwght.spread, self._attrs["units"]), "{:.5g} {}"
+                )
+        self._add_info_box(fig_info)
+
+    def _draw_colorbar(self: DrawDetImage, cm_img: AxesImage) -> None:
+        """Add colorbar to figure."""
+        _ = plt.colorbar(cm_img, cax=self._axx["colorbar"], label=self._zlabel)
+
+    def _draw_side_panels(self: DrawDetImage, side_panels: str) -> None:
+        """Add side-panels to figure."""
         match side_panels:
             case "nanmedian" | "default":
                 func_panels = np.nanmedian
@@ -438,103 +546,29 @@ class DrawDetImage(DrawDetGen):
         xdata = np.arange(self._image.shape[1])
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", r"All-NaN (slice|axis) encountered")
-            axx["x-panel"].plot(
+            self._axx["x-panel"].plot(
                 xdata,
                 func_panels(self._image, axis=0),
                 linewidth=0.75,
                 color=self._cset.blue,
             )
-            axx["x-panel"].grid()
+            self._axx["x-panel"].grid()
 
         # draw panel left of the image panel
         ydata = np.arange(self._image.shape[0])
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", r"All-NaN (slice|axis) encountered")
-            axx["y-panel"].plot(
+            self._axx["y-panel"].plot(
                 func_panels(self._image, axis=1),
                 ydata,
                 linewidth=0.75,
                 color=self._cset.blue,
             )
-        axx["y-panel"].grid()
+        self._axx["y-panel"].grid()
 
-    def draw(
-        self: DrawDetQuality,
-        axx: dict[str, Axes],
-        *,
-        fig_info: FIGinfo | None = None,
-        side_panels: str = "default",
-        title: str | None = None,
-    ) -> None:
-        """Display 2D array as an image.
-
-        Averaged column/row signal are optionally displayed in side-panels.
-
-        Parameters
-        ----------
-        axx :  dict[str, Axes]
-           Dictionary with Matplotlib Axes objects
-        fig_info :  FIGinfo, <default=None
-           OrderedDict holding meta-data to be displayed in the figure.
-        side_panels :  str, default='nanmedian'
-           Show image row and column statistics in two side panels.
-           Valid values are: 'median', 'nanmedian', 'mean', 'nanmean',
-           'quality', 'std' and 'nanstd'.
-        title :  str, default=None
-           Title of this figure using `Axis.set_title`.
-
-        Notes
-        -----
-        The information provided in the parameter `fig_info` will be displayed
-        in a text box. In addition, we display the creation date and the data
-        (biweight) median & spread.
-
-        Currently, we have turned off the automatic offset notation of
-        `matplotlib`. Maybe this should be the default, which the user may
-        override.
-
-        Examples
-        --------
-        Create a PDF document 'test.pdf' and add figure of dataset img
-        (`numpy.ndarray` or `xarray.DataArray`) with side-panels and title::
-
-        ...
-
-        """
-        # add data statistics to fig_info
-        if fig_info is None:
-            fig_info = FIGinfo()
-
-        # draw image and colorbar
-        cm_img = self._draw_image(axx)
-        self._draw_colorbar(axx, cm_img)
-
-        # add title above image panel
-        axx["image"].set_title(self._attrs["long_name"] if title is None else title)
-
-        # add side-panels and labels along the axis
-        cnames = iter(self._coords.keys())
-        if "x-panel" not in axx:
-            axx["image"].set_ylabel(next(cnames))
-            axx["image"].set_xlabel(next(cnames))
-        else:
-            self._draw_side_panels(axx, side_panels)
-            axx["y-panel"].set_ylabel(next(cnames))
-            axx["x-panel"].set_xlabel(next(cnames))
-
-        # add info-box
-        with Biweight(self._image) as bwght:
-            if self._attrs["units"] == "1":
-                fig_info.add("median", bwght.median, "{:.5g}")
-                fig_info.add("spread", bwght.spread, "{:.5g}")
-            else:
-                fig_info.add(
-                    "median", (bwght.median, self._attrs["units"]), "{:.5g} {}"
-                )
-                fig_info.add(
-                    "spread", (bwght.spread, self._attrs["units"]), "{:.5g} {}"
-                )
-        self._add_info_box(axx["info"], fig_info)
+    def close(self: DrawDetImage) -> None:
+        """Finalize figure by adding image and colorbar."""
+        self._draw_colorbar(self._draw_image())
 
 
 # - class DrawDetQuality definition --------------------------
@@ -546,9 +580,11 @@ class DrawDetQuality(DrawDetGen):
         arr: NDArray,
         attrs: dict,
         coords: dict[str, ArrayLike] | None = None,
+        *,
+        side_panels: bool = True,
     ) -> None:
         """Initialize class DrawDetQuality."""
-        DrawDetGen.__init__(self, arr, attrs, coords)
+        DrawDetGen.__init__(self, arr, attrs, coords, side_panels)
 
         # obligatory attributes
         for key in [
@@ -565,101 +601,79 @@ class DrawDetQuality(DrawDetGen):
         self._cmap = mcolors.ListedColormap(self._attrs["colors"])
         self._znorm = mcolors.BoundaryNorm(self._attrs["flag_values"], self._cmap.N)
 
-    def _draw_colorbar(
-        self: DrawDetQuality, axx: dict[str, Axes], cm_img: AxesImage
-    ) -> None:
-        """..."""
+    def _draw_colorbar(self: DrawDetQuality, cm_img: AxesImage) -> None:
+        """Add colorbar to figure."""
         bounds = self._attrs["flag_values"]
         mbounds = [(bounds[ii + 1] + bounds[ii]) / 2 for ii in range(len(bounds) - 1)]
-        _ = plt.colorbar(cm_img, cax=axx["colorbar"], ticks=mbounds, boundaries=bounds)
-        axx["colorbar"].tick_params(axis="y", which="both", length=0)
-        axx["colorbar"].set_yticklabels(self._attrs["flag_meanings"])
+        _ = plt.colorbar(
+            cm_img,
+            cax=self._axx["colorbar"],
+            ticks=mbounds,
+            boundaries=bounds,
+        )
+        self._axx["colorbar"].tick_params(axis="y", which="both", length=0)
+        self._axx["colorbar"].set_yticklabels(self._attrs["flag_meanings"])
 
-    def _draw_side_panels(self: DrawDetQuality, axx: dict[str, Axes]) -> None:
+    def _draw_side_panels(self: DrawDetQuality, _not_used: str) -> None:
         """..."""
         # draw panel below the image panel
         xdata = np.arange(self._image.shape[1])
         if len(self._attrs["flag_values"]) == 4:
             ydata = self._image.clip(0, None).sum(axis=0)
-            axx["x-panel"].step(xdata, ydata, linewidth=0.75, color=self._cset.yellow)
+            self._axx["x-panel"].step(
+                xdata, ydata, linewidth=0.75, color=self._cset.yellow
+            )
         else:
             ydata = np.sum(((self._image == 1) | (self._image == 2)), axis=0)
-            axx["x-panel"].step(xdata, ydata, linewidth=0.75, color=self._cset.yellow)
+            self._axx["x-panel"].step(
+                xdata, ydata, linewidth=0.75, color=self._cset.yellow
+            )
             ydata = np.sum((self._image == 1), axis=0)  # worst
-            axx["x-panel"].step(xdata, ydata, linewidth=0.75, color=self._cset.red)
+            self._axx["x-panel"].step(
+                xdata, ydata, linewidth=0.75, color=self._cset.red
+            )
         if len(self._attrs["flag_values"]) == 6:
             ydata = np.sum((self._image == 4), axis=0)  # to_good
-            axx["x-panel"].step(xdata, ydata, linewidth=0.75, color=self._cset.green)
-        axx["x-panel"].grid()
+            self._axx["x-panel"].step(
+                xdata, ydata, linewidth=0.75, color=self._cset.green
+            )
+        self._axx["x-panel"].grid()
 
         # draw panel left of the image panel
         ydata = np.arange(self._image.shape[0])
         if len(self._attrs["flag_values"]) == 4:
             xdata = self._image.clip(0, None).sum(axis=1)
-            axx["y-panel"].step(xdata, ydata, linewidth=0.75, color=self._cset.yellow)
+            self._axx["y-panel"].step(
+                xdata, ydata, linewidth=0.75, color=self._cset.yellow
+            )
         else:
             xdata = np.sum(((self._image == 1) | (self._image == 2)), axis=1)
-            axx["y-panel"].step(xdata, ydata, linewidth=0.75, color=self._cset.yellow)
+            self._axx["y-panel"].step(
+                xdata, ydata, linewidth=0.75, color=self._cset.yellow
+            )
             xdata = np.sum(self._image == 1, axis=1)  # worst
-            axx["y-panel"].step(xdata, ydata, linewidth=0.75, color=self._cset.red)
+            self._axx["y-panel"].step(
+                xdata, ydata, linewidth=0.75, color=self._cset.red
+            )
         if len(self._attrs["flag_values"]) == 6:
             xdata = np.sum(self._image == 4, axis=1)  # to_good
-            axx["y-panel"].step(xdata, ydata, linewidth=0.75, color=self._cset.green)
-        axx["y-panel"].grid()
+            self._axx["y-panel"].step(
+                xdata, ydata, linewidth=0.75, color=self._cset.green
+            )
+        self._axx["y-panel"].grid()
 
-    def draw(
-        self: DrawDetQuality,
-        axx: dict[str, Axes],
-        *,
-        fig_info: FIGinfo | None = None,
-        title: str | None = None,
-    ) -> None:
-        """Display 2D array as an image.
-
-        Averaged column/row signal are optionally displayed in side-panels.
+    def add_fig_info(self: DrawDetQuality, fig_info: FIGinfo | None = None) -> None:
+        """Add fig_info box to the figure.
 
         Parameters
         ----------
-        axx :  dict[str, Axes]
-           Dictionary with Matplotlib Axes objects
-        fig_info :  FIGinfo, <default=None
+        fig_info :  FIGinfo, optional
            OrderedDict holding meta-data to be displayed in the figure.
-        title :  str, default=None
-           Title of this figure using `Axis.set_title`.
-
-        Notes
-        -----
-        The information provided in the parameter `fig_info` will be displayed
-        in a text box. In addition, we display the creation date and the data
-        (biweight) median & spread.
-
-        Currently, we have turned off the automatic offset notation of
-        `matplotlib`. Maybe this should be the default, which the user may
-        override.
 
         """
-        # add data statistics to fig_info
         if fig_info is None:
             fig_info = FIGinfo()
 
-        # draw image and colorbar
-        cm_img = self._draw_image(axx)
-        self._draw_colorbar(axx, cm_img)
-
-        # add title above image panel
-        axx["image"].set_title(self._attrs["long_name"] if title is None else title)
-
-        # add side-panels and labels along the axis
-        cnames = iter(self._coords.keys())
-        if "x-panel" not in axx:
-            axx["image"].set_ylabel(next(cnames))
-            axx["image"].set_xlabel(next(cnames))
-        else:
-            self._draw_side_panels(axx)
-            axx["y-panel"].set_ylabel(next(cnames))
-            axx["x-panel"].set_xlabel(next(cnames))
-
-        # add info-box
         if "unchanged" in self._attrs["flag_meanings"]:
             fig_info.add(self._attrs["flag_meanings"][3], np.sum(self._image == 4))
             fig_info.add(self._attrs["flag_meanings"][2], np.sum(self._image == 2))
@@ -680,4 +694,8 @@ class DrawDetQuality(DrawDetGen):
                 f" (quality < {self._attrs['thres_worst']})",
                 (self._image == 1).sum(),
             )
-        self._add_info_box(axx["info"], fig_info)
+        self._add_info_box(fig_info)
+
+    def close(self: DrawDetQuality) -> None:
+        """Finalize figure by adding image and colorbar."""
+        self._draw_colorbar(self._draw_image())
