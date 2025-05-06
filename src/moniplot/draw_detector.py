@@ -88,7 +88,15 @@ class DrawDetGen:
 
     def close(self: DrawDetGen) -> None:
         """Finalize all panels."""
-        return
+        cnames = iter(self._coords.keys())
+        if "x-panel" not in self._axx:
+            self._axx["image"].set_ylabel(next(cnames))
+            self._axx["image"].set_xlabel(next(cnames))
+        else:
+            self._axx["y-panel"].set_ylabel(next(cnames))
+            self._axx["x-panel"].set_xlabel(next(cnames))
+        self._draw_colorbar(self._draw_image())
+
 
     def _subplots_(self: DrawDetGen, side_panels: bool) -> dict[str, Axes]:
         """Obtain matplotlib Axes for plot-layout.
@@ -179,6 +187,10 @@ class DrawDetGen:
 
         return axx
 
+    def _draw_colorbar(self: DrawDetGen, _cm_img: AxesImage) -> None:
+        """Add colorbar to figure."""
+        return
+
     @property
     def aspect(self: DrawDetGen) -> int | None:
         """Return aspect-ratio of image data."""
@@ -193,7 +205,7 @@ class DrawDetGen:
             0.5,
             3.0,
             caption,
-            fontsize="x-large",
+            fontsize="xx-large",
             horizontalalignment="center",
             verticalalignment="top",
             transform=self._axx["caption"].transAxes,
@@ -225,14 +237,8 @@ class DrawDetGen:
            'quality', 'std' and 'nanstd'.
 
         """
-        cnames = iter(self._coords.keys())
-        if "x-panel" not in self._axx:
-            self._axx["image"].set_ylabel(next(cnames))
-            self._axx["image"].set_xlabel(next(cnames))
-        else:
+        if "x-panel" in self._axx:
             self._draw_side_panels(side_panels)
-            self._axx["y-panel"].set_ylabel(next(cnames))
-            self._axx["x-panel"].set_xlabel(next(cnames))
 
     def _add_info_box(self: DrawDetGen, fig_info: FIGinfo) -> None:
         """Add a box with meta information in the current figure.
@@ -566,10 +572,6 @@ class DrawDetImage(DrawDetGen):
             )
         self._axx["y-panel"].grid()
 
-    def close(self: DrawDetImage) -> None:
-        """Finalize figure by adding image and colorbar."""
-        self._draw_colorbar(self._draw_image())
-
 
 # - class DrawDetQuality definition --------------------------
 class DrawDetQuality(DrawDetGen):
@@ -695,7 +697,3 @@ class DrawDetQuality(DrawDetGen):
                 (self._image == 1).sum(),
             )
         self._add_info_box(fig_info)
-
-    def close(self: DrawDetQuality) -> None:
-        """Finalize figure by adding image and colorbar."""
-        self._draw_colorbar(self._draw_image())

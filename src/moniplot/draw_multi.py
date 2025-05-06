@@ -84,11 +84,11 @@ class DrawMulti:
             "kw_adjust": {},
             "sharex": sharex,
             "sharey": sharey,
-            "title": [],
+            "title": n_panel * [None],
+            "xlabel": n_panel * [None],
+            "ylabel": n_panel * [None],
             "xlim": [],
-            "xlabel": [],
             "ylim": [],
-            "ylabel": [],
         }
         self.fig = None
         self.axxs = None
@@ -122,7 +122,7 @@ class DrawMulti:
                 axx.set_ylim(*self._decoration["ylim"])
 
             # add an title to each panel
-            if len(self._decoration["title"]) == n_panel:
+            if self._decoration["title"][ii] is not None:
                 if self._decoration["sharex"]:
                     axx.set_title(
                         self._decoration["title"][ii],
@@ -135,9 +135,10 @@ class DrawMulti:
                     axx.set_title(self._decoration["title"][ii], fontsize="large")
 
             # add labels along the axis
-            if self.show_xlabel[ii] and len(self._decoration["xlabel"]) == n_panel:
+            
+            if self.show_xlabel[ii] and self._decoration["xlabel"][ii] is not None:
                 axx.set_xlabel(self._decoration["xlabel"][ii])
-            if self.show_ylabel[ii] and len(self._decoration["ylabel"]) == n_panel:
+            if self.show_ylabel[ii] and self._decoration["ylabel"][ii] is not None:
                 axx.set_ylabel(self._decoration["ylabel"][ii])
 
         # add fig_info box
@@ -279,15 +280,6 @@ class DrawMulti:
         """Finalize all panels."""
         self.__decorate__()
 
-    def add_caption(self: DrawMulti, text: str) -> None:
-        """Add figure caption."""
-        self.fig.suptitle(
-            text,
-            fontsize="x-large",
-            linespacing=2,
-            position=(0.5, 1 - 0.3 / self.fig.get_figheight()),
-        )
-
     def add_copyright(self: DrawMulti, ipanel: int, institute: str = "SRON") -> None:
         """Display copyright statement in the lower right corner.
 
@@ -310,6 +302,10 @@ class DrawMulti:
             transform=self.axxs[ipanel].transAxes,
         )
 
+    def add_fig_info(self: DrawMulti, fig_info: FIGinfo) -> None:
+        """Add fig_info box to the figure."""
+        self._decoration["fig_info"] = fig_info
+
     def set_cset(self: DrawMulti, cname: str, cnum: int | None = None) -> None:
         """Use alternative color-set through which `draw_lplot` will cycle.
 
@@ -329,61 +325,44 @@ class DrawMulti:
         """Set color set to its default."""
         self._cset = tol_rgba(DEFAULT_CSET)
 
-    def set_fig_info(self: DrawMulti, fig_info: FIGinfo) -> None:
-        """Add fig_info box to the figure."""
-        self._decoration["fig_info"] = fig_info
+    def set_caption(self: DrawMulti, text: str) -> None:
+        """Add figure caption."""
+        self.fig.suptitle(
+            text,
+            fontsize="xx-large",
+            linespacing=2,
+            position=(0.5, 1 - 0.3 / self.fig.get_figheight()),
+        )
 
     def set_title(self: DrawMulti, title: str, ipanel: int | None = None) -> None:
         """Set title of the current panel."""
         n_panel = len(self.axxs)
         if ipanel is None:
-            if len(self._decoration["title"]) < n_panel:
-                self._decoration["title"].append(title)
-            else:
-                raise KeyError("You have already defined a title for all panels")
-            return
-        if ipanel < n_panel:
-            print(ipanel, n_panel, self._decoration["title"])
-            if ipanel == len(self._decoration["title"]):
-                self._decoration["title"].append(title)
-            else:
-                self._decoration["title"][ipanel] = title
+            self._decoration["title"] = n_panel * [title]
         else:
-            raise ValueError("You try to define a tile for a non-existing panel")
+            if ipanel >= n_panel:
+                raise ValueError("Invalid ipanel larger than number of panels")
+            self._decoration["title"][ipanel] = title
 
     def set_xlabel(self: DrawMulti, xlabel: str, ipanel: int | None = None) -> None:
         """Set xlabel of the current panel."""
         n_panel = len(self.axxs)
         if ipanel is None:
-            if len(self._decoration["xlabel"]) < n_panel:
-                self._decoration["xlabel"].append(xlabel)
-            else:
-                raise KeyError("You have already defined a xlabel for all panels")
-            return
-        if ipanel < n_panel:
-            if ipanel == len(self._decoration["xlabel"]):
-                self._decoration["xlabel"].append(xlabel)
-            else:
-                self._decoration["xlabel"][ipanel] = xlabel
+            self._decoration["xlabel"] = n_panel * [xlabel]
         else:
-            raise ValueError("You try to define a tile for a non-existing panel")
+            if ipanel >= n_panel:
+                raise ValueError("Invalid ipanel larger than number of panels")
+            self._decoration["xlabel"][ipanel] = xlabel
 
     def set_ylabel(self: DrawMulti, ylabel: str, ipanel: int | None = None) -> None:
         """Set ylabel of the current panel."""
         n_panel = len(self.axxs)
         if ipanel is None:
-            if len(self._decoration["ylabel"]) < n_panel:
-                self._decoration["ylabel"].append(ylabel)
-            else:
-                raise KeyError("You have already defined a ylabel for all panels")
-            return
-        if ipanel < n_panel:
-            if ipanel == len(self._decoration["ylabel"]):
-                self._decoration["ylabel"].append(ylabel)
-            else:
-                self._decoration["ylabel"][ipanel] = ylabel
+            self._decoration["ylabel"] = n_panel * [ylabel]
         else:
-            raise ValueError("You try to define a tile for a non-existing panel")
+            if ipanel >= n_panel:
+                raise ValueError("Invalid ipanel larger than number of panels")
+            self._decoration["ylabel"][ipanel] = ylabel
 
     def set_xlim(
         self: DrawMulti,
