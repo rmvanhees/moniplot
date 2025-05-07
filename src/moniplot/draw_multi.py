@@ -329,7 +329,7 @@ class DrawMulti:
         """Add figure caption."""
         self.fig.suptitle(
             text,
-            fontsize="xx-large",
+            fontsize="x-large" if self.fig.get_figheight() < 9 else "xx-large",
             linespacing=2,
             position=(0.5, 1 - 0.3 / self.fig.get_figheight()),
         )
