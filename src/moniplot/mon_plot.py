@@ -116,9 +116,6 @@ class MONplot:
 
     def __add_caption(self: MONplot, fig: Figure, axx: Axes | None) -> None:
         """Add figure caption."""
-        if not self.caption:
-            return
-
         if axx is None:
             fig.suptitle(
                 self.caption,
@@ -129,18 +126,18 @@ class MONplot:
             axx.set_title(self.caption, fontsize="x-large")
 
     @staticmethod
-    def __add_fig_box(fig: Figure, fig_info: FIGinfo | None) -> None:
+    def __add_fig_box(fig: Figure, fig_info: FIGinfo) -> None:
         """Add a box with meta information in the current figure.
 
         Parameters
         ----------
         fig :  matplotlib.figure.Figure
            Matplotlib object Figure
-        fig_info :  FIGinfo, optional
+        fig_info :  FIGinfo
            Moniplot object with figure annotations
 
         """
-        if fig_info is None or fig_info.location != "above":
+        if fig_info.location != "above":
             return
 
         fig.text(
@@ -191,8 +188,10 @@ class MONplot:
            Provide axes and use set_title to place the caption (DrawImage)
 
         """
-        self.__add_caption(fig, axx)
-        self.__add_fig_box(fig, fig_info)
+        if self.caption:
+            self.__add_caption(fig, axx)
+        if fig_info is not None:
+            self.__add_fig_box(fig, fig_info)
 
         # add save figure
         if self.__pdf is None:
