@@ -15,7 +15,6 @@ authors = [
   {name = "Paul Tol", email = "P.J.J.Tol@sron.nl"},
 ]
 license = "Apache-2.0"
-license.files = "LICENSE"
 requires-python = ">=3.10"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
