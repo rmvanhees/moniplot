@@ -203,7 +203,7 @@ class DrawDetGen:
         """Add caption as a subtitle."""
         self._axx["caption"].text(
             0.5,
-            3.0,
+            3.5,
             caption,
             fontsize="xx-large",
             horizontalalignment="center",
