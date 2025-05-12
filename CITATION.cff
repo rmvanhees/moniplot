@@ -5,7 +5,7 @@ authors:
 - family-names: "van Hees"
   given-names: "Richard"
   orcid: "https://orcid.org/0000-0002-3846-0753"
-license: GPLv3
+license: Apache-2.0
 license-url: "https://github.com/rmvanhees/moniplot/LICENSE"
 repository-code: "https://github.com/rmvanhees/moniplot"
 doi: 10.5281/zenodo.7024743

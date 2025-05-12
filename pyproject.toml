@@ -10,17 +10,18 @@ build-backend = "hatchling.build"
 name = "moniplot"
 description = "a Python data visualization library for (satellite) instrument monitoring"
 readme = "README.md"
-license.file = "LICENSE"
 authors = [
   {name = "Richard van Hees", email = "R.M.van.Hees@sron.nl"},
   {name = "Paul Tol", email = "P.J.J.Tol@sron.nl"},
 ]
+license = "Apache-2.0"
+license.files = "LICENSE"
 requires-python = ">=3.10"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
-  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+  "License :: OSI Approved :: Apache Software License",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.10",
@@ -28,6 +29,7 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Topic :: Scientific/Engineering :: Atmospheric Science",
+  "Topic :: Scientific/Engineering :: Image Processing",
   "Topic :: Scientific/Engineering :: Visualization"
 ]
 dynamic = [

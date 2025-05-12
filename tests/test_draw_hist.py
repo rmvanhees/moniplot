@@ -18,13 +18,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""SRON Python package: `moniplot`.
+"""..."""
 
-Moniplot is a Python data visualization library for (satellite) instrument monitoring.
-"""
+from __future__ import annotations
 
-import contextlib
-from importlib.metadata import PackageNotFoundError, version
 
-with contextlib.suppress(PackageNotFoundError):
-    __version__ = version(__name__)
+import matplotlib.pyplot as plt
+import numpy as np
+
+from moniplot.draw_hist import DrawHist
+
+
+def main(n_panel: int = 1) -> None:
+    """..."""
+
+    mu, sigma = 0, 0.1 # mean and standard deviation
+    
+    plot = DrawHist()
+    fig, axx = plot.subplots(
+        n_panel,
+        xlim=[-0.425, 0.425],
+        xlabel="noise",
+        ylim=[0, 100],
+        ylabel="number",
+    )
+    for ii in range(n_panel):
+        plot.add_hist(np.random.normal(mu, sigma, 1000), clip=[-0.4, 0.4], bins=40)
+        plot.draw(axx[ii])
+        axx[ii].set_title(f"Figure {ii+1}")
+    plt.show()
+
+
+
+if __name__ == "__main__":
+    main(4)
