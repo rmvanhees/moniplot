@@ -233,16 +233,14 @@ class DrawMulti:
                 ((8, 8), (12, 6), (14, 6), (9, 9)) + 2 * ((12, 9),) + 3 * ((12, 12),)
             )[n_panel - 1]
 
-        layout = "constrained" if not (sharex or sharey) else None
-        self.fig = plt.figure(figsize=fig_size, layout=layout)
-        if layout is None:
-            margin = min(1.0 / (1.65 * (n_row + 1)), 0.3)
-            self._decoration["kw_adjust"]["bottom"] = margin
-            self._decoration["kw_adjust"]["top"] = 1 - 1.1 / self.fig.get_figheight()
-            if sharex:
-                self._decoration["kw_adjust"]["hspace"] = 0.05
-            if sharey:
-                self._decoration["kw_adjust"]["wspace"] = 0.1
+        self.fig = plt.figure(figsize=fig_size)
+        margin = min(1.0 / (1.65 * (n_row + 1)), 0.3)
+        self._decoration["kw_adjust"]["bottom"] = margin
+        self._decoration["kw_adjust"]["top"] = 1 - 1.1 / self.fig.get_figheight()
+        if sharex:
+            self._decoration["kw_adjust"]["hspace"] = 0.05
+        if sharey:
+            self._decoration["kw_adjust"]["wspace"] = 0.1
 
         axx_arr = ()
         for ii in range(n_panel):
