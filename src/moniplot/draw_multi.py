@@ -112,8 +112,6 @@ class DrawMulti:
 
     def __decorate__(self: DrawMulti) -> None:
         """Decorate the panels of the figure."""
-        n_panel = len(self.axxs)
-        # pprint.pprint(self._decoration)
         for ii, axx in enumerate(self.axxs):
             if self._decoration["sharex"] and self._decoration["xlim"]:
                 axx.set_xlim(*self._decoration["xlim"])
@@ -135,7 +133,6 @@ class DrawMulti:
                     axx.set_title(self._decoration["title"][ii], fontsize="large")
 
             # add labels along the axis
-            
             if self.show_xlabel[ii] and self._decoration["xlabel"][ii] is not None:
                 axx.set_xlabel(self._decoration["xlabel"][ii])
             if self.show_ylabel[ii] and self._decoration["ylabel"][ii] is not None:
