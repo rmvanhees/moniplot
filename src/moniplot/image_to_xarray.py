@@ -122,11 +122,12 @@ def __get_coords(dset: h5py.Dataset, data_sel: tuple[slice | int]) -> list:
 
                 # determine coordinate
                 buff = None
-                if dim[0].size > 0 and not np.all(dim[0][()] == 0):
-                    buff = dim[0][()]
-                elif name in ("row", "column"):
-                    d_type = "u2" if ((dset.shape[ii] - 1) >> 16) == 0 else "u4"
-                    buff = np.arange(dset.shape[ii], dtype=d_type)
+                if dim[0].size > 0:
+                    if np.all(dim[0][()] == 0):
+                        d_type = "u2" if ((dset.shape[ii] - 1) >> 16) == 0 else "u4"
+                        buff = np.arange(dset.shape[ii], dtype=d_type)
+                    else:
+                        buff = dim[0][()]
 
                 if not (buff is None or data_sel is None):
                     buff = buff[data_sel[ii]]
@@ -337,10 +338,11 @@ def h5_to_xr(
     if not coords:
         coords = __set_coords(h5_dset, data_sel, dims)
     # print(f"dims: {dims}")
-    # print(f"coords: {coords}")
+    # print(f"coords: {coords}, {len(coords)}")
 
     # get values for the dataset
     data = __get_data(h5_dset, data_sel, field)
+    # print(f"data: {data.ndim}, {data.shape}")
 
     # - check if dimension of dataset and coordinates agree
     if data.ndim < len(coords):
