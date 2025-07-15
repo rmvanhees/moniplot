@@ -170,7 +170,9 @@ class DrawMulti:
         if not self._decoration["sharey"]:
             return
 
-        ylim = [np.min(ydata), np.max(ydata)]
+        mask = np.isfinite(ydata)
+        values = ydata if np.all(mask) else ydata[mask]
+        ylim = [values.min(), values.max()]
         if self._decoration["ylim"]:
             ylim = [
                 min(self._decoration["ylim"][0], ylim[0]),
