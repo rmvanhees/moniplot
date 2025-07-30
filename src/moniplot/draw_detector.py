@@ -97,7 +97,6 @@ class DrawDetGen:
             self._axx["x-panel"].set_xlabel(next(cnames))
         self._draw_colorbar(self._draw_image())
 
-
     def _subplots_(self: DrawDetGen, side_panels: bool) -> dict[str, Axes]:
         """Obtain matplotlib Axes for plot-layout.
 

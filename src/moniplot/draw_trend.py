@@ -84,7 +84,7 @@ class DrawTrend:
 
     @staticmethod
     def subplots(
-            npanels: int, *, two_col: bool = False
+        npanels: int, *, two_col: bool = False
     ) -> tuple[Figure, list[Axes, ...]]:
         """Create a figure and a set of subplots for trend-plots."""
         nrows = npanels // 2 if two_col else npanels
