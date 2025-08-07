@@ -27,6 +27,7 @@ from typing import TYPE_CHECKING
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
+
 from moniplot.lib.fig_info import FIGinfo
 
 if TYPE_CHECKING:
@@ -38,10 +39,12 @@ def add_fig_box(axx_c: Axes, aspect: int, fig_info: FIGinfo) -> None:
 
     Parameters
     ----------
-    axx_c :  Matplotlib Axes instance of the colorbar
+    axx_c :  Axes
+       Matplotlib Axes instance of the colorbar
     aspect :  int
+       Provide aspect ratio
     fig_info :  FIGinfo
-        instance of moniplot.lib.fig_info to be displayed
+       instance of moniplot.lib.fig_info to be displayed
 
     """
     if fig_info is None:
@@ -190,7 +193,7 @@ def test_layout(aspect: int) -> None:
 
     fig_info = FIGinfo()
     for ii in range(5):
-        fig_info.add(f"text line {ii+1}", "blah blah blah")
+        fig_info.add(f"text line {ii + 1}", "blah blah blah")
     add_fig_box(axx_c, aspect, fig_info)
 
     plt.show()

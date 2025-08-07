@@ -31,8 +31,8 @@ from typing import TYPE_CHECKING
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import numpy as np
-import xarray as xr
 from matplotlib.ticker import AutoMinorLocator
+from pyxarr import DataArray
 
 from .biweight import Biweight
 from .lib.fig_info import FIGinfo
@@ -41,6 +41,7 @@ from .tol_colors import tol_cmap, tol_cset
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from matplotlib.figure import Figure
+    from numpy.typing import NDArray
 
 # - global variables -------------------------------
 
@@ -51,8 +52,8 @@ class DrawImage:
 
     Parameters
     ----------
-    arr :  np.ndarray | xr.DataArray
-        2D-data array
+    arr :  NDArray | DataArray
+        2D-data (labeled) array
     zscale :  str, default='linear'
         Scaling of the data values. Recognized values are: 'linear', 'log',
         'diff', 'ratio' or 'quality'.
@@ -79,7 +80,7 @@ class DrawImage:
 
     def __init__(
         self: DrawImage,
-        arr: np.ndarray | xr.DataArray,
+        arr: NDArray | DataArray,
         zscale: str | None = None,
         vperc: list[int, int] | None = None,
         vrange: list[float, float] | None = None,
@@ -87,11 +88,11 @@ class DrawImage:
         """Prepare image data for plotting."""
         self._cmap = tol_cmap("rainbow_PuRd")
         self._cset = tol_cset("bright")
-        self._image = arr.values if isinstance(arr, xr.DataArray) else arr
+        self._image = arr.values if isinstance(arr, DataArray) else arr
         self.attrs = {
             "long_name": "",
             "units": "1",
-            "dims": arr.dims if isinstance(arr, xr.DataArray) else ("row", "column"),
+            "dims": arr.dims if isinstance(arr, DataArray) else ("row", "column"),
         }
         self._zlabel: str = "value"
 
@@ -105,8 +106,8 @@ class DrawImage:
 
         if self._zscale == "quality":
             # check DataArray
-            if not isinstance(arr, xr.DataArray):
-                raise ValueError("Pixel-Quality data must be a xr.DataArray")
+            if not isinstance(arr, DataArray):
+                raise ValueError("Pixel-Quality data must be a pyxarr.DataArray")
             # check attributes
             for key in [
                 "colors",
@@ -138,7 +139,7 @@ class DrawImage:
             vmin, vmax = vrange
 
         # obtain image-data and attributes
-        if isinstance(arr, xr.DataArray):
+        if isinstance(arr, DataArray):
             if "long_name" in arr.attrs:
                 self.attrs["long_name"] = arr.attrs["long_name"]
             if "units" in arr.attrs:
@@ -548,7 +549,7 @@ class DrawImage:
         Examples
         --------
         Create a PDF document 'test.pdf' and add figure of dataset img
-        (`numpy.ndarray` or `xarray.DataArray`) with side-panels and title::
+        (`numpy.ndarray` or `pyxarr.DataArray`) with side-panels and title::
 
         ...
 

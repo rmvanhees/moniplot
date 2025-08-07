@@ -27,7 +27,7 @@ __all__ = ["DrawHist"]
 from typing import TYPE_CHECKING
 
 import numpy as np
-import xarray as xr
+from pyxarr import DataArray
 
 from .biweight import Biweight
 from .lib.fig_info import FIGinfo
@@ -45,7 +45,7 @@ class DrawHist:
 
     Parameters
     ----------
-    arr :  xr.DataArray | np.ndarray
+    arr :  pyxarr.DataArray | np.ndarray
         Data array
     clip :  tuple[float | None, float | None] | None, optional
         Pass clip values to numpy.clip
@@ -54,7 +54,7 @@ class DrawHist:
 
     Notes
     -----
-    When the input data is a xarray.DataArray then the attributes 'long_name'
+    When the input data is a DataArray then the attributes 'long_name'
     and 'units' are used in the plot decoration.
 
     Examples
@@ -78,7 +78,7 @@ class DrawHist:
 
     def __init__(
         self: DrawHist,
-        arr: xr.DataArray | np.ndarray,
+        arr: DataArray | np.ndarray,
         clip: tuple[float | None, float | None] | None = None,
         **kwargs: int,
     ) -> None:
@@ -86,7 +86,7 @@ class DrawHist:
         self.xlabel = "value"
         self.ylabel = "density" if kwargs.get("density") else "number"
         self.zunits = "1"
-        if isinstance(arr, xr.DataArray):
+        if isinstance(arr, DataArray):
             data = np.ravel(arr.values)
             if "long_name" in arr.attrs:
                 self.xlabel = arr.attrs["long_name"]

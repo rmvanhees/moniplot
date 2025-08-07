@@ -58,9 +58,8 @@ class MONplot:
     The methods of the class `MONplot` will accept `numpy` arrays as input and
     display your data without knowledge on the data units and coordinates.
     In most cases, this will be enough for a quick inspection of your data.
-    However, when you use the labeled arrays and datasets of `xarray`then
-    the software will use the name of the xarray class, coordinate names and
-    data attributes, such as `long_name` and `units`.
+    However, when you use the labeled arrays then the software will use the
+    coordinate names and data attributes, such as `long_name` and `units`.
 
     """
 

@@ -25,11 +25,10 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 
 import numpy as np
-import xarray as xr
-from moniplot.image_to_xarray import data_to_xr
+
 from moniplot.lib.fig_info import FIGinfo
 from moniplot.mon_plot import MONplot
-
+from pyxarr import DataArray
 
 def get_test_data(
     data_sel: list[tuple, tuple] | None = None,
@@ -37,7 +36,7 @@ def get_test_data(
     xy_max: float = 5,
     delta: float = 0.01,
     error: float = 0,
-) -> xr.DataArray:
+) -> DataArray:
     """Generate synthetic data to simulate a square-detector image."""
     if data_sel is None:
         data_sel = [(), ()]
@@ -49,10 +48,10 @@ def get_test_data(
     data = (zz1 - zz2) * 2
     data += np.random.default_rng().normal(0.0, error, data.shape)
 
-    return data_to_xr(data, long_name="bogus data", units="Volt")
+    return DataArray(data, attrs={"long_name": "bogus data", "units": "Volt"})
 
 
-def test_lplot() -> xr.DataArray:
+def test_lplot() -> DataArray:
     """Run unit tests on MONplot::draw_lplot."""
     print("Run unit tests on MONplot::draw_lplot")
     plot = MONplot("mon_plot_draw_lplot-1.png")

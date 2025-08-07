@@ -39,9 +39,9 @@ from .tol_colors import tol_cset
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    import xarray as xr
     from matplotlib.axes import Axes
     from matplotlib.figure import Figure
+    from pyxarr import DataArray
 
 # - global variables -------------------------------
 
@@ -52,7 +52,7 @@ class DrawTrend:
 
     Notes
     -----
-    The input data should be a xarray.DataArray with atleast attributes providing
+    The input data should be a DataArray with atleast attributes providing
     'long_name' and 'units'.
 
     Examples
@@ -250,7 +250,7 @@ class DrawTrend:
 
         return ()
 
-    def decoration(self: DrawTrend, xarr: xr.DataArray) -> dataclass:
+    def decoration(self: DrawTrend, xarr: DataArray) -> dataclass:
         """Return decoration parameters for trend-plots.
 
         Notes
@@ -358,7 +358,7 @@ class DrawTrend:
     def draw(
         self: DrawTrend,
         axx: Axes,
-        xarr: xr.DataArray,
+        xarr: DataArray,
         scatter: bool = False,
     ) -> None:
         """Add a subplot for measurement data.
@@ -367,7 +367,7 @@ class DrawTrend:
         ----------
         axx :  matplotlib.Axes
             Matplotlib Axes object of the current panel
-        xarr :  xarray.DataArray
+        xarr :  pyxarr.DataArray
             Object holding measurement data and attributes
             Dimension must be 'orbit', 'hours' or 'time'.
         scatter: bool, default=False
@@ -465,7 +465,7 @@ class DrawTrend:
     def draw_hk(
         self: DrawTrend,
         axx: Axes,
-        xarr: xr.DataArray,
+        xarr: DataArray,
         vperc: list[int, int] | None = None,
         vrange_last_orbits: int = -1,
     ) -> None:
@@ -475,7 +475,7 @@ class DrawTrend:
         ----------
         axx :  matplotlib.Axes
             Matplotlib Axes object of the current panel
-        xarr :  xarray.DataArray
+        xarr :  pyxarr.DataArray
             Object holding housekeeping data and attributes.
             Dimension must be 'orbit', 'hours' or 'time'.
         vperc :  list | None, optional
@@ -575,7 +575,7 @@ class DrawTrend:
         legend.draw_frame(False)
 
     def masked_hk(
-        self: DrawTrend, axx: Axes, xarr: xr.DataArray, mask: np.ndarray
+        self: DrawTrend, axx: Axes, xarr: DataArray, mask: np.ndarray
     ) -> None:
         """Show where housekeeping data is available, but not shown.
 
@@ -583,7 +583,7 @@ class DrawTrend:
         ----------
         axx :  matplotlib.Axes
             Matplotlib Axes object of the current panel
-        xarr :  xarray.DataArray
+        xarr :  pyxarr.DataArray
             Object holding housekeeping data and attributes.
             Dimension must be 'orbit', 'hours' or 'time'.
         mask :  np.ndarray

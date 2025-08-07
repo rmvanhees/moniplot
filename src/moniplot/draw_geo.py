@@ -29,11 +29,11 @@ from typing import TYPE_CHECKING
 import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 import numpy as np
-import xarray as xr
 from cartopy import crs as ccrs
 from cartopy.mpl.gridliner import LATITUDE_FORMATTER, LONGITUDE_FORMATTER
 from matplotlib.patches import Polygon
 from matplotlib.ticker import FixedLocator
+from pyxarr import DataArray
 
 from .lib.saa_region import saa_region
 from .tol_colors import tol_cmap, tol_cset, tol_rgba
@@ -253,7 +253,7 @@ class DrawGeo:
         self: DrawGeo,
         lons: np.ndarray | tuple[np.ndarray],
         lats: np.ndarray | tuple[np.ndarray],
-        data_in: np.ndarray | xr.DataArray | tuple[np.ndarray],
+        data_in: np.ndarray | DataArray | tuple[np.ndarray],
         *,
         whole_globe: bool = False,
         extent: list[float, float, float, float] | None = None,
@@ -269,7 +269,7 @@ class DrawGeo:
            Longitude coordinates (N, M,)
         lats :  ndarray | tuple[ndarray]
            Latitude coordinates (N, M,)
-        data_in :  ndarray | xr.DataArray
+        data_in :  ndarray | DataArray | tuple[np.ndarray]
            Pixel values  (N, M,) or (N-1, M-1,)
         vrange :  list[vmin,vmax], optional
            Range to normalize luminance data between vmin and vmax.
@@ -309,7 +309,7 @@ class DrawGeo:
         zlabel = "value"
         if isinstance(data_in, np.ndarray):
             data = (data_in,)
-        elif isinstance(data_in, xr.DataArray):
+        elif isinstance(data_in, DataArray):
             data = (data_in.values,)
             if "units" in data_in.attrs and data_in.attrs["units"] != "1":
                 zlabel = rf"value [{data_in.attrs['units']}]"

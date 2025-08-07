@@ -34,7 +34,7 @@ from matplotlib.dates import (
     ConciseDateFormatter,
     DateFormatter,
 )
-from xarray import DataArray
+from pyxarr import DataArray
 
 from .tol_colors import tol_cset, tol_rgba
 

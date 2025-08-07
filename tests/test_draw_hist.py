@@ -22,7 +22,6 @@
 
 from __future__ import annotations
 
-
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -31,24 +30,17 @@ from moniplot.draw_hist import DrawHist
 
 def main(n_panel: int = 1) -> None:
     """..."""
+    mu, sigma = 0, 0.1  # mean and standard deviation
+    rng = np.random.default_rng()
 
-    mu, sigma = 0, 0.1 # mean and standard deviation
-    
-    plot = DrawHist()
-    fig, axx = plot.subplots(
-        n_panel,
-        xlim=[-0.425, 0.425],
-        xlabel="noise",
-        ylim=[0, 100],
-        ylabel="number",
-    )
+    fig, axx = plt.subplots(n_panel, sharey="all", figsize=(9, 8))
     for ii in range(n_panel):
-        plot.add_hist(np.random.normal(mu, sigma, 1000), clip=[-0.4, 0.4], bins=40)
-        plot.draw(axx[ii])
-        axx[ii].set_title(f"Figure {ii+1}")
+        plot = DrawHist(rng.normal(mu, sigma, 1000), clip=[-0.4, 0.4], bins=40)
+        plot.draw(
+            axx[ii], title=f"Figure {ii + 1}", xticks_visible=ii+1 == n_panel
+        )
     plt.show()
 
 
-
 if __name__ == "__main__":
-    main(4)
+    main(3)
