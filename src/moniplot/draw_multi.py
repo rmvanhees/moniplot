@@ -47,6 +47,11 @@ if TYPE_CHECKING:
 # - global variables -------------------------------
 DEFAULT_CSET = "bright"
 
+FIG_SIZES_1COL = [(10, 3), (10, 5), (10, 7), (10, 9), (10, 11)]
+FIG_SIZES_NCOL = (
+    [(5, 4.5), (10, 4.5), (15, 4.5), (6.5, 5)] + 2 * [(10, 5)] + 3 * [(10, 7.5)]
+)
+PANELS_NCOL = [(1, 1), (1, 2), (1, 3), (2, 2)] + 2 * [(2, 3)] + 3 * [(3, 3)]
 
 class HistKeys(TypedDict):
     """Define keyword arguments of method add_hist()."""
@@ -225,25 +230,21 @@ class DrawMulti:
         if one_column:
             n_row = n_panel
             n_col = 1
-            fig_size = ((10, 3), (10, 5), (10, 7), (10, 9), (10, 11))[n_panel - 1]
+            fig_size = FIG_SIZES_1COL[n_panel - 1]
         else:
-            n_row, n_col = (
-                ((1, 1), (1, 2), (1, 3), (2, 2)) + 2 * ((2, 3),) + 3 * ((3, 3),)
-            )[n_panel - 1]
-            fig_size = (
-                ((5, 4.5), (10, 4.5), (15, 4.5), (6.5, 5))
-                + 2 * ((10, 5),)
-                + 3 * ((10, 7.5),)
-            )[n_panel - 1]
+            n_row, n_col = PANELS_NCOL[n_panel - 1]
+            fig_size = FIG_SIZES_NCOL[n_panel - 1]
 
         # calculate space at bottom and top in inches (at n_row=2)
         bottom_inch = 0.11 * (5 if one_column else 3)
         top_inch = 0.12 * (5 if one_column else 3)
+        
         # make room for the figinfo box
+        hght = 0
         if fig_info is not None:
-            top_inch += (0.0 if one_column else 0.2) + 0.15 * (
-                min(5, len(fig_info)) - 1
-            )
+            hght = (0.0 if one_column else 0.2) + 0.15 * (min(5, len(fig_info)) - 1)
+            top_inch += hght
+
         fig = plt.figure(figsize=fig_size)
         gs = GridSpec(
             n_row,
@@ -254,6 +255,7 @@ class DrawMulti:
             hspace=0.08 if sharex else None,
             wspace=0.1 if sharey else None,
         )
+        fig.set_figheight(fig_size[1] + hght)
         axx_arr = ()
         ip = 0
         for yy in range(n_row):
