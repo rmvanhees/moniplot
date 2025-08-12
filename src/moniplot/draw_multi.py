@@ -34,6 +34,7 @@ from matplotlib.dates import (
     ConciseDateFormatter,
     DateFormatter,
 )
+from matplotlib.gridspec import GridSpec
 from pyxarr import DataArray
 
 from .tol_colors import tol_cset, tol_rgba
@@ -96,7 +97,6 @@ class DrawMulti:
         self._cset = tol_rgba(DEFAULT_CSET)
         self._decoration = {
             "mode": [],
-            "fig_info": None,
             "sharex": sharex,
             "sharey": sharey,
             "title": n_panel * [None],
@@ -114,7 +114,7 @@ class DrawMulti:
         if not 1 <= n_panel <= 9:
             raise ValueError("value out of range: 1 <= n_panel <= 9")
 
-        self.__subplots__(n_panel, one_column, sharex, sharey)
+        self.__subplots__(n_panel, one_column, sharex, sharey, fig_info)
 
     def __enter__(self: DrawMulti) -> Self:
         """Initiate the context manager."""
@@ -222,74 +222,75 @@ class DrawMulti:
             X X X
 
         """
-    if one_column:
-        n_row = n_panel
-        n_col = 1
-        fig_size = ((10, 3), (10, 5), (10, 7), (10, 9), (10, 11))[n_panel - 1]
-    else:
-        n_row, n_col = (
-            ((1, 1), (1, 2), (1, 3), (2, 2)) + 2 * ((2, 3),) + 3 * ((3, 3),)
-        )[n_panel - 1]
-        fig_size = (
-            ((5, 4.5), (10, 4.5), (15, 4.5), (6.5, 5))
-            + 2 * ((10, 5),)
-            + 3 * ((10, 7.5),)
-        )[n_panel - 1]
+        if one_column:
+            n_row = n_panel
+            n_col = 1
+            fig_size = ((10, 3), (10, 5), (10, 7), (10, 9), (10, 11))[n_panel - 1]
+        else:
+            n_row, n_col = (
+                ((1, 1), (1, 2), (1, 3), (2, 2)) + 2 * ((2, 3),) + 3 * ((3, 3),)
+            )[n_panel - 1]
+            fig_size = (
+                ((5, 4.5), (10, 4.5), (15, 4.5), (6.5, 5))
+                + 2 * ((10, 5),)
+                + 3 * ((10, 7.5),)
+            )[n_panel - 1]
 
-    # calculate space at bottom and top in inches (at n_row=2)
-    bottom_inch = 0.11 * (5 if one_column else 3)
-    top_inch = 0.12 * (5 if one_column else 3)
-    # make room for the figinfo box
-    if fig_info is not None:
-        top_inch += (0.0 if one_column else 0.2) + 0.15 * (min(5, len(fig_info)) - 1)
+        # calculate space at bottom and top in inches (at n_row=2)
+        bottom_inch = 0.11 * (5 if one_column else 3)
+        top_inch = 0.12 * (5 if one_column else 3)
+        # make room for the figinfo box
+        if fig_info is not None:
+            top_inch += (0.0 if one_column else 0.2) + 0.15 * (
+                min(5, len(fig_info)) - 1
+            )
+        fig = plt.figure(figsize=fig_size)
+        gs = GridSpec(
+            n_row,
+            n_col,
+            figure=fig,
+            bottom=bottom_inch / fig.get_figheight(),
+            top=1 - top_inch / fig.get_figheight(),
+            hspace=0.08 if sharex else None,
+            wspace=0.1 if sharey else None,
+        )
+        axx_arr = ()
+        ip = 0
+        for yy in range(n_row):
+            for xx in range(n_col):
+                if ip >= n_panel:
+                    continue
+                axx = fig.add_subplot(gs[yy, xx])
+                axx.grid(which="major", color="#AAAAAA", linestyle="--")
+                axx_arr += (axx,)
 
-    fig = plt.figure(figsize=fig_size)
-    gs = GridSpec(
-        n_row,
-        n_col,
-        figure=fig,
-        bottom=bottom_inch / fig.get_figheight(),
-        top=1 - top_inch / fig.get_figheight(),
-        hspace=0.08 if sharex else None,
-        wspace=0.1 if sharey else None,
-    )
-    axx_arr = ()
-    ip = 0
-    for yy in range(n_row):
-        for xx in range(n_col):
-            if ip >= n_panel:
-                continue
-            axx = fig.add_subplot(gs[yy, xx])
-            axx.grid(which="major", color="#AAAAAA", linestyle="--")
-            axx_arr += (axx,)
-            
-            # decoration X-axis
-            show_label = True
-            if (
-                sharex
-                and ip < (n_row - 1) * n_col
-                and not (
-                    (n_panel == 5 and ip == 2)
-                    or (n_panel == 7 and ip >= 4)
-                    or (n_panel == 8 and ip == 5)
-                )
-            ):
-                axx.set_xticklabels("")
-                show_label = False
+                # decoration X-axis
+                show_label = True
+                if (
+                    sharex
+                    and ip < (n_row - 1) * n_col
+                    and not (
+                        (n_panel == 5 and ip == 2)
+                        or (n_panel == 7 and ip >= 4)
+                        or (n_panel == 8 and ip == 5)
+                    )
+                ):
+                    axx.set_xticklabels("")
+                    show_label = False
 
-            self.show_xlabel += (show_label,)
+                self.show_xlabel += (show_label,)
 
-            # decoration Y-axis
-            show_label = True
-            if sharey and ip % n_col:
-                axx.set_yticklabels("")
-                show_label = False
+                # decoration Y-axis
+                show_label = True
+                if sharey and ip % n_col:
+                    axx.set_yticklabels("")
+                    show_label = False
 
-            self.show_ylabel += (show_label,)
-            ip += 1
+                self.show_ylabel += (show_label,)
+                ip += 1
 
-        self.fig = fig
-        self.axxs = np.array(axx_arr)
+            self.fig = fig
+            self.axxs = np.array(axx_arr)
 
     # - Public Methods ---------------------------------
     def close(self: DrawMulti) -> None:
