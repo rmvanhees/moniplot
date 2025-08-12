@@ -66,7 +66,22 @@ class DrawKeys(TypedDict):
 
 # - class definition -------------------------------
 class DrawMulti:
-    """Draw a multi-panel figure."""
+    """Draw a multi-panel figure.
+
+    Parameters
+    ----------
+    n_panel :  int
+       Total number of panels
+    one_column :  bool, default=False
+       Put all panels in one column of equal size (max 5)
+    sharex :  bool, default=False
+       All panels share their X-axis
+    sharey :  bool, default=False
+       All panels share their Y-axis
+    fig_info :  FIGinfo, optional
+       Add fig_info box to the figure
+
+    """
 
     def __init__(
         self: DrawMulti,
@@ -75,13 +90,13 @@ class DrawMulti:
         one_column: bool = False,
         sharex: bool = False,
         sharey: bool = False,
+        fig_info: FIGinfo | None = None,
     ) -> None:
         """Create DrawMuli object."""
         self._cset = tol_rgba(DEFAULT_CSET)
         self._decoration = {
             "mode": [],
             "fig_info": None,
-            "kw_adjust": {},
             "sharex": sharex,
             "sharey": sharey,
             "title": n_panel * [None],
@@ -138,20 +153,6 @@ class DrawMulti:
             if self.show_ylabel[ii] and self._decoration["ylabel"][ii] is not None:
                 axx.set_ylabel(self._decoration["ylabel"][ii])
 
-        # add fig_info box
-        if self._decoration["fig_info"] is not None:
-            self._decoration["fig_info"].draw(self.fig)
-
-        # adjust the white space
-        if self._decoration["kw_adjust"]:
-            if self._decoration["fig_info"] is not None and (
-                (n_lines := len(self._decoration["fig_info"])) > 5
-            ):
-                self._decoration["kw_adjust"]["top"] -= (
-                    (n_lines - 5) * 0.1 / self.fig.get_figheight()
-                )
-            plt.subplots_adjust(**self._decoration["kw_adjust"])
-
     def _xlim_update_(self: DrawMulti, xdata: ArrayLike) -> None:
         """Update the X-axis view limits if sharex is True."""
         if not self._decoration["sharex"]:
@@ -186,6 +187,7 @@ class DrawMulti:
         one_column: bool,
         sharex: bool,
         sharey: bool,
+        fig_info: FIGinfo | None,
     ) -> None:
         """Create a figure and a set of panels.
 
@@ -220,41 +222,56 @@ class DrawMulti:
             X X X
 
         """
-        if one_column:
-            n_row = n_panel
-            n_col = 1
-            fig_size = ((10, 6), (10, 7), (10, 9), (10, 10), (10, 12))[n_panel - 1]
-        else:
-            n_row, n_col = (
-                ((1, 1), (1, 2), (1, 3), (2, 2)) + 2 * ((2, 3),) + 3 * ((3, 3),)
-            )[n_panel - 1]
-            fig_size = (
-                ((9, 9), (12, 6), (14, 6), (10, 10)) + 2 * ((12, 9),) + 3 * ((12, 12),)
-            )[n_panel - 1]
+    if one_column:
+        n_row = n_panel
+        n_col = 1
+        fig_size = ((10, 3), (10, 5), (10, 7), (10, 9), (10, 11))[n_panel - 1]
+    else:
+        n_row, n_col = (
+            ((1, 1), (1, 2), (1, 3), (2, 2)) + 2 * ((2, 3),) + 3 * ((3, 3),)
+        )[n_panel - 1]
+        fig_size = (
+            ((5, 4.5), (10, 4.5), (15, 4.5), (6.5, 5))
+            + 2 * ((10, 5),)
+            + 3 * ((10, 7.5),)
+        )[n_panel - 1]
 
-        self.fig = plt.figure(figsize=fig_size)
-        margin = min(1.0 / (1.65 * (n_row + 1)), 0.3)
-        self._decoration["kw_adjust"]["bottom"] = margin
-        self._decoration["kw_adjust"]["top"] = 1 - 1.1 / self.fig.get_figheight()
-        if sharex:
-            self._decoration["kw_adjust"]["hspace"] = 0.05
-        if sharey:
-            self._decoration["kw_adjust"]["wspace"] = 0.1
+    # calculate space at bottom and top in inches (at n_row=2)
+    bottom_inch = 0.11 * (5 if one_column else 3)
+    top_inch = 0.12 * (5 if one_column else 3)
+    # make room for the figinfo box
+    if fig_info is not None:
+        top_inch += (0.0 if one_column else 0.2) + 0.15 * (min(5, len(fig_info)) - 1)
 
-        axx_arr = ()
-        for ii in range(n_panel):
-            axx = self.fig.add_subplot(n_row, n_col, ii + 1)
+    fig = plt.figure(figsize=fig_size)
+    gs = GridSpec(
+        n_row,
+        n_col,
+        figure=fig,
+        bottom=bottom_inch / fig.get_figheight(),
+        top=1 - top_inch / fig.get_figheight(),
+        hspace=0.08 if sharex else None,
+        wspace=0.1 if sharey else None,
+    )
+    axx_arr = ()
+    ip = 0
+    for yy in range(n_row):
+        for xx in range(n_col):
+            if ip >= n_panel:
+                continue
+            axx = fig.add_subplot(gs[yy, xx])
+            axx.grid(which="major", color="#AAAAAA", linestyle="--")
             axx_arr += (axx,)
-
+            
             # decoration X-axis
             show_label = True
             if (
                 sharex
-                and ii < (n_row - 1) * n_col
+                and ip < (n_row - 1) * n_col
                 and not (
-                    (n_panel == 5 and ii == 2)
-                    or (n_panel == 7 and ii >= 4)
-                    or (n_panel == 8 and ii == 5)
+                    (n_panel == 5 and ip == 2)
+                    or (n_panel == 7 and ip >= 4)
+                    or (n_panel == 8 and ip == 5)
                 )
             ):
                 axx.set_xticklabels("")
@@ -264,12 +281,14 @@ class DrawMulti:
 
             # decoration Y-axis
             show_label = True
-            if sharey and ii % n_col:
+            if sharey and ip % n_col:
                 axx.set_yticklabels("")
                 show_label = False
 
             self.show_ylabel += (show_label,)
+            ip += 1
 
+        self.fig = fig
         self.axxs = np.array(axx_arr)
 
     # - Public Methods ---------------------------------
@@ -298,10 +317,6 @@ class DrawMulti:
             fontsize="xx-small",
             transform=self.axxs[ipanel].transAxes,
         )
-
-    def add_fig_info(self: DrawMulti, fig_info: FIGinfo) -> None:
-        """Add fig_info box to the figure."""
-        self._decoration["fig_info"] = fig_info
 
     def set_cset(self: DrawMulti, cname: str, cnum: int | None = None) -> None:
         """Use alternative color-set through which `draw_lplot` will cycle.
