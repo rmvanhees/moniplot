@@ -49,7 +49,7 @@ DEFAULT_CSET = "bright"
 
 FIG_SIZES_1COL = [(10, 3), (10, 5), (10, 7), (10, 9), (10, 11)]
 FIG_SIZES_NCOL = (
-    [(5, 4.5), (10, 4.5), (15, 4.5), (6.5, 5)] + 2 * [(10, 5)] + 3 * [(10, 7.5)]
+    [(8, 5.5), (10, 4.5), (15, 4.5), (8, 5.5)] + 2 * [(10, 5)] + 3 * [(10, 7.5)]
 )
 PANELS_NCOL = [(1, 1), (1, 2), (1, 3), (2, 2)] + 2 * [(2, 3)] + 3 * [(3, 3)]
 
@@ -345,15 +345,6 @@ class DrawMulti:
     def unset_cset(self: DrawMulti) -> None:
         """Set color set to its default."""
         self._cset = tol_rgba(DEFAULT_CSET)
-
-    def set_caption(self: DrawMulti, text: str) -> None:
-        """Add figure caption."""
-        self.fig.suptitle(
-            text,
-            fontsize="x-large" if self.fig.get_figheight() < 10 else "xx-large",
-            linespacing=2,
-            position=(0.5, 1 - 0.3 / self.fig.get_figheight()),
-        )
 
     def set_title(self: DrawMulti, title: str, ipanel: int | None = None) -> None:
         """Set title of the current panel."""
