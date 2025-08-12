@@ -256,6 +256,8 @@ class DrawMulti:
             wspace=0.1 if sharey else None,
         )
         fig.set_figheight(fig_size[1] + hght)
+
+        # create all panels
         axx_arr = ()
         ip = 0
         for yy in range(n_row):
@@ -291,8 +293,12 @@ class DrawMulti:
                 self.show_ylabel += (show_label,)
                 ip += 1
 
-            self.fig = fig
-            self.axxs = np.array(axx_arr)
+        # draw figinfo box
+        if fig_info is not None:
+            fig_info.draw(fig)
+
+        self.fig = fig
+        self.axxs = np.array(axx_arr)
 
     # - Public Methods ---------------------------------
     def close(self: DrawMulti) -> None:
