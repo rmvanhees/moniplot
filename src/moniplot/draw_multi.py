@@ -53,6 +53,7 @@ FIG_SIZES_NCOL = (
 )
 PANELS_NCOL = [(1, 1), (1, 2), (1, 3), (2, 2)] + 2 * [(2, 3)] + 3 * [(3, 3)]
 
+
 class HistKeys(TypedDict):
     """Define keyword arguments of method add_hist()."""
 
@@ -238,7 +239,7 @@ class DrawMulti:
         # calculate space at bottom and top in inches (at n_row=2)
         bottom_inch = 0.11 * (5 if one_column else 3)
         top_inch = 0.12 * (5 if one_column else 3)
-        
+
         # make room for the figinfo box
         hght = 0
         if fig_info is not None:

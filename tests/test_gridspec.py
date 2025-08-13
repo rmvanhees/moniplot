@@ -1,10 +1,32 @@
+#
+# This file is part of Python package: `moniplot`
+#
+#     https://github.com/rmvanhees/moniplot.git
+#
+# Copyright (c) 2025 SRON
+#    All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+"""Check setting for subplots, used by class `DrawMulti`."""
+
+from __future__ import annotations
+
 import matplotlib.pyplot as plt
 import numpy as np
-
 from matplotlib.gridspec import GridSpec
 
 from moniplot.lib.fig_info import FIGinfo
-
 
 FIG_SIZES_1COL = [(10, 3), (10, 5), (10, 7), (10, 9), (10, 11)]
 FIG_SIZES_NCOL = (
@@ -20,7 +42,7 @@ def subplots(
     sharex: bool = False,
     sharey: bool = False,
     fig_info: FIGinfo | None = None,
-):
+) -> None:
     """Create the figure and a set of Axes."""
     if one_column:
         n_row = n_panel
@@ -33,7 +55,7 @@ def subplots(
     # calculate space at bottom and top in inches (at n_row=2)
     bottom_inch = 0.11 * (5 if one_column else 3)
     top_inch = 0.12 * (5 if one_column else 3)
-    
+
     # make room for the figinfo box
     hght = 0
     if fig_info is not None:
@@ -60,9 +82,9 @@ def subplots(
             axx = fig.add_subplot(gs[yy, xx])
             axx.grid(which="major", color="#AAAAAA", linestyle="--")
             axx_arr += (axx,)
-            
+
             # decoration X-axis
-            show_label = True
+            # show_label = True
             if (
                 sharex
                 and ip < (n_row - 1) * n_col
@@ -73,15 +95,15 @@ def subplots(
                 )
             ):
                 axx.set_xticklabels("")
-                show_label = False
+                # show_label = False
 
             # self.show_xlabel += (show_label,)
 
             # decoration Y-axis
-            show_label = True
+            # show_label = True
             if sharey and ip % n_col:
                 axx.set_yticklabels("")
-                show_label = False
+                # show_label = False
 
             # self.show_ylabel += (show_label,)
             ip += 1
@@ -109,7 +131,6 @@ def test_grid11() -> None:
     plt.show()
 
 
-
 def test_grid02() -> None:
     """..."""
     for ii in range(1, 6):
@@ -127,6 +148,7 @@ def test_grid12() -> None:
         fig.suptitle(f"GridSpec (n={ii}, one_column, sharex)")
     plt.show()
 
+
 def test_grid03() -> None:
     """..."""
     fig_info = FIGinfo()
@@ -135,6 +157,7 @@ def test_grid03() -> None:
         fig, axxs = subplots(2, fig_info=fig_info)
         fig.suptitle(f"GridSpec (n=2, one_column, fig_info[{ii}])")
     plt.show()
+
 
 def test_grid13() -> None:
     """..."""
@@ -148,11 +171,11 @@ def test_grid13() -> None:
 
 def tests() -> None:
     """..."""
-    #test_grid01()
-    #test_grid11()
-    #test_grid02()
-    #test_grid12()
-    #test_grid03()
+    # test_grid01()
+    # test_grid11()
+    # test_grid02()
+    # test_grid12()
+    # test_grid03()
     test_grid13()
 
 

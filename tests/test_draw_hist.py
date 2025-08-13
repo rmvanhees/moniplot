@@ -36,9 +36,7 @@ def main(n_panel: int = 1) -> None:
     fig, axx = plt.subplots(n_panel, sharey="all", figsize=(9, 8))
     for ii in range(n_panel):
         plot = DrawHist(rng.normal(mu, sigma, 1000), clip=[-0.4, 0.4], bins=40)
-        plot.draw(
-            axx[ii], title=f"Figure {ii + 1}", xticks_visible=ii+1 == n_panel
-        )
+        plot.draw(axx[ii], title=f"Figure {ii + 1}", xticks_visible=ii + 1 == n_panel)
     plt.show()
 
 
