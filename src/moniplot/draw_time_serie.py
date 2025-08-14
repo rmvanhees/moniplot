@@ -105,7 +105,7 @@ class DrawTimeSerie:
         y_in_bins = res[3]
 
         # calculate percentiles per date-bin
-        self.x_perc = np.append(res[0], res[0][-1] + ONE_DAY)
+        self.x_perc = np.append(res[0], res[0][-1] + bin_size)
         self.y_perc = np.full((len(percentiles), self.x_perc.size), np.nan)
         for ii, ybuff in enumerate(y_in_bins):
             if ybuff.size >= min_in_bins:
