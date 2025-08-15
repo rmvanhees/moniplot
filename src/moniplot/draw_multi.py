@@ -49,7 +49,7 @@ DEFAULT_CSET = "bright"
 
 FIG_SIZES_1COL = [(10, 3), (10, 5), (10, 7), (10, 9), (10, 11)]
 FIG_SIZES_NCOL = (
-    [(8, 5.5), (10, 4.5), (15, 4.5), (8, 5.5)] + 2 * [(10, 5)] + 3 * [(10, 7.5)]
+    [(8, 5.5), (10, 4.5), (15, 4.5), (8, 5.5)] + 2 * [(10, 6.5)] + 3 * [(10, 7.5)]
 )
 PANELS_NCOL = [(1, 1), (1, 2), (1, 3), (2, 2)] + 2 * [(2, 3)] + 3 * [(3, 3)]
 
@@ -237,7 +237,7 @@ class DrawMulti:
             fig_size = FIG_SIZES_NCOL[n_panel - 1]
 
         # calculate space at bottom and top in inches (at n_row=2)
-        bottom_inch = 0.11 * (5 if one_column else 3)
+        bottom_inch = 0.11 * (5 if one_column else 3.5)
         top_inch = 0.12 * (5 if one_column else 3)
 
         # make room for the figinfo box
