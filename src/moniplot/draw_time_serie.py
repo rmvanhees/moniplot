@@ -68,7 +68,7 @@ class DrawTimeSerie:
     percentiles :  tuple[int, ...], optional
        Sequence of pairs of percentages for the percentiles to compute.
        Values must be between 0 and 100 inclusive, excluding 50.
-       The median will always be determined.
+       The median will always be shown by the Matplotlib step-function.
 
     Examples
     --------
@@ -98,8 +98,8 @@ class DrawTimeSerie:
         )
         # (x_avg, y_avg) contain the timestamps and median of the input data
         # which are shown using the matplotlib step-function.
-        self.x_avg = res[0]
-        self.y_avg = res[1]
+        self.x_avg = np.append(res[0], res[0][-1] + bin_size)
+        self.y_avg = np.append(res[1], res[1][-1])
         if percentiles is None:
             return
         y_in_bins = res[3]
