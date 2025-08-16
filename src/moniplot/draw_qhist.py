@@ -32,9 +32,9 @@ from matplotlib.patches import Rectangle
 from matplotlib.ticker import AutoMinorLocator
 
 if TYPE_CHECKING:
-    import xarray as xr
     from matplotlib.axes import Axes
     from matplotlib.figure import Figure
+    from pyxarr import Dataset
 
 # - global variables -------------------------------
 DEFAULT_CSET = "bright"
@@ -56,7 +56,7 @@ class DrawQhist:
     >>> report = MONplot("test_monplot.pdf", "This is an example figure")
     >>> report.set_institute("SRON")
     >>> plot = DrawQhist()
-    >>> fig, axarr = plot.subplots(len(xds.data_vars))
+    >>> fig, axarr = plot.subplots(len(xds))
     >>> plot.draw(axarr, xds)
     >>> report.add_copyright(axx[-1])
     >>> report.close_this_page(fig, fig_info)
@@ -89,7 +89,7 @@ class DrawQhist:
     def draw(
         self: DrawQhist,
         axarr: list[Axes],
-        qxds: xr.Dataset,
+        qxds: Dataset,
         *,
         density: bool = True,
         title: str | None = None,
@@ -100,7 +100,7 @@ class DrawQhist:
         ----------
         axarr :  list[matplotlib.Axes]
            Matplotlib Axes object of plot window
-        qxds :  xr.Dataset
+        qxds :  pyxarr.Dataset
            Object holding pixel-quality data and attributes
         density :  bool, default=True
            See method MONplot::draw_qhist for a description
@@ -113,7 +113,7 @@ class DrawQhist:
             title = "Histograms of pixel-quality"
         axarr[0].set_title(title)
 
-        for axx, key in zip(axarr, qxds.data_vars, strict=True):
+        for axx, key in zip(axarr, qxds, strict=True):
             qdata = qxds[key].values.flatten()
             qdata[np.isnan(qdata)] = 0.0
 

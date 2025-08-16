@@ -27,7 +27,6 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Topic :: Scientific/Engineering :: Atmospheric Science",
-  "Topic :: Scientific/Engineering :: Image Processing",
   "Topic :: Scientific/Engineering :: Visualization"
 ]
 dynamic = [
@@ -38,7 +37,7 @@ dependencies = [
   "matplotlib>=3.7",
   "Cartopy>0.21",
   "numpy>=1.25",
-  "xarray>=2023.3",
+  "pyxarr>=0.2",
   'tomli>=1; python_version < "3.11"',
   'typing-extensions; python_version < "3.11"',
 ]
