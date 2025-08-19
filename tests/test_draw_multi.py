@@ -29,7 +29,7 @@ from moniplot.draw_multi import DrawMulti
 from moniplot.mon_plot import MONplot
 
 
-def main(n_panel: int = 1) -> None:
+def test_hist(n_panel: int = 1) -> None:
     """..."""
     mu, sigma = 0, 0.1  # mean and standard deviation
     rng = np.random.default_rng()
@@ -68,25 +68,29 @@ def main(n_panel: int = 1) -> None:
         plot.set_xlim(-0.425, 0.425)
     plt.show()
 
+
+def test_lines(n_panel: int = 5, one_column: bool = True) -> None:
+    """..."""
     report = MONplot("multi_line.pdf")
-    with DrawMulti(n_panel, sharex=True, sharey=True) as plot:
+    with DrawMulti(n_panel, one_column=one_column, sharex=True, sharey=True) as plot:
         xdata = np.arange(128)
         ydata = np.sin(xdata / np.pi)
         for ii in range(n_panel):
             plot.add_line(ii, xdata, ydata, marker="+", ls="--")
             plot.add_line(ii, xdata + 1.5, ydata, marker="x", ls="--")
             plot.add_line(ii, xdata - 1.5, ydata, marker="o", ls="--")
-            plot.set_xlabel("time", ipanel=ii)
-            plot.set_ylabel("value", ipanel=ii)
-            plot.draw(ii)
+            plot.set_title(f"figure [{ii + 1}]", ipanel=ii)
+            plot.set_ylabel(f"value[{ii}]", ipanel=ii)
+        plot.end_line(ii)
+        plot.set_xlabel("time")
         # plot.set_xlim(-0.5, 0.5)
         # plot.set_ylim(0, 120)
-        plot.add_caption(f"This is a Figure of {n_panel} line-plots")
         plot.add_copyright(-1)
-        # fig_info.draw(plot.fig)
-    report.close_this_page(plt.figure)
+        plot.fig.suptitle(f"This is a Figure of {n_panel} line-plots")
+    report.close_this_page(plot.fig)
     report.close()
 
 
 if __name__ == "__main__":
-    main(5)
+    test_hist(5)
+    test_lines(5)

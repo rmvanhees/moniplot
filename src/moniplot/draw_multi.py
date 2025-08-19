@@ -49,7 +49,7 @@ DEFAULT_CSET = "bright"
 
 FIG_SIZES_1COL = [(10, 3), (10, 5), (10, 7), (10, 9), (10, 11)]
 FIG_SIZES_NCOL = (
-    [(8, 5.5), (10, 4.5), (15, 4.5), (8, 5.5)] + 2 * [(10, 6.5)] + 3 * [(10, 7.5)]
+    [(8, 5.5), (10, 4.5), (15, 4.5), (8, 6.5)] + 2 * [(10, 6.5)] + 3 * [(10, 8.5)]
 )
 PANELS_NCOL = [(1, 1), (1, 2), (1, 3), (2, 2)] + 2 * [(2, 3)] + 3 * [(3, 3)]
 
@@ -63,6 +63,7 @@ class HistKeys(TypedDict):
     density: NotRequired[bool]
 
 
+# pylint: disable=too-many-arguments
 class DrawKeys(TypedDict):
     """Define keyword arguments of DrawMulti.draw()."""
 
@@ -100,6 +101,10 @@ class DrawMulti:
         fig_info: FIGinfo | None = None,
     ) -> None:
         """Create DrawMuli object."""
+        max_panel = 5 if one_column else 9
+        if not 1 <= n_panel <= max_panel:
+            raise ValueError(f"value out of range: 1 <= n_panel <= {max_panel}")
+
         self._cset = tol_rgba(DEFAULT_CSET)
         self._decoration = {
             "mode": [],
@@ -116,9 +121,6 @@ class DrawMulti:
         self.show_xlabel = ()
         self.show_ylabel = ()
         self.time_axis = False
-
-        if not 1 <= n_panel <= 9:
-            raise ValueError("value out of range: 1 <= n_panel <= 9")
 
         self.__subplots__(n_panel, one_column, sharex, sharey, fig_info)
 
@@ -142,7 +144,7 @@ class DrawMulti:
 
             # add an title to each panel
             if self._decoration["title"][ii] is not None:
-                if self._decoration["sharex"]:
+                if len(self.axxs) > 1:
                     axx.set_title(
                         self._decoration["title"][ii],
                         loc="right",
@@ -187,6 +189,7 @@ class DrawMulti:
             ]
         self._decoration["ylim"] = ylim
 
+    # pylint: disable=too-many-positional-arguments
     def __subplots__(
         self: DrawMulti,
         n_panel: int,
@@ -237,7 +240,7 @@ class DrawMulti:
             fig_size = FIG_SIZES_NCOL[n_panel - 1]
 
         # calculate space at bottom and top in inches (at n_row=2)
-        bottom_inch = 0.11 * (5 if one_column else 3.5)
+        bottom_inch = 0.12 * (5 if one_column else 3.5)
         top_inch = 0.12 * (5 if one_column else 3)
 
         # make room for the figinfo box
@@ -274,10 +277,13 @@ class DrawMulti:
                 if (
                     sharex
                     and ip < (n_row - 1) * n_col
-                    and not (
-                        (n_panel == 5 and ip == 2)
-                        or (n_panel == 7 and ip >= 4)
-                        or (n_panel == 8 and ip == 5)
+                    and (
+                        one_column
+                        or not (
+                            (n_panel == 5 and ip == 2)
+                            or (n_panel == 7 and ip >= 4)
+                            or (n_panel == 8 and ip == 5)
+                        )
                     )
                 ):
                     axx.set_xticklabels("")
