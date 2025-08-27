@@ -55,6 +55,7 @@ class DrawDetGen:
         side_panels: bool = True,
     ) -> None:
         """Initialize class DrawDetGen."""
+        self.fig = None
         self._cmap = tol_cmap("rainbow_PuRd")
         self._cset = tol_cset("bright")
         self._znorm = None
@@ -133,7 +134,7 @@ class DrawDetGen:
         else:
             mosaic = [["caption", ".", "info"], ["image", "colorbar", "."]]
 
-        _, axx = plt.subplot_mosaic(
+        self.fig, axx = plt.subplot_mosaic(
             mosaic,
             width_ratios=width_ratios,
             height_ratios=height_ratios,
@@ -199,21 +200,21 @@ class DrawDetGen:
         return min(4, max(1, round(self._image.shape[1] / self._image.shape[0])))
 
     def set_caption(self: DrawDetGen, caption: str) -> None:
-        """Add caption as a subtitle."""
-        self._axx["caption"].text(
-            0.5,
-            3.5,
-            caption,
-            fontsize="xx-large",
-            horizontalalignment="center",
-            verticalalignment="top",
-            transform=self._axx["caption"].transAxes,
-        )
-        # plt.figure.subtitle(
+        """Add caption as a suptitle."""
+        # self._axx["caption"].text(
+        #    0.5,
+        #    3.5,
         #    caption,
-        #    fontsize="x-large",
-        #    position=(0.5, 1 - 0.3 / plt.figure.get_figheight())
+        #    fontsize="xx-large",
+        #    horizontalalignment="center",
+        #    verticalalignment="top",
+        #    transform=self._axx["caption"].transAxes,
         # )
+        self.fig.suptitle(
+            caption,
+            fontsize="x-large",
+            position=(0.5, 1 - 0.3 / self.fig.get_figheight()),
+        )
 
     def set_title(self: DrawDetGen, title: str | None = None) -> None:
         """Add title above the image panel."""
