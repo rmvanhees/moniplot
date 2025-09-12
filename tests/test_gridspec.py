@@ -118,7 +118,7 @@ def subplots(
 def test_grid01() -> None:
     """..."""
     for ii in range(1, 10):
-        fig, axxs = subplots(ii)
+        fig, _ = subplots(ii)
         fig.suptitle(f"GridSpec (n={ii})")
     plt.show()
 
@@ -126,7 +126,7 @@ def test_grid01() -> None:
 def test_grid11() -> None:
     """..."""
     for ii in range(1, 10):
-        fig, axxs = subplots(ii, sharex=True, sharey=True)
+        fig, _ = subplots(ii, sharex=True, sharey=True)
         fig.suptitle(f"GridSpec (n={ii}), sharex, sharey")
     plt.show()
 
@@ -134,9 +134,9 @@ def test_grid11() -> None:
 def test_grid02() -> None:
     """..."""
     for ii in range(1, 6):
-        fig, axxs = subplots(ii, one_column=True)
+        fig, _ = subplots(ii, one_column=True)
         fig.suptitle(f"GridSpec (n={ii}, one_column)")
-    fig, axxs = subplots(3, one_column=True, sharex=True)
+    fig, _ = subplots(3, one_column=True, sharex=True)
     fig.suptitle(f"GridSpec (n={ii}, one_column, sharex)")
     plt.show()
 
@@ -144,7 +144,7 @@ def test_grid02() -> None:
 def test_grid12() -> None:
     """..."""
     for ii in range(1, 6):
-        fig, axxs = subplots(ii, one_column=True, sharex=True)
+        fig, _ = subplots(ii, one_column=True, sharex=True)
         fig.suptitle(f"GridSpec (n={ii}, one_column, sharex)")
     plt.show()
 
@@ -154,7 +154,7 @@ def test_grid03() -> None:
     fig_info = FIGinfo()
     for ii in range(1, 7):
         fig_info.add(f"line_{ii:02d}", "dit is een tekst")
-        fig, axxs = subplots(2, fig_info=fig_info)
+        fig, _ = subplots(2, fig_info=fig_info)
         fig.suptitle(f"GridSpec (n=2, one_column, fig_info[{ii}])")
     plt.show()
 
@@ -164,7 +164,7 @@ def test_grid13() -> None:
     fig_info = FIGinfo()
     for ii in range(1, 7):
         fig_info.add(f"line_{ii:02d}", "dit is een tekst")
-        fig, axxs = subplots(2, one_column=True, fig_info=fig_info)
+        fig, _ = subplots(2, one_column=True, fig_info=fig_info)
         fig.suptitle(f"GridSpec (n=2, one_column, fig_info[{ii}])")
     plt.show()
 

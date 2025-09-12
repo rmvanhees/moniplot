@@ -33,7 +33,7 @@ def main(n_panel: int = 1) -> None:
     mu, sigma = 0, 0.1  # mean and standard deviation
     rng = np.random.default_rng()
 
-    fig, axx = plt.subplots(n_panel, sharey="all", figsize=(9, 8))
+    _, axx = plt.subplots(n_panel, sharey="all", figsize=(9, 8))
     for ii in range(n_panel):
         plot = DrawHist(rng.normal(mu, sigma, 1000), clip=[-0.4, 0.4], bins=40)
         plot.draw(axx[ii], title=f"Figure {ii + 1}", xticks_visible=ii + 1 == n_panel)
