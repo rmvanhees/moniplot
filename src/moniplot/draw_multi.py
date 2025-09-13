@@ -568,13 +568,14 @@ class DrawMulti:
 
         # format the X-axis when it is a time-axis
         if self.time_axis:
-            if abs(self.xdata[-1] - self.xdata[0]) <= np.timedelta64(1, "D"):
-                plt.gcf().autofmt_xdate()
-                axx.xaxis.set_major_formatter(DateFormatter("%H:%M:%S"))
-            else:
-                locator = AutoDateLocator()
-                axx.xaxis.set_major_locator(locator)
-                axx.xaxis.set_major_formatter(ConciseDateFormatter(locator))
+            print(axx.get_xlim())
+            # if np.diff(axx.get_xlim()) <= np.timedelta64(1, "D"):
+            #    plt.gcf().autofmt_xdate()
+            #    axx.xaxis.set_major_formatter(DateFormatter("%H:%M:%S"))
+            # else:
+            #    locator = AutoDateLocator()
+            #    axx.xaxis.set_major_locator(locator)
+            #    axx.xaxis.set_major_formatter(ConciseDateFormatter(locator))
 
         # draw legenda in figure
         if axx.get_legend_handles_labels()[1]:
