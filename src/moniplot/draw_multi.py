@@ -516,7 +516,10 @@ class DrawMulti:
         """
         if len(self._decoration["mode"]) == ipanel:
             self._decoration["mode"].append("LPLOT")
-        if isinstance(xdata[0], dt.date | dt.time | dt.datetime):
+        if isinstance(xdata, np.ndarray):
+            if np.issubdtype(xdata.dtype, np.datetime64):
+                self.time_axis = True
+        elif isinstance(xdata[0], dt.date | dt.time | dt.datetime):
             xdata = np.asarray(xdata, dtype="datetime64")
             self.time_axis = True
 
@@ -615,7 +618,10 @@ class DrawMulti:
 
         """
         self._decoration["mode"].append("YPERC")
-        if isinstance(xdata[0], dt.date | dt.time | dt.datetime):
+        if isinstance(xdata, np.ndarray):
+            if np.issubdtype(xdata.dtype, np.datetime64):
+                self.time_axis = True
+        elif isinstance(xdata[0], dt.date | dt.time | dt.datetime):
             xdata = np.asarray(xdata, dtype="datetime64")
             self.time_axis = True
 
