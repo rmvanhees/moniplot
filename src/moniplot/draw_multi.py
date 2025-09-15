@@ -29,11 +29,6 @@ from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, Unpack
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.dates import (
-    AutoDateLocator,
-    ConciseDateFormatter,
-    DateFormatter,
-)
 from matplotlib.gridspec import GridSpec
 from pyxarr import DataArray
 
@@ -120,7 +115,6 @@ class DrawMulti:
         self.axxs = None
         self.show_xlabel = ()
         self.show_ylabel = ()
-        self.time_axis = False
 
         self.__subplots__(n_panel, one_column, sharex, sharey, fig_info)
 
@@ -516,12 +510,8 @@ class DrawMulti:
         """
         if len(self._decoration["mode"]) == ipanel:
             self._decoration["mode"].append("LPLOT")
-        if isinstance(xdata, np.ndarray):
-            if np.issubdtype(xdata.dtype, np.datetime64):
-                self.time_axis = True
-        elif isinstance(xdata[0], dt.date | dt.time | dt.datetime):
+        if isinstance(xdata[0], dt.date | dt.time | dt.datetime):
             xdata = np.asarray(xdata, dtype="datetime64")
-            self.time_axis = True
 
         self._xlim_update_(xdata)
         self._ylim_update_(ydata)
@@ -566,17 +556,6 @@ class DrawMulti:
         if "yscale" in kwargs:
             axx.set_yscale(kwargs["yscale"])
 
-        # format the X-axis when it is a time-axis
-        if self.time_axis:
-            print(axx.get_xlim())
-            # if np.diff(axx.get_xlim()) <= np.timedelta64(1, "D"):
-            #    plt.gcf().autofmt_xdate()
-            #    axx.xaxis.set_major_formatter(DateFormatter("%H:%M:%S"))
-            # else:
-            #    locator = AutoDateLocator()
-            #    axx.xaxis.set_major_locator(locator)
-            #    axx.xaxis.set_major_formatter(ConciseDateFormatter(locator))
-
         # draw legenda in figure
         if axx.get_legend_handles_labels()[1]:
             kwlegend = kwargs.get("kwlegend", {"fontsize": "small", "loc": "best"})
@@ -619,12 +598,8 @@ class DrawMulti:
 
         """
         self._decoration["mode"].append("YPERC")
-        if isinstance(xdata, np.ndarray):
-            if np.issubdtype(xdata.dtype, np.datetime64):
-                self.time_axis = True
-        elif isinstance(xdata[0], dt.date | dt.time | dt.datetime):
+        if isinstance(xdata[0], dt.date | dt.time | dt.datetime):
             xdata = np.asarray(xdata, dtype="datetime64")
-            self.time_axis = True
 
         # check percentiles
         if percentiles is None:
