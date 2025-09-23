@@ -377,7 +377,7 @@ class DrawDetImage(DrawDetGen):
             vmin, vmax = vrange
 
         # optimize data-range accordig to vmin and vmax
-        dscale = self.set_zunit(self._attrs["units"], vmin, vmax)
+        dscale = self.__set_zunit__(self._attrs["units"], vmin, vmax)
         if dscale != 1:
             vmin /= dscale
             vmax /= dscale
@@ -401,24 +401,9 @@ class DrawDetImage(DrawDetGen):
             self._zlabel += f" [{self._attrs['units']}]"
 
         # set matplotlib data normalization
-        self._znorm = self.set_norm(vmin, vmax)
+        self._znorm = self.__set_norm__(vmin, vmax)
 
-    def set_cmap(self: DrawDetImage, cname: str, reverse: bool = False) -> None:
-        """Set data-range normalization for matplotlib.
-
-        Parameters
-        ----------
-        cname :  str
-            Name of the colormap (tol_colors or matplotlib)
-        reverse :  bool, default=False
-            Reverse colors of the colormap
-
-        """
-        self._cmap = tol_cmap(cname) if cname in tol_cmap() else colormaps[cname]
-        if reverse:
-            self._cmap = self._cmap.reversed()
-
-    def set_norm(self: DrawDetImage, vmin: float, vmax: float) -> mcolors:
+    def __set_norm__(self: DrawDetImage, vmin: float, vmax: float) -> mcolors:
         """Set data-range normalization for matplotlib.
 
         Parameters
@@ -450,6 +435,9 @@ class DrawDetImage(DrawDetGen):
                 vmax = max(-tmp1, tmp2)
             else:
                 vcntr = (vmin + vmax) / 2
+                self._cmap = (
+                    tol_cmap("YlOrBr") if vcntr > 0 else tol_cmap("YlOrBr").reversed()
+                )
             return mcolors.TwoSlopeNorm(vcntr, vmin=vmin, vmax=vmax)
 
         if self._zscale == "ratio":
@@ -464,7 +452,7 @@ class DrawDetImage(DrawDetGen):
 
         return mcolors.Normalize(vmin=vmin, vmax=vmax)
 
-    def set_zunit(self: DrawDetImage, zunits: str, vmin: float, vmax: float) -> int:
+    def __set_zunit__(self: DrawDetImage, zunits: str, vmin: float, vmax: float) -> int:
         """Adjust data units given the data range.
 
         Units which are renamed: electron to `e` and Volt to `V`
@@ -516,6 +504,21 @@ class DrawDetImage(DrawDetGen):
 
         self._attrs["units"] = zunits
         return 1
+
+    def set_cmap(self: DrawDetImage, cname: str, reverse: bool = False) -> None:
+        """Set data-range normalization for matplotlib.
+
+        Parameters
+        ----------
+        cname :  str
+            Name of the colormap (tol_colors or matplotlib)
+        reverse :  bool, default=False
+            Reverse colors of the colormap
+
+        """
+        self._cmap = tol_cmap(cname) if cname in tol_cmap() else colormaps[cname]
+        if reverse:
+            self._cmap = self._cmap.reversed()
 
     def add_fig_info(self: DrawDetGen, fig_info: FIGinfo | None = None) -> None:
         """Add fig_info box to the figure.
