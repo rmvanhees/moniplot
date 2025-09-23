@@ -234,7 +234,7 @@ class DrawDetGen:
         ----------
         side_panels :  str, default='nanmedian'
            Show image row and column statistics in two side panels.
-           Valid values are: 'median', 'nanmedian', 'mean', 'nanmean',
+           Valid values are: 'median', 'nanmedian', 'mean', 'nanmean', 'sum', 'nansum',
            'quality', 'std' and 'nanstd'.
 
         """
@@ -558,12 +558,16 @@ class DrawDetImage(DrawDetGen):
                 func_panels = np.nanmean
             case "nanstd":
                 func_panels = np.nanstd
+            case "nansum":
+                func_panels = np.nansum
             case "median":
                 func_panels = np.median
             case "mean":
                 func_panels = np.mean
             case "std":
                 func_panels = np.std
+            case "sum":
+                func_panels = np.sum
             case _:
                 raise ValueError(f"unknown function for side_panels: {side_panels}")
 
