@@ -46,6 +46,46 @@ def test(delta: float = 0.025) -> None:
 
     plt.show()
 
+    with DrawDetImage(zz, side_panels=True) as plot:
+        plot.set_cmap("YlOrBr")
+        plot.set_caption("This is a test figure")
+        plot.set_title("simple bivariate normal distribution")
+        plot.add_side_panels()
+        plot.add_fig_info()
+        plot.add_copyright()
+
+    plt.show()
+
+    with DrawDetImage(zz, side_panels=True) as plot:
+        plot.set_cmap("YlOrBr", reverse=True)
+        plot.set_caption("This is a test figure")
+        plot.set_title("simple bivariate normal distribution")
+        plot.add_side_panels()
+        plot.add_fig_info()
+        plot.add_copyright()
+
+    plt.show()
+
+    with DrawDetImage(zz, side_panels=True) as plot:
+        plot.set_cmap("PuBu")
+        plot.set_caption("This is a test figure")
+        plot.set_title("simple bivariate normal distribution")
+        plot.add_side_panels()
+        plot.add_fig_info()
+        plot.add_copyright()
+
+    plt.show()
+
+    with DrawDetImage(zz, side_panels=True) as plot:
+        plot.set_cmap("PuBu", reverse=True)
+        plot.set_caption("This is a test figure")
+        plot.set_title("simple bivariate normal distribution")
+        plot.add_side_panels()
+        plot.add_fig_info()
+        plot.add_copyright()
+
+    plt.show()
+
 
 def qtest(delta: float = 0.025) -> None:
     """..."""

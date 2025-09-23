@@ -31,6 +31,7 @@ from typing import TYPE_CHECKING, Self
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import colormaps
 from matplotlib.ticker import AutoMinorLocator
 
 from moniplot.biweight import Biweight
@@ -401,6 +402,21 @@ class DrawDetImage(DrawDetGen):
 
         # set matplotlib data normalization
         self._znorm = self.set_norm(vmin, vmax)
+
+    def set_cmap(self: DrawDetImage, cname: str, reverse: bool = False) -> None:
+        """Set data-range normalization for matplotlib.
+
+        Parameters
+        ----------
+        cname :  str
+            Name of the colormap (tol_colors or matplotlib)
+        reverse :  bool, default=False
+            Reverse colors of the colormap
+
+        """
+        self._cmap = tol_cmap(cname) if cname in tol_cmap() else colormaps[cname]
+        if reverse:
+            self._cmap = self._cmap.reversed()
 
     def set_norm(self: DrawDetImage, vmin: float, vmax: float) -> mcolors:
         """Set data-range normalization for matplotlib.
