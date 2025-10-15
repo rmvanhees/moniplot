@@ -44,7 +44,7 @@ DEFAULT_CSET = "bright"
 
 FIG_SIZES_1COL = [(10, 3), (10, 5), (10, 7), (10, 9), (10, 11)]
 FIG_SIZES_NCOL = (
-    [(8, 5.5), (10, 4.5), (15, 4.5), (8, 6.5)] + 2 * [(10, 6.5)] + 3 * [(10, 8.5)]
+    [(8, 5.5), (10, 4.5), (15, 4.5), (12, 10)] + 2 * [(10, 6.5)] + 3 * [(10, 8.5)]
 )
 PANELS_NCOL = [(1, 1), (1, 2), (1, 3), (2, 2)] + 2 * [(2, 3)] + 3 * [(3, 3)]
 
@@ -237,11 +237,11 @@ class DrawMulti:
         bottom_inch = 0.12 * (5 if one_column else 3.5)
         top_inch = 0.12 * (5 if one_column else 3)
 
-        # make room for the figinfo box
-        hght = 0
-        if fig_info is not None:
-            hght = (0.0 if one_column else 0.2) + 0.15 * (min(5, len(fig_info)) - 1)
-            top_inch += hght
+        # make room for the caption and figinfo box
+        hght = (0.0 if one_column else 0.2) + 0.15 * (
+            min(5, (1 if fig_info is None else len(fig_info)) - 1)
+        )
+        top_inch += hght
 
         fig = plt.figure(figsize=fig_size)
         gs = GridSpec(
