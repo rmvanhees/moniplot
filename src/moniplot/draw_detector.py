@@ -61,7 +61,7 @@ class DrawDetGen:
         self._cset = tol_cset("bright")
         self._znorm = None
         self._attrs = (
-            attrs
+            attrs.copy()
             if attrs is not None
             else {
                 "long_name": "",
@@ -381,7 +381,7 @@ class DrawDetImage(DrawDetGen):
         if dscale != 1:
             vmin /= dscale
             vmax /= dscale
-            self._image /= dscale
+            self._image = self._image / dscale
 
         # set data-label and matplotlib colormap
         match self._zscale:
