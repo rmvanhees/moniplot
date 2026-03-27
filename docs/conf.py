@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.abspath("../src"))
 # -- Project information -----------------------------------------------------
 
 project = "moniplot"
-copyright = "2022, SRON"
+Copyright = "2022, SRON"
 author = "Richard van Hees"
 
 # The full version, including alpha/beta/rc tags
