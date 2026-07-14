@@ -379,15 +379,15 @@ class DrawTrend:
 
         # define xdata and determine gap_list (always at least one element!)
         isel = np.s_[:]
-        if "orbit" in xarr.coords:
-            xdata = xarr.coords["orbit"].values
+        if "orbit" in xarr.get_coords:
+            xdata = xarr.get_coords["orbit"].values
             gap_list = self.get_gap_list(xdata)
-        elif "hours" in xarr.coords:
-            xdata = xarr.coords["hours"].values
+        elif "hours" in xarr.get_coords:
+            xdata = xarr.get_coords["hours"].values
             isel = np.s_[0, :]
             gap_list = self.get_gap_list(np.round(3600 * xdata).astype(int))
         else:
-            xdata = xarr.coords["time"].values
+            xdata = xarr.get_coords["time"].values
             gap_list = self.get_gap_list(xdata)
         gap_list += (xdata.size - 1,)
 
@@ -436,10 +436,10 @@ class DrawTrend:
             ii = jj + 1
 
         # adjust data X-coordinate
-        if "hours" in xarr.coords:
+        if "hours" in xarr.get_coords:
             axx.xaxis.set_major_locator(MultipleLocator(3))
             axx.xaxis.set_minor_locator(MultipleLocator(1))
-        elif "time" in xarr.coords:
+        elif "time" in xarr.get_coords:
             locator = AutoDateLocator()
             axx.xaxis.set_major_locator(locator)
             axx.xaxis.set_major_formatter(ConciseDateFormatter(locator))
@@ -449,7 +449,7 @@ class DrawTrend:
 
         # adjust data X-coordinate
         axx.locator_params(axis="y", nbins=5)
-        if "orbit" in xarr.coords:
+        if "orbit" in xarr.get_coords:
             axx.set_ylim(*self.adjust_ylim(avg, err1, err2, None, -1))
 
         axx.set_ylabel(deco_fig.ylabel)
@@ -490,18 +490,18 @@ class DrawTrend:
 
         # define xdata and determine gap_list (always one element!)
         isel = np.s_[:]
-        if "time" in xarr.coords:
-            xdata = xarr.coords["time"].values
-            if "orbit" in xarr.coords:
-                gap_list = self.get_gap_list(xarr.coords["orbit"].values)
+        if "time" in xarr.get_coords:
+            xdata = xarr.get_coords["time"].values
+            if "orbit" in xarr.get_coords:
+                gap_list = self.get_gap_list(xarr.get_coords["orbit"].values)
             else:
                 gap_list = self.get_gap_list(xdata)
-        elif "hours" in xarr.coords:
-            xdata = xarr.coords["hours"].values
+        elif "hours" in xarr.get_coords:
+            xdata = xarr.get_coords["hours"].values
             isel = np.s_[0, :]
             gap_list = self.get_gap_list(np.round(3600 * xdata).astype(int))
         else:
-            xdata = xarr.coords["orbit"].values
+            xdata = xarr.get_coords["orbit"].values
             gap_list = self.get_gap_list(xdata)
 
         # check if we have any data to work with
@@ -545,10 +545,10 @@ class DrawTrend:
             ii = jj + 1
 
         # adjust data X-coordinate
-        if "hours" in xarr.coords:
+        if "hours" in xarr.get_coords:
             axx.xaxis.set_major_locator(MultipleLocator(3))
             axx.xaxis.set_minor_locator(MultipleLocator(1))
-        elif "time" in xarr.coords:
+        elif "time" in xarr.get_coords:
             locator = AutoDateLocator()
             axx.xaxis.set_major_locator(locator)
             axx.xaxis.set_major_formatter(ConciseDateFormatter(locator))
@@ -558,7 +558,7 @@ class DrawTrend:
 
         # adjust data Y-coordinate
         axx.locator_params(axis="y", nbins=4)
-        if "orbit" in xarr.coords:
+        if "orbit" in xarr.get_coords:
             axx.set_ylim(*self.adjust_ylim(avg, err1, err2, vperc, vrange_last_orbits))
         else:
             axx.set_ylim(*self.adjust_ylim(avg, err1, err2, vperc))
@@ -605,9 +605,9 @@ class DrawTrend:
 
         ylim = axx.get_ylim()
         for ni, nj in zip(poly_bgn, poly_end, strict=True):
-            tt0 = xarr.coords["time"].values[ni]
+            tt0 = xarr.get_coords["time"].values[ni]
             tt0 = (tt0 - np.datetime64("1970-01-01")) / np.timedelta64(1, "D")
-            tt1 = xarr.coords["time"].values[nj]
+            tt1 = xarr.get_coords["time"].values[nj]
             tt1 = (tt1 - np.datetime64("1970-01-01")) / np.timedelta64(1, "D")
             verts = [(tt0, ylim[0]), (tt0, ylim[1]), (tt1, ylim[1]), (tt1, ylim[0])]
             poly = Polygon(verts, facecolor=deco_fig.lcolor, edgecolor=None)
