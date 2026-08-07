@@ -46,7 +46,7 @@ class DrawQhist:
 
     Notes
     -----
-    When the input data is a xarray.DataArray then the attribute 'long_name'
+    When the input data is a pyxarr.DataArray then the attribute 'long_name'
     are used in the plot decoration.
 
     Examples
