@@ -3,7 +3,7 @@
 #
 #     https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2025 SRON
+# Copyright (c) 2025-2026 SRON
 #    All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -340,7 +340,7 @@ class DrawMulti:
 
         """
         if not isinstance(cname, str):
-            raise ValueError("The name of a color-set should be a string.")
+            raise TypeError("The name of a color-set should be a string.")
         self._cset = tol_rgba(cname, cnum)
 
     def unset_cset(self: DrawMulti) -> None:

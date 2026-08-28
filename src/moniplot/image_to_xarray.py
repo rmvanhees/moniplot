@@ -3,7 +3,7 @@
 #
 #     https://github.com/rmvanhees/moniplot.git
 #
-# Copyright (c) 2019-2025 SRON
+# Copyright (c) 2019-2026 SRON
 #    All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -117,7 +117,7 @@ def __get_coords(dset: h5py.Dataset, data_sel: tuple[slice | int]) -> list:
             for ii, dim in enumerate(dset.dims):
                 # get name of dimension
                 name = PurePath(dim[0].name).name
-                if name.startswith("row") or name.startswith("column"):
+                if name.startswith(("row", "column")):
                     name = name.split(" ")[0]
 
                 # determine coordinate
