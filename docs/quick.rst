@@ -39,7 +39,7 @@ Nearly all methods of :py:class:`MONplot` accept your data as a
 :py:class:`numpy.ndarray` or a :py:class:`xarray.DataArray`.
 The attributes and coordinates of the :py:class:`xarray.DataArray` are used as
 names for the axis in the figure and the attributes `long_name` and `units` is
-used in the data labels. 
+used in the data labels.
 
 Let's assume that you have your data of your 2-D detector stored in a
 :py:class:`xarray.DataArray` `xda` with coordinates `column` and `row`.

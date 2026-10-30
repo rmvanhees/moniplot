@@ -59,4 +59,3 @@ and wheels. Then you can install `moniplot` as follows::
 
   python3 -m build
   pip3 install dist/moniplot-<version>.whl [--user]
-
